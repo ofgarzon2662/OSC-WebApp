@@ -1,0 +1,80 @@
+name: Creation of PR from feature Branch to Develop
+on:
+  push:
+    branches:
+      - 'feature**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  tests:
+    name: Tests
+    if: ${{ contains(github.event.head_commit.message, 'DEPLOY') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to feature branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Merge Develop into feature branch
+        uses: tukasz/direct-merge-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          source-branch: develop
+          target-branch:  ${{ github.ref }}
+
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: |
+          ng test --no-watch --browsers=ChromeHeadless --code-coverage | tee test-output.txt
+          if grep -q "FAILED" test-output.txt; then
+            echo "Tests failed, aborting workflow."
+            exit 1
+          fi
+
+      - name: Check coverage for Statements, Lines, Branches, and Functions
+        run: |
+          STATEMENTS_COVERAGE=$(grep -Po 'Statements\s*:\s*\K\d+' test-output.txt)
+          LINES_COVERAGE=$(grep -Po 'Lines\s*:\s*\K\d+' test-output.txt)
+          BRANCHES_COVERAGE=$(grep -Po 'Branches\s*:\s*\K\d+' test-output.txt)
+          FUNCTIONS_COVERAGE=$(grep -Po 'Functions\s*:\s*\K\d+' test-output.txt)
+
+          echo "Statements coverage is $STATEMENTS_COVERAGE%, min required is 70%"
+          echo "Lines coverage is $LINES_COVERAGE%, min required is 70%"
+          echo "Branches coverage is $BRANCHES_COVERAGE%, min required is 70%"
+          echo "Functions coverage is $FUNCTIONS_COVERAGE%, min required is 70%"
+
+          if [ "$STATEMENTS_COVERAGE" -lt 70 ]; then
+            echo "Statements coverage is below 70%"
+            exit 1
+          fi
+
+          if [ "$LINES_COVERAGE" -lt 70 ]; then
+            echo "Lines coverage is below 70%"
+            exit 1
+          fi
+
+          if [ "$BRANCHES_COVERAGE" -lt 70 ]; then
+            echo "Branches coverage is below 70%"
+            exit 1
+          fi
+
+          if [ "$FUNCTIONS_COVERAGE" -lt 70 ]; then
+            echo "Functions coverage is below 70%"
+            exit 1
+          fi
+
+      - name: Coverage passed
+        run: echo "Coverage is sufficient!"
