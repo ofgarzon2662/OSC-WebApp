@@ -90,9 +90,3 @@ jobs:
           git checkout -b $BRANCH_NAME develop
           git push origin $BRANCH_NAME
 
-      - name: Create a PR to Master
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: ${{ env.BRANCH_NAME }}
-          body: ${{ github.event.head_commit.message }}
-          head: ${{ env.BRANCH_NAME }}
