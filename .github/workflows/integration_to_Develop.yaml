@@ -27,7 +27,6 @@ jobs:
           source-branch: develop
           target-branch:  ${{ github.ref }}
 
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -44,37 +43,42 @@ jobs:
             exit 1
           fi
 
-      - name: Check coverage for Statements, Lines, Branches, and Functions
+      - name: Extract and Validate Coverage for Statements, Lines, Branches, and Functions
         run: |
-          STATEMENTS_COVERAGE=$(grep -Po 'Statements\s*:\s*\K\d+' test-output.txt)
-          LINES_COVERAGE=$(grep -Po 'Lines\s*:\s*\K\d+' test-output.txt)
-          BRANCHES_COVERAGE=$(grep -Po 'Branches\s*:\s*\K\d+' test-output.txt)
-          FUNCTIONS_COVERAGE=$(grep -Po 'Functions\s*:\s*\K\d+' test-output.txt)
+          # Extract coverage values from the coverage summary
+          STATEMENTS_COVERAGE=$(grep -Po 'Statements\s*:\s*\K\d+(\.\d+)?' test-output.txt | awk '{print int($1)}')
+          LINES_COVERAGE=$(grep -Po 'Lines\s*:\s*\K\d+(\.\d+)?' test-output.txt | awk '{print int($1)}')
+          BRANCHES_COVERAGE=$(grep -Po 'Branches\s*:\s*\K\d+(\.\d+)?' test-output.txt | awk '{print int($1)}')
+          FUNCTIONS_COVERAGE=$(grep -Po 'Functions\s*:\s*\K\d+(\.\d+)?' test-output.txt | awk '{print int($1)}')
 
-          echo "Statements coverage is $STATEMENTS_COVERAGE%, min required is 70%"
-          echo "Lines coverage is $LINES_COVERAGE%, min required is 70%"
-          echo "Branches coverage is $BRANCHES_COVERAGE%, min required is 70%"
-          echo "Functions coverage is $FUNCTIONS_COVERAGE%, min required is 70%"
+          # Debug output for extracted values
+          echo "Extracted Coverage Percentages:"
+          echo "Statements: $STATEMENTS_COVERAGE%"
+          echo "Lines: $LINES_COVERAGE%"
+          echo "Branches: $BRANCHES_COVERAGE%"
+          echo "Functions: $FUNCTIONS_COVERAGE%"
 
-          if [ "$STATEMENTS_COVERAGE" -lt 70 ]; then
-            echo "Statements coverage is below 70%"
+          # Check if coverage meets the threshold (70%)
+          MIN_COVERAGE=70
+
+          if [ "$STATEMENTS_COVERAGE" -lt $MIN_COVERAGE ]; then
+            echo "❌ Statements coverage ($STATEMENTS_COVERAGE%) is below $MIN_COVERAGE%."
+            exit 1
+          fi
+          if [ "$LINES_COVERAGE" -lt $MIN_COVERAGE ]; then
+            echo "❌ Lines coverage ($LINES_COVERAGE%) is below $MIN_COVERAGE%."
+            exit 1
+          fi
+          if [ "$BRANCHES_COVERAGE" -lt $MIN_COVERAGE ]; then
+            echo "❌ Branches coverage ($BRANCHES_COVERAGE%) is below $MIN_COVERAGE%."
+            exit 1
+          fi
+          if [ "$FUNCTIONS_COVERAGE" -lt $MIN_COVERAGE ]; then
+            echo "❌ Functions coverage ($FUNCTIONS_COVERAGE%) is below $MIN_COVERAGE%."
             exit 1
           fi
 
-          if [ "$LINES_COVERAGE" -lt 70 ]; then
-            echo "Lines coverage is below 70%"
-            exit 1
-          fi
+          echo "✅ All coverage metrics meet the required threshold of $MIN_COVERAGE%!"
 
-          if [ "$BRANCHES_COVERAGE" -lt 70 ]; then
-            echo "Branches coverage is below 70%"
-            exit 1
-          fi
-
-          if [ "$FUNCTIONS_COVERAGE" -lt 70 ]; then
-            echo "Functions coverage is below 70%"
-            exit 1
-          fi
-
-      - name: Coverage passed
-        run: echo "Coverage is sufficient!"
+      - name: Coverage Passed
+        run: echo "✅ Coverage is sufficient!"
