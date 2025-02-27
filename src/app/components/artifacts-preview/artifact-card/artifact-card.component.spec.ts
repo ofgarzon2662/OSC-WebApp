@@ -3,7 +3,6 @@ import { ArtifactCardComponent } from './artifact-card.component';
 import { Artifact } from '../../../models/artifact.model';
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { DebugElement } from '@angular/core';
 
 describe('ArtifactCardComponent', () => {
   let component: ArtifactCardComponent;

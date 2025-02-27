@@ -38,3 +38,4 @@ jobs:
         with:
           args: >
             -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.cpd.exclusions=**/*.spec.ts
