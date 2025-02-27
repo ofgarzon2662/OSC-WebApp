@@ -12,4 +12,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class AppComponent {
   title = 'OSC-WebApp';
+  ngOnInit() {
+    console.log("AppComponent cargado"); // ⚠️ Si esto aparece dos veces en consola, hay un problema
+  }
 }

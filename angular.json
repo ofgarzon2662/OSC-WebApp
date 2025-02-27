@@ -57,6 +57,14 @@
             "outputPath": "dist/OSC-WebApp/server",
             "main": "src/main.server.ts",
             "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputPath": "dist/OSC-WebApp/server/production"
+            },
+            "development": {
+              "outputPath": "dist/OSC-WebApp/server/development"
+            }
           }
         },
         "serve": {
