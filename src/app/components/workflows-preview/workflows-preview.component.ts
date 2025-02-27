@@ -14,7 +14,7 @@ import { WorkflowService } from '../../services/workflow.service';
 export class WorkflowsPreviewComponent implements OnInit {
   workflows: Workflow[] = [];
 
-  constructor(private workflowService: WorkflowService) { }
+  constructor(private readonly workflowService: WorkflowService) { }
 
   ngOnInit(): void {
     this.workflowService.getWorkflows().subscribe(workflows => {

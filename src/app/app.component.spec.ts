@@ -62,10 +62,8 @@ describe('AppComponent', () => {
     expect(links.length).toBeGreaterThanOrEqual(2);
 
     // Usar forEach para construir el array de textos
-    const linkTexts: string[] = [];
-    links.forEach((link: HTMLAnchorElement) => {
-      linkTexts.push(link.textContent?.trim() || '');
-    });
+    const linkTexts = Array.from<Element, string>(links, (link) =>
+      (link as HTMLAnchorElement).textContent?.trim() ?? '');
 
     expect(linkTexts).toContain('Contribute');
     expect(linkTexts).toContain('Sign in');

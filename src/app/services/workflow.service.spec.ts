@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { WorkflowService } from './workflow.service';
-import { Workflow } from '../models/workflow.model';
 
 describe('WorkflowService', () => {
   let service: WorkflowService;

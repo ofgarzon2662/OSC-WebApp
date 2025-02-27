@@ -14,7 +14,7 @@ import { ArtifactService } from '../../services/artifact.service';
 export class ArtifactsPreviewComponent implements OnInit {
   artifacts: Artifact[] = [];
 
-  constructor(private artifactService: ArtifactService) { }
+  constructor(private readonly artifactService: ArtifactService) { }
 
   ngOnInit(): void {
     this.artifactService.getArtifacts().subscribe(artifacts => {

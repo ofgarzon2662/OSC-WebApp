@@ -8,7 +8,6 @@ import { DebugElement } from '@angular/core';
 describe('ArtifactCardComponent', () => {
   let component: ArtifactCardComponent;
   let fixture: ComponentFixture<ArtifactCardComponent>;
-  let debugElement: DebugElement;
 
   // Datos de prueba para el artefacto
   const testArtifact: Artifact = {
@@ -25,7 +24,6 @@ describe('ArtifactCardComponent', () => {
 
     fixture = TestBed.createComponent(ArtifactCardComponent);
     component = fixture.componentInstance;
-    debugElement = fixture.debugElement;
 
     // Asignar el artefacto de prueba al componente
     component.artifact = testArtifact;

@@ -6,7 +6,7 @@ import { Workflow } from '../models/workflow.model';
   providedIn: 'root'
 })
 export class WorkflowService {
-  private mockWorkflows: Workflow[] = [
+  private readonly mockWorkflows: Workflow[] = [
     {
       id: '1',
       name: 'Name Workflow 1',

@@ -6,7 +6,7 @@ import { Artifact } from '../models/artifact.model';
   providedIn: 'root'
 })
 export class ArtifactService {
-  private mockArtifacts: Artifact[] = [
+  private readonly mockArtifacts: Artifact[] = [
     {
       id: '1',
       name: 'Name Artifact 1',
