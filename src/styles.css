@@ -4,8 +4,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
 
 /* Aplicar OpenSans a toda la aplicación */
-body {
-  font-family: 'Open Sans', sans-serif;
+* {
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+body, html {
+  font-family: 'Open Sans', sans-serif !important;
 }
 
 /* Variables para tamaños de fuente responsivos */
