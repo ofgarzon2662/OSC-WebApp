@@ -196,47 +196,16 @@
 
     <!-- Enlaces con la misma configuración de fuente -->
     <div class="d-flex" style="margin-right: 30px;">
-      <a href="#" style="color: #FFFFFF; margin-right: 15px; text-decoration: none; font-weight: 600; font-size: 20px; font-family: 'Open Sans', sans-serif !important;">Contribute</a>
-      <a href="#" style="color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 20px; font-family: 'Open Sans', sans-serif !important;">Sign in</a>
+      <a href="#" style="color: #FFFFFF; margin-right: 15px; text-decoration: none; font-weight: 600; font-size: 24px; font-family: 'Open Sans', sans-serif !important;">Contribute</a>
+      <a href="#" style="color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 24px; font-family: 'Open Sans', sans-serif !important;">Sign in</a>
     </div>
   </div>
 </nav>
 
 <!-- Contenido principal -->
 <div class="container mt-5">
-
-  <!-- Sección de Artifacts -->
-  <div class="row mb-5">
-    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-      <h2 style="color: #1D3557; font-weight: 700; font-size: 36px; font-family: 'Open Sans', sans-serif !important;">Artifacts</h2>
-      <a href="#" style="color: #1D3557; text-decoration: none; font-weight: 700; font-size: 18px; font-family: 'Open Sans', sans-serif !important;">VIEW ALL</a>
-    </div>
-
-    <!-- Espacio para las tarjetas de Artifacts -->
-    <div class="col-12">
-      <div class="row" id="artifacts-container">
-        <!-- Aquí se añadirán dinámicamente las tarjetas de Artifacts -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Sección de Workflows -->
-  <div class="row mb-5">
-    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-      <h2 style="color: #1D3557; font-weight: 700; font-size: 36px; font-family: 'Open Sans', sans-serif !important;">Workflows</h2>
-      <a href="#" style="color: #1D3557; text-decoration: none; font-weight: 700; font-size: 18px; font-family: 'Open Sans', sans-serif !important;">VIEW ALL</a>
-    </div>
-
-    <!-- Espacio para las tarjetas de Workflows -->
-    <div class="col-12">
-      <div class="row" id="workflows-container">
-        <!-- Aquí se añadirán dinámicamente las tarjetas de Workflows -->
-      </div>
-    </div>
-  </div>
-
+  <app-artifacts-preview></app-artifacts-preview>
+  <app-workflows-preview></app-workflows-preview>
 </div>
-
-
 
 <router-outlet />

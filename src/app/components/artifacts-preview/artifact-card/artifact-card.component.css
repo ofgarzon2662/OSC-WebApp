@@ -1,0 +1,62 @@
+.artifact-card {
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 380px;  /* Ancho fijo para todas las tarjetas */
+  margin: 0 auto; /* Centra la tarjeta en su contenedor */
+  height: auto;   /* La altura se ajustará automáticamente */
+  min-height: 300px; /* Altura mínima para mantener consistencia */
+}
+
+.artifact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #7DD3D8;
+  color: white;
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;  /* Permite que el cuerpo de la tarjeta crezca */
+}
+
+.card-subtitle {
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.card-text {
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.button-container {
+  padding-top: 15px;
+  border-top: none;
+  margin-top: auto; /* Empuja el botón hacia abajo */
+}
+
+.view-button {
+  background-color: #1D3557;
+  border-color: #1D3557;
+  font-family: 'Open Sans', sans-serif !important;
+  border-radius: 12px;
+  padding: 6px 20px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.view-button:hover {
+  background-color: #2a4a76;
+  border-color: #2a4a76;
+}
