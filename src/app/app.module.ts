@@ -13,10 +13,7 @@ import {
 } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { HttpErrorInterceptor } from './commons/interceptors/http-error.interceptor';
-import { HttpRequestInterceptor } from './commons/interceptors/http-request.interceptor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { ToastComponent } from './commons/toast/toast.component';
 
 // Import ngx-translate core and http-loader
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
