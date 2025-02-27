@@ -12,7 +12,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 })
 export class AppComponent {
   title = 'OSC-WebApp';
+  logoError = false;
+
   ngOnInit() {
     console.log("AppComponent cargado"); // ⚠️ Si esto aparece dos veces en consola, hay un problema
+  }
+
+  onLogoError() {
+    this.logoError = true;
+    console.error('Error loading logo image');
   }
 }
