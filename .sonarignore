@@ -1,0 +1,6 @@
+**/*.spec.ts
+**/*.test.ts
+**/test/**/*
+**/tests/**/*
+**/mock/**/*
+**/mocks/**/*
