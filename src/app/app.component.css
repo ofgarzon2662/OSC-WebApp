@@ -43,12 +43,13 @@
 
 /* Aumentar el tamaño del logo para que el banner se vea más alto */
 .navbar-brand img {
-  height: 50px;                    /* Mantén la altura actual o ajústala si es necesario */
+  width: 70%;
+  height: auto;                    /* Mantén la altura actual o ajústala si es necesario */
 }
 
 /* Estilos para el contenedor del botón de retroceso */
 .back-button-placeholder {
-  width: 24px;
+  width: 10px;
   visibility: hidden;
 }
 

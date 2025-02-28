@@ -9,7 +9,7 @@
 
 .sign-in-form-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 350px;
   padding: 20px;
   text-align: center;
 }
@@ -21,11 +21,11 @@
   justify-content: center;
   background-color: #1D3557;
   border-radius: 15px;
-  padding: 20px;
+  padding: 20px 20px;
 }
 
 .logo {
-  width: 50%;
+  width: 55%;
   height: auto;
 }
 
@@ -45,9 +45,21 @@
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ddd;
-  border-radius: 15px;
+  border-radius: 20px;
   font-size: 16px;
   transition: border-color 0.2s;
+}
+
+/* Estilos para los placeholders */
+.form-control::placeholder {
+  color: #aaa; /* Color del texto */
+  font-size: 14px; /* Tamaño de fuente más pequeño */
+  opacity: 0.8; /* Transparencia */
+  font-family: 'Open Sans', sans-serif; /* Fuente */
+  text-align: left; /* Alinea el texto del placeholder a la izquierda */
+  top: 20px; /* Ajusta la posición vertical */
+  transform-origin: left top; /* Establece el origen de la transformación */
+  pointer-events: none; /* Permite que los clics pasen a través del placeholder */
 }
 
 .form-control:focus {
@@ -57,14 +69,13 @@
 
 .forgot-password {
   text-align: right;
-  margin-bottom: 8px;
-  margin-top: -5px;
-  font-size: 14px;
+  margin-bottom: -2px;
+  margin-top: -8px;
+  font-size: 12px;
 }
 
 .forgot-password a {
   color: #888;
-  font-size: 14px;
   text-decoration: none;
 }
 
@@ -78,11 +89,15 @@
 
 .btn {
   cursor: pointer;
-  padding: 10px 30px;
+  padding: 5px 45px;
   font-size: 16px;
   border-radius: 25px;
   border: none;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 18px;
+  font-family: 'Open Sans', sans-serif;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
@@ -92,4 +107,6 @@
 
 .btn-primary:hover {
   background-color: #152538;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
