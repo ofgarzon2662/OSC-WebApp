@@ -1,0 +1,54 @@
+/* Estilos para la barra de navegación */
+.main-navbar {
+  background-color: #1D3557;
+  padding-top: 1rem !important;    /* Aumentar el padding superior */
+  padding-bottom: 1rem !important; /* Aumentar el padding inferior */
+  height: auto;                    /* Permitir que la altura se ajuste al contenido */
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Aumentar el tamaño del logo para que el banner se vea más alto */
+.navbar-brand img {
+  height: 50px;                    /* Aumentar la altura del logo */
+}
+
+/* Estilos para el contenedor del botón de retroceso */
+.back-button-placeholder {
+  width: 24px;
+  visibility: hidden;
+}
+
+/* Estilos para los enlaces de navegación */
+.nav-links {
+  margin-right: 30px;
+}
+
+/* Estilos comunes para los enlaces */
+.nav-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 24px;
+  font-family: 'Open Sans', sans-serif !important;
+  padding: 0.5rem 0;              /* Añadir padding vertical a los enlaces */
+}
+
+/* Estilo específico para el enlace Contribute */
+.contribute-link {
+  margin-right: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+/* Estilo específico para el enlace Sign in */
+.signin-link {
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  font-family: 'Open Sans', sans-serif !important;
+  /* Puedes añadir estilos específicos si es necesario */
+}

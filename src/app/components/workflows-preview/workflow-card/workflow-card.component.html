@@ -1,0 +1,16 @@
+<div class="card artifact-card shadow-sm">
+  <div class="card-header">
+    {{ workflow.name }}
+  </div>
+  <div class="card-body d-flex flex-column">
+    <h6 class="card-subtitle mb-2 text-muted">Description:</h6>
+    <p class="card-text">{{ workflow.description }}</p>
+
+    <h6 class="card-subtitle mb-2 text-muted">Updates:</h6>
+    <p class="card-text">Last Updated at {{ workflow.lastUpdated | date:'medium' }}</p>
+
+    <div class="mt-auto button-container">
+      <button class="btn btn-primary view-button">View</button>
+    </div>
+  </div>
+</div>
