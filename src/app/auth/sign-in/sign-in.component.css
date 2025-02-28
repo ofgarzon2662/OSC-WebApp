@@ -1,0 +1,81 @@
+.sign-in-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.sign-in-form-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+}
+
+.logo {
+  max-width: 350px;
+  height: auto;
+  background-color: #1D3557;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.sign-in-form .form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: #1D3557;
+  outline: none;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: #888;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.btn {
+  cursor: pointer;
+  padding: 10px 30px;
+  font-size: 16px;
+  border-radius: 25px;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: #1D3557;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #152538;
+}

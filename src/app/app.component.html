@@ -1,32 +1,40 @@
-<!-- Banner principal usando Bootstrap -->
-<nav class="navbar navbar-dark py-2 main-navbar">
+<!-- Barra de navegación -->
+<nav class="main-navbar navbar navbar-expand-lg navbar-dark">
   <div class="container-fluid">
+    <!-- Contenedor izquierdo para la flecha y el logo -->
     <div class="d-flex align-items-center">
-      <!-- Espacio reservado para la flecha "ir atrás" en páginas internas -->
-      <div id="back-button-container" class="me-2 back-button-placeholder">
-        <!-- La flecha se añadirá aquí cuando sea necesario -->
-      </div>
+      <!-- Botón de retroceso -->
+      <button *ngIf="showBackButton" class="back-button" (click)="goBack()">
+        <i class="bi bi-arrow-left-circle"></i>
+      </button>
 
-      <!-- Logo -->
-      <a class="navbar-brand" href="#">
-        <img src="assets/images/OpenScienceChain_logo_horiz_white.png"
-             alt="Open Science Chain Logo"
-             height="40">
+      <!-- Logo (con posición fija) -->
+      <a class="navbar-brand" routerLink="/">
+        <img src="assets/images/OpenScienceChain_logo_horiz_white.png" alt="osc-logo">
       </a>
     </div>
 
-    <!-- Enlaces de navegación -->
-    <div class="d-flex nav-links">
-      <a href="#" class="nav-link contribute-link">Contribute</a>
-      <a href="#" class="nav-link signin-link">Sign in</a>
+    <!-- Navegación dinámica basada en el estado de autenticación -->
+    <div class="d-flex nav-links" *ngIf="!isAuthRoute()">
+      <!-- Contribute - comportamiento condicional basado en autenticación -->
+      <a class="nav-link contribute-link"
+         [routerLink]="isAuthenticated ? '/contribute' : '/auth/sign-in'">
+        Contribute
+      </a>
+
+      <!-- Condicional basado en autenticación -->
+      <a *ngIf="!isAuthenticated" class="nav-link signin-link" routerLink="/auth/sign-in">Sign in</a>
+      <a *ngIf="isAuthenticated" class="nav-link signout-link" (click)="logout()">Sign out</a>
     </div>
   </div>
 </nav>
 
-<!-- Contenido principal -->
-<div class="container mt-5">
+<!-- Router outlet para las rutas cargadas dinámicamente -->
+<router-outlet></router-outlet>
+
+<!-- Contenido principal de la página de inicio -->
+<!-- Solo mostrar cuando estamos en la ruta principal -->
+<div class="container mt-4" *ngIf="router.url === '/' || router.url === '/home'">
   <app-artifacts-preview></app-artifacts-preview>
   <app-workflows-preview></app-workflows-preview>
 </div>
-
-<router-outlet />

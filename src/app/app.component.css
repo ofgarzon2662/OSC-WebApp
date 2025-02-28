@@ -1,3 +1,30 @@
+/* Estilos para el botón de retroceso */
+.back-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 35px;
+  padding: 0.25rem;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+.back-button:hover {
+  transform: scale(1.1);
+}
+
+.back-button:hover i {
+  transform: translateX(-3px);
+}
+
+.btn-back:hover i {
+  transform: translateX(-5px); /* La flecha se mueve ligeramente a la izquierda */
+}
 /* Estilos para la barra de navegación */
 .main-navbar {
   background-color: #1D3557;
@@ -9,9 +36,14 @@
   padding-right: 0;
 }
 
+/* Ajuste para el logo */
+.navbar-brand {
+  margin-left: 0; /* Quitamos el margen izquierdo */
+}
+
 /* Aumentar el tamaño del logo para que el banner se vea más alto */
 .navbar-brand img {
-  height: 50px;                    /* Aumentar la altura del logo */
+  height: 50px;                    /* Mantén la altura actual o ajústala si es necesario */
 }
 
 /* Estilos para el contenedor del botón de retroceso */
@@ -31,17 +63,47 @@
   text-decoration: none;
   font-weight: 600;
   font-size: 24px;
-  font-family: 'Open Sans', sans-serif !important;
-  padding: 0.5rem 0;              /* Añadir padding vertical a los enlaces */
+  font-family: 'Open Sans', sans-serif;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+/* Efecto hover para los enlaces */
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilo específico para el enlace Contribute */
 .contribute-link {
+  position: relative;
+  overflow: hidden;
   margin-right: 15px;
   font-size: 20px;
   font-weight: 600;
   color: #FFFFFF;
   font-family: 'Open Sans', sans-serif !important;
+}
+
+.contribute-link:hover::after {
+  position: absolute;
+  right: 10px;
+  animation: slideRight 0.5s ease;
+}
+
+@keyframes slideRight {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Estilo específico para el enlace Sign in */
@@ -50,5 +112,36 @@
   font-weight: 600;
   color: #FFFFFF;
   font-family: 'Open Sans', sans-serif !important;
-  /* Puedes añadir estilos específicos si es necesario */
+  border: 1px solid transparent;
+}
+
+.signin-link:hover::after {
+  position: absolute;
+  right: 10px;
+  animation: slideRight 0.5s ease;
+}
+
+/* Estilos para el enlace Sign out (para uso futuro) */
+.signout-link {
+  cursor: pointer;
+}
+
+.signout-link:hover {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+
+/* Contenedor izquierdo para mantener la flecha y el logo juntos */
+.d-flex.align-items-center {
+  flex-grow: 0; /* Evita que este contenedor crezca y empuje el logo */
+}
+
+/* Botón fijo de volver atrás */
+.fixed-back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background-color: rgba(29, 53, 87, 0.8);
+  border-radius: 50%;
+  padding: 10px;
 }
