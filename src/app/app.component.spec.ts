@@ -3,8 +3,9 @@ import { AppComponent } from './app.component';
 import { Component } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
 
 // Crear componentes mock como standalone
 @Component({
@@ -26,8 +27,12 @@ describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let router: Router;
   let location: Location;
+  let routerEventsSubject: Subject<any>;
+  let urlSpy: jasmine.Spy<any>;
 
   beforeEach(async () => {
+    routerEventsSubject = new Subject<any>();
+
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([]), // Configurar con rutas vacías
@@ -42,12 +47,16 @@ describe('AppComponent', () => {
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
 
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
+    // Mock para router.events
+    Object.defineProperty(router, 'events', {
+      get: () => routerEventsSubject.asObservable()
+    });
 
     // Configurar la URL actual para las pruebas
-    spyOnProperty(router, 'url', 'get').and.returnValue('/');
+    urlSpy = spyOnProperty(router, 'url', 'get').and.returnValue('/');
 
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
@@ -90,5 +99,85 @@ describe('AppComponent', () => {
   it('should include workflows-preview component', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('app-workflows-preview')).toBeTruthy();
+  });
+
+  // Pruebas para los métodos no cubiertos
+  describe('Navigation and Initialization', () => {
+    it('should subscribe to navigation events in ngOnInit', () => {
+      // Espiar el método updateBackButtonVisibility
+      spyOn<any>(component, 'updateBackButtonVisibility');
+
+      // Llamar a ngOnInit de nuevo para asegurarnos de que se ejecuta
+      component.ngOnInit();
+
+      // Simular un evento de navegación
+      routerEventsSubject.next(new NavigationEnd(1, '/', '/'));
+
+      // Verificar que se llamó al método updateBackButtonVisibility
+      expect(component['updateBackButtonVisibility']).toHaveBeenCalled();
+    });
+  });
+
+  describe('Navigation Methods', () => {
+    it('should navigate to home when going back from auth route', () => {
+      // Cambiar la URL a una ruta de autenticación
+      urlSpy.and.returnValue('/auth/sign-in');
+
+      // Espiar el método navigate del router
+      spyOn(router, 'navigate');
+
+      // Llamar al método goBack
+      component.goBack();
+
+      // Verificar que se navegó a la página principal
+      expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should use location.back() for non-auth routes', () => {
+      // Cambiar la URL a una ruta que no es de autenticación
+      urlSpy.and.returnValue('/home');
+
+      // Espiar el método back de location
+      spyOn(location, 'back');
+
+      // Llamar al método goBack
+      component.goBack();
+
+      // Verificar que se llamó a location.back()
+      expect(location.back).toHaveBeenCalled();
+    });
+
+    it('should handle logout correctly', () => {
+      // Establecer isAuthenticated a true inicialmente
+      component.isAuthenticated = true;
+
+      // Espiar el método navigate del router
+      spyOn(router, 'navigate');
+
+      // Llamar al método logout
+      component.logout();
+
+      // Verificar que isAuthenticated se estableció a false
+      expect(component.isAuthenticated).toBeFalse();
+
+      // Verificar que se navegó a la página principal
+      expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle logo loading error', () => {
+      // Espiar console.error
+      spyOn(console, 'error');
+
+      // Llamar al método onLogoError
+      component.onLogoError();
+
+      // Verificar que logoError se estableció a true
+      expect(component.logoError).toBeTrue();
+
+      // Verificar que se registró el error
+      expect(console.error).toHaveBeenCalledWith('Error loading logo image');
+    });
   });
 });

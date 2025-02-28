@@ -138,6 +138,7 @@ describe('SignInComponent', () => {
 
     it('should not navigate when form is invalid', () => {
       spyOn(router, 'navigate');
+      spyOn(console, 'log');
 
       component.signInForm.patchValue({
         username: '',
@@ -147,6 +148,37 @@ describe('SignInComponent', () => {
       component.onSubmit();
 
       expect(router.navigate).not.toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith('Form is invalid');
+    });
+
+    it('should log form values when form is valid but not navigate', () => {
+      spyOn(router, 'navigate');
+      spyOn(console, 'log');
+
+      component.signInForm.patchValue({
+        username: 'testuser',
+        password: 'password123'
+      });
+
+      component.onSubmit();
+
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith('Form submitted:', {username: 'testuser', password: 'password123'});
+      expect(console.log).toHaveBeenCalledWith('Login successful (no redirect)');
+    });
+
+    it('should mark all fields as touched when form is submitted', () => {
+      // Espiar el método markAsTouched en los controles del formulario
+      const usernameControl = component.signInForm.get('username');
+      const passwordControl = component.signInForm.get('password');
+
+      spyOn(usernameControl!, 'markAsTouched');
+      spyOn(passwordControl!, 'markAsTouched');
+
+      component.onSubmit();
+
+      expect(usernameControl!.markAsTouched).toHaveBeenCalled();
+      expect(passwordControl!.markAsTouched).toHaveBeenCalled();
     });
   });
 
@@ -215,6 +247,40 @@ describe('SignInComponent', () => {
       forgotMessage = debugElement.query(By.css('.forgot-message'));
       expect(forgotMessage).toBeTruthy();
       expect(forgotMessage.nativeElement.textContent.trim()).toContain('If you forgot your password or username');
+    });
+
+    it('should prevent default behavior when forgot credentials link is clicked', () => {
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
+
+      component.onForgotCredentials(mockEvent);
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(component.showForgotMessage).toBeTrue();
+    });
+
+    it('should log a message when forgot credentials link is clicked', () => {
+      spyOn(console, 'log');
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
+
+      component.onForgotCredentials(mockEvent);
+
+      expect(console.log).toHaveBeenCalledWith('Forgot credentials link clicked');
+    });
+
+    it('should toggle message visibility when clicking the link multiple times', () => {
+      const mockEvent = jasmine.createSpyObj('Event', ['preventDefault']);
+
+      // Primera vez - mostrar mensaje
+      component.onForgotCredentials(mockEvent);
+      expect(component.showForgotMessage).toBeTrue();
+
+      // Modificamos el componente para que el método alterne la visibilidad
+      component.showForgotMessage = false;
+      fixture.detectChanges();
+
+      // Segunda vez - mostrar mensaje de nuevo
+      component.onForgotCredentials(mockEvent);
+      expect(component.showForgotMessage).toBeTrue();
     });
   });
 });

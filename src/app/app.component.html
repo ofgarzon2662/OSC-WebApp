@@ -29,12 +29,12 @@
   </div>
 </nav>
 
-<!-- Router outlet para las rutas cargadas dinámicamente -->
-<router-outlet></router-outlet>
-
 <!-- Contenido principal de la página de inicio -->
-<!-- Solo mostrar cuando estamos en la ruta principal -->
-<div class="container mt-4" *ngIf="router.url === '/' || router.url === '/home'">
+<!-- Solo mostrar cuando estamos en la ruta principal y no hay otra ruta cargada -->
+<div class="container mt-4" *ngIf="router.url === '/' && !isAuthRoute()">
   <app-artifacts-preview></app-artifacts-preview>
   <app-workflows-preview></app-workflows-preview>
 </div>
+
+<!-- Router outlet para las rutas cargadas dinámicamente -->
+<router-outlet></router-outlet>

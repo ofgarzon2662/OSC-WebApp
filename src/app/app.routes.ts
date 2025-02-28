@@ -1,12 +1,15 @@
 import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
+import { Component } from '@angular/core';
+
+// Componente vacío para la ruta raíz
+@Component({
+  template: ''
+})
+export class EmptyComponent {}
 
 export const routes: Routes = [
-  // Ruta raíz redirige a home
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-
-  // Ruta home usa AppComponent como página de inicio
-  { path: 'home', component: AppComponent },
+  // Ruta raíz usa un componente vacío para evitar renderización duplicada
+  { path: '', component: EmptyComponent, pathMatch: 'full' },
 
   // Módulo de autenticación
   {
@@ -15,5 +18,5 @@ export const routes: Routes = [
   },
 
   // Ruta de fallback para cualquier ruta no definida
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: '' }
 ];
