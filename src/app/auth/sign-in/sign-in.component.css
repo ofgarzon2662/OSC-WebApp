@@ -90,7 +90,6 @@
 .btn {
   cursor: pointer;
   padding: 5px 45px;
-  font-size: 16px;
   border-radius: 25px;
   border: none;
   transition: all 0.3s ease;

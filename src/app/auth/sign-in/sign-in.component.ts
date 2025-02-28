@@ -16,8 +16,8 @@ export class SignInComponent {
   showForgotMessage = false;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private router: Router
+    private readonly formBuilder: FormBuilder,
+    private readonly router: Router
   ) {
     this.signInForm = this.formBuilder.group({
       username: ['', [Validators.required]],

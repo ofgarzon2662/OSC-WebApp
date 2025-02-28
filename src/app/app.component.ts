@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { filter } from 'rxjs/operators';
-import { Location } from '@angular/common';
 import { ArtifactsPreviewComponent } from './components/artifacts-preview/artifacts-preview.component';
 import { WorkflowsPreviewComponent } from './components/workflows-preview/workflows-preview.component';
 
@@ -29,7 +28,7 @@ export class AppComponent implements OnInit {
   showBackButton = false;
 
   // Lista de rutas donde quieres mostrar el botón de retroceso
-  private routesWithBackButton: string[] = [
+  private readonly routesWithBackButton: string[] = [
     '/auth/sign-in',
     // Puedes añadir más rutas aquí según necesites
     // '/otra-ruta',
@@ -38,7 +37,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     public router: Router,
-    private location: Location
+    private readonly location: Location
   ) {}
 
   ngOnInit() {
