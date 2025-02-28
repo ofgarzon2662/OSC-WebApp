@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 })
 export class SignInComponent {
   signInForm: FormGroup;
+  showForgotMessage = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -51,5 +52,15 @@ export class SignInComponent {
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  onForgotCredentials(event: Event): void {
+    // Prevenir el comportamiento predeterminado del enlace
+    event.preventDefault();
+
+    // Mostrar el mensaje
+    this.showForgotMessage = true;
+
+    console.log('Forgot credentials link clicked');
   }
 }

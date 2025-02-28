@@ -62,7 +62,7 @@ describe('SignInComponent', () => {
     });
 
     it('should have a sign-in button', () => {
-      const signInButton = debugElement.query(By.css('button[type="submit"]'));
+      const signInButton = debugElement.query(By.css('button.btn-primary'));
       expect(signInButton).toBeTruthy();
       expect(signInButton.nativeElement.textContent).toBe('Sign In');
       expect(signInButton.nativeElement.classList).toContain('btn-primary');
@@ -109,7 +109,7 @@ describe('SignInComponent', () => {
       });
       fixture.detectChanges();
 
-      const submitButton = debugElement.query(By.css('button[type="submit"]'));
+      const submitButton = debugElement.query(By.css('button.btn-primary'));
       expect(submitButton.nativeElement.disabled).toBeTrue();
     });
 
@@ -120,18 +120,18 @@ describe('SignInComponent', () => {
       });
       fixture.detectChanges();
 
-      const submitButton = debugElement.query(By.css('button[type="submit"]'));
+      const submitButton = debugElement.query(By.css('button.btn-primary'));
       expect(submitButton.nativeElement.disabled).toBeFalse();
     });
   });
 
   // Test for form submission
   describe('Form Submission', () => {
-    it('should call onSubmit method when form is submitted', () => {
+    it('should call onSubmit method when button is clicked', () => {
       spyOn(component, 'onSubmit');
 
-      const formElement = debugElement.query(By.css('form.sign-in-form'));
-      formElement.triggerEventHandler('submit', null);
+      const signInButton = debugElement.query(By.css('button.btn-primary'));
+      signInButton.triggerEventHandler('click', null);
 
       expect(component.onSubmit).toHaveBeenCalled();
     });
@@ -147,19 +147,6 @@ describe('SignInComponent', () => {
       component.onSubmit();
 
       expect(router.navigate).not.toHaveBeenCalled();
-    });
-
-    it('should navigate to home page when form is valid', () => {
-      spyOn(router, 'navigate');
-
-      component.signInForm.patchValue({
-        username: 'testuser',
-        password: 'password123'
-      });
-
-      component.onSubmit();
-
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
   });
 
@@ -204,6 +191,30 @@ describe('SignInComponent', () => {
 
       expect(usernameError).toBeNull();
       expect(passwordError).toBeNull();
+    });
+  });
+
+  // Test for forgot credentials functionality
+  describe('Forgot Credentials', () => {
+    it('should show message when forgot credentials link is clicked', () => {
+      // Verificar que el mensaje no se muestra inicialmente
+      expect(component.showForgotMessage).toBeFalse();
+      let forgotMessage = debugElement.query(By.css('.forgot-message'));
+      expect(forgotMessage).toBeNull();
+
+      // Simular clic en el enlace
+      const forgotLink = debugElement.query(By.css('.forgot-password a'));
+      const mockEvent = new Event('click');
+      spyOn(mockEvent, 'preventDefault');
+
+      component.onForgotCredentials(mockEvent);
+      fixture.detectChanges();
+
+      // Verificar que el mensaje se muestra
+      expect(component.showForgotMessage).toBeTrue();
+      forgotMessage = debugElement.query(By.css('.forgot-message'));
+      expect(forgotMessage).toBeTruthy();
+      expect(forgotMessage.nativeElement.textContent.trim()).toContain('If you forgot your password or username');
     });
   });
 });

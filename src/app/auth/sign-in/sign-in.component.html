@@ -19,7 +19,7 @@
       </div>
 
       <div class="forgot-password">
-        <a href="#">Forgot password or username?</a>
+        <a href="#" (click)="onForgotCredentials($event)">Forgot password or username?</a>
       </div>
 
       <div class="form-group">
@@ -39,5 +39,10 @@
         <button type="button" class="btn btn-primary" [disabled]="signInForm.invalid" (click)="onSubmit()">Sign In</button>
       </div>
     </form>
+
+    <!-- Mensaje de recuperación de credenciales -->
+    <div *ngIf="showForgotMessage" class="forgot-message">
+      If you forgot your password or username, please send an email to block&#64;manager.com
+    </div>
   </div>
 </div>
