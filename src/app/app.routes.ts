@@ -1,11 +1,19 @@
 import { Routes } from '@angular/router';
+import { AppComponent } from './app.component';
 
 export const routes: Routes = [
-  // La ruta vacía muestra el contenido principal que ya está en AppComponent
+  // Ruta raíz redirige a home
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', redirectTo: '' }, // Redirigir a la raíz en lugar de usar null
+
+  // Ruta home usa AppComponent como página de inicio
+  { path: 'home', component: AppComponent },
+
+  // Módulo de autenticación
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
-  }
+  },
+
+  // Ruta de fallback para cualquier ruta no definida
+  { path: '**', redirectTo: 'home' }
 ];

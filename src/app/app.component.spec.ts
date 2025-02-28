@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { Component } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Crear componentes mock como standalone
 @Component({
@@ -20,21 +24,30 @@ class MockWorkflowsPreviewComponent {}
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  let router: Router;
+  let location: Location;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      // Mover AppComponent al array imports ya que es un componente standalone
       imports: [
+        RouterTestingModule.withRoutes([]), // Configurar con rutas vacías
+        NgbModule, // Añadir NgbModule si el componente lo usa
         AppComponent,
         MockArtifactsPreviewComponent,
         MockWorkflowsPreviewComponent
       ],
-      // El array declarations queda vacío
       declarations: []
     }).compileComponents();
 
+    router = TestBed.inject(Router);
+    location = TestBed.inject(Location);
+
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
+
+    // Configurar la URL actual para las pruebas
+    spyOnProperty(router, 'url', 'get').and.returnValue('/');
+
     fixture.detectChanges();
   });
 

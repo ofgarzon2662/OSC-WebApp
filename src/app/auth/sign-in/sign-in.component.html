@@ -4,14 +4,18 @@
       <img src="assets/images/OpenScienceChain_logo_horiz_white.png" alt="Open Science Chain Logo" class="logo">
     </div>
 
-    <form class="sign-in-form">
+    <form [formGroup]="signInForm" class="sign-in-form">
       <div class="form-group">
         <input
           type="text"
           id="username"
+          formControlName="username"
           class="form-control"
           placeholder="username or email"
           required>
+        <div *ngIf="signInForm.get('username')?.invalid && signInForm.get('username')?.touched" class="error-message">
+          Username is required
+        </div>
       </div>
 
       <div class="forgot-password">
@@ -22,13 +26,17 @@
         <input
           type="password"
           id="password"
+          formControlName="password"
           class="form-control"
           placeholder="password"
           required>
+        <div *ngIf="signInForm.get('password')?.invalid && signInForm.get('password')?.touched" class="error-message">
+          Password is required
+        </div>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button type="button" class="btn btn-primary" [disabled]="signInForm.invalid" (click)="onSubmit()">Sign In</button>
       </div>
     </form>
   </div>

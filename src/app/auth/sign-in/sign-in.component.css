@@ -110,3 +110,16 @@
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
 }
+
+/* Error message styles */
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  text-align: left;
+  padding-left: 15px;
+}
+
+.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
