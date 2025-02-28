@@ -16,25 +16,36 @@
 
 .logo-container {
   margin-bottom: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: #1D3557;
+  border-radius: 15px;
+  padding: 20px;
 }
 
 .logo {
-  max-width: 350px;
+  width: 50%;
   height: auto;
-  background-color: #1D3557;
-  padding: 20px;
-  border-radius: 10px;
+}
+
+.logo img {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .sign-in-form .form-group {
   margin-bottom: 15px;
+  position: relative;
 }
 
 .form-control {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ddd;
-  border-radius: 25px;
+  border-radius: 15px;
   font-size: 16px;
   transition: border-color 0.2s;
 }
@@ -46,7 +57,9 @@
 
 .forgot-password {
   text-align: right;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
+  margin-top: -5px;
+  font-size: 14px;
 }
 
 .forgot-password a {
