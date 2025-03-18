@@ -1,4 +1,11 @@
 import { Routes } from '@angular/router';
+import { Component } from '@angular/core';
+
+// Componente vacío para la ruta raíz
+@Component({
+  template: ''
+})
+export class EmptyComponent {}
 
 export const routes: Routes = [
   // Root path
