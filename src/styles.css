@@ -6,6 +6,9 @@
 /* Importar Bootstrap Icons */
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
+/* Importar Toastr styles */
+@import 'ngx-toastr/toastr';
+
 /* Aplicar OpenSans a toda la aplicación */
 * {
   font-family: 'Open Sans', sans-serif !important;

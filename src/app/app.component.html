@@ -18,13 +18,19 @@
     <div class="d-flex nav-links" *ngIf="!isAuthRoute()">
       <!-- Contribute - comportamiento condicional basado en autenticación -->
       <a class="nav-link contribute-link"
-         [routerLink]="isAuthenticated ? '/contribute' : '/auth/sign-in'">
+         (click)="onContributeClick()"
+         style="cursor: pointer;">
         Contribute
       </a>
 
       <!-- Condicional basado en autenticación -->
       <a *ngIf="!isAuthenticated" class="nav-link signin-link" routerLink="/auth/sign-in">Sign in</a>
-      <a *ngIf="isAuthenticated" class="nav-link signout-link" (click)="logout()">Sign out</a>
+      <a *ngIf="isAuthenticated"
+              class="nav-link signin-link"
+              (click)="logout()"
+              type="button">
+        Sign out
+    </a>
     </div>
   </div>
 </nav>

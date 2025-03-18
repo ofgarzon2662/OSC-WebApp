@@ -8,8 +8,8 @@ import { Component } from '@angular/core';
 export class EmptyComponent {}
 
 export const routes: Routes = [
-  // Ruta raíz usa un componente vacío para evitar renderización duplicada
-  { path: '', component: EmptyComponent, pathMatch: 'full' },
+  // Root path
+  { path: '', pathMatch: 'full', children: [] },
 
   // Módulo de autenticación
   {

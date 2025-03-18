@@ -12,8 +12,11 @@
           formControlName="username"
           class="form-control"
           placeholder="username or email"
-          required>
-        <div *ngIf="signInForm.get('username')?.invalid && signInForm.get('username')?.touched" class="error-message">
+          required
+          data-cy="username-input">
+        <div *ngIf="signInForm.get('username')?.invalid && signInForm.get('username')?.touched"
+             class="error-message"
+             data-cy="username-error">
           Username is required
         </div>
       </div>
@@ -29,14 +32,28 @@
           formControlName="password"
           class="form-control"
           placeholder="password"
-          required>
-        <div *ngIf="signInForm.get('password')?.invalid && signInForm.get('password')?.touched" class="error-message">
+          required
+          data-cy="password-input">
+        <div *ngIf="signInForm.get('password')?.invalid && signInForm.get('password')?.touched"
+             class="error-message"
+             data-cy="password-error">
           Password is required
         </div>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-primary" [disabled]="signInForm.invalid" (click)="onSubmit()">Sign In</button>
+        <button type="button"
+                class="btn btn-primary"
+                [disabled]="signInForm.invalid"
+                (click)="onSubmit()"
+                data-cy="login-button">Sign In</button>
+      </div>
+
+      <!-- Mensaje de error de credenciales inválidas -->
+      <div *ngIf="invalidCredentials"
+           class="error-message text-center mt-3"
+           data-cy="invalid-credentials">
+        Username and/or password not valid, please try again
       </div>
     </form>
 
