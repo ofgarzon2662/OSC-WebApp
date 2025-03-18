@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../services/auth.service';
 // Importa otros módulos que necesites, como ReactiveFormsModule si usas formularios
 
 @Component({
@@ -14,10 +16,14 @@ import { Router } from '@angular/router';
 export class SignInComponent {
   signInForm: FormGroup;
   showForgotMessage = false;
+  isLoading = false;
+  invalidCredentials = false;
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly toastr: ToastrService
   ) {
     this.signInForm = this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -35,22 +41,31 @@ export class SignInComponent {
     console.log('onSubmit called - Form valid:', this.signInForm.valid);
 
     if (this.signInForm.valid) {
-      // Aquí normalmente llamarías a un servicio de autenticación
-      console.log('Form submitted:', this.signInForm.value);
+      this.isLoading = true;
+      this.invalidCredentials = false;
+      const { username, password } = this.signInForm.value;
 
-      // No hacemos nada más, solo registramos en consola
-      console.log('Login successful (no redirect)');
-
-      // Comentamos la navegación para que no haga nada
-      // try {
-      //   this.router.navigate(['/home']).then(
-      //     navigated => console.log('Navigation result:', navigated)
-      //   ).catch(err => console.error('Navigation error:', err));
-      // } catch (error) {
-      //   console.error('Error during navigation:', error);
-      // }
+      this.authService.login(username, password).subscribe({
+        next: () => {
+          this.toastr.success('Successfully signed in!', 'Welcome');
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          console.error('Login error:', error);
+          this.invalidCredentials = true;
+          this.toastr.error(
+            error.error?.message || 'Invalid credentials',
+            'Login Failed'
+          );
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
     } else {
       console.log('Form is invalid');
+      this.toastr.warning('Please fill in all required fields', 'Form Invalid');
     }
   }
 
@@ -60,6 +75,7 @@ export class SignInComponent {
 
     // Mostrar el mensaje
     this.showForgotMessage = true;
+    this.toastr.info('Please contact support for assistance', 'Password Recovery');
 
     console.log('Forgot credentials link clicked');
   }

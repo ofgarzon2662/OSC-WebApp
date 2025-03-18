@@ -5,7 +5,24 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from './services/auth.service';
+
+// Mock services
+const mockToastr = {
+  success: jasmine.createSpy('success'),
+  error: jasmine.createSpy('error'),
+  warning: jasmine.createSpy('warning'),
+  info: jasmine.createSpy('info')
+};
+
+const mockAuthService = {
+  logout: jasmine.createSpy('logout').and.returnValue(of({})),
+  isAuthenticated$: of(false),
+  getToken: jasmine.createSpy('getToken').and.returnValue('mock-token')
+};
 
 // Crear componentes mock como standalone
 @Component({
@@ -29,23 +46,31 @@ describe('AppComponent', () => {
   let location: Location;
   let routerEventsSubject: Subject<any>;
   let urlSpy: jasmine.Spy<any>;
+  let authService: AuthService;
+  let toastrService: ToastrService;
 
   beforeEach(async () => {
     routerEventsSubject = new Subject<any>();
 
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule.withRoutes([]), // Configurar con rutas vacías
-        NgbModule, // Añadir NgbModule si el componente lo usa
+        RouterTestingModule.withRoutes([]),
+        NgbModule,
+        HttpClientTestingModule,
         AppComponent,
         MockArtifactsPreviewComponent,
         MockWorkflowsPreviewComponent
       ],
-      declarations: []
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: ToastrService, useValue: mockToastr }
+      ]
     }).compileComponents();
 
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
+    authService = TestBed.inject(AuthService);
+    toastrService = TestBed.inject(ToastrService);
 
     // Mock para router.events
     Object.defineProperty(router, 'events', {
@@ -120,48 +145,59 @@ describe('AppComponent', () => {
 
   describe('Navigation Methods', () => {
     it('should navigate to home when going back from auth route', () => {
-      // Cambiar la URL a una ruta de autenticación
       urlSpy.and.returnValue('/auth/sign-in');
-
-      // Espiar el método navigate del router
       spyOn(router, 'navigate');
-
-      // Llamar al método goBack
       component.goBack();
-
-      // Verificar que se navegó a la página principal
       expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should use location.back() for non-auth routes', () => {
-      // Cambiar la URL a una ruta que no es de autenticación
       urlSpy.and.returnValue('/home');
-
-      // Espiar el método back de location
       spyOn(location, 'back');
-
-      // Llamar al método goBack
       component.goBack();
-
-      // Verificar que se llamó a location.back()
       expect(location.back).toHaveBeenCalled();
     });
 
-    it('should handle logout correctly', () => {
-      // Establecer isAuthenticated a true inicialmente
-      component.isAuthenticated = true;
-
-      // Espiar el método navigate del router
+    it('should handle successful logout', () => {
       spyOn(router, 'navigate');
+      component.logout();
+      expect(authService.logout).toHaveBeenCalled();
+      expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
+    });
 
-      // Llamar al método logout
+    it('should handle logout error gracefully', () => {
+      const error = new Error('Logout failed');
+      (authService.logout as jasmine.Spy).and.returnValue(throwError(() => error));
+      spyOn(console, 'error');
+
       component.logout();
 
-      // Verificar que isAuthenticated se estableció a false
-      expect(component.isAuthenticated).toBeFalse();
+      expect(console.error).toHaveBeenCalledWith('Logout error:', error);
+      expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
+    });
+  });
 
-      // Verificar que se navegó a la página principal
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
+  describe('Contribute Navigation', () => {
+    it('should show info message and navigate to sign-in when not authenticated', () => {
+      component.isAuthenticated = false;
+      spyOn(router, 'navigate');
+
+      component.onContributeClick();
+
+      expect(toastrService.info).toHaveBeenCalledWith(
+        "We'd love to have your contribution, but first Sign in to continue",
+        'Welcome!'
+      );
+      expect(router.navigate).toHaveBeenCalledWith(['/auth/sign-in']);
+    });
+
+    it('should navigate to contribute page when authenticated', () => {
+      component.isAuthenticated = true;
+      spyOn(router, 'navigate');
+
+      component.onContributeClick();
+
+      expect(router.navigate).toHaveBeenCalledWith(['/contribute']);
     });
   });
 

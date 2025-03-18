@@ -1,15 +1,8 @@
 import { Routes } from '@angular/router';
-import { Component } from '@angular/core';
-
-// Componente vacío para la ruta raíz
-@Component({
-  template: ''
-})
-export class EmptyComponent {}
 
 export const routes: Routes = [
-  // Ruta raíz usa un componente vacío para evitar renderización duplicada
-  { path: '', component: EmptyComponent, pathMatch: 'full' },
+  // Root path
+  { path: '', pathMatch: 'full', children: [] },
 
   // Módulo de autenticación
   {

@@ -4,14 +4,33 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DebugElement } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ToastrService } from 'ngx-toastr';
+import { of, throwError } from 'rxjs';
 
 import { SignInComponent } from './sign-in.component';
+import { AuthService } from '../../services/auth.service';
+
+// Mock services
+const mockToastr = {
+  success: jasmine.createSpy('success'),
+  error: jasmine.createSpy('error'),
+  warning: jasmine.createSpy('warning'),
+  info: jasmine.createSpy('info')
+};
+
+const mockAuthService = {
+  login: jasmine.createSpy('login').and.returnValue(of({})),
+  isAuthenticated$: of(false)
+};
 
 describe('SignInComponent', () => {
   let component: SignInComponent;
   let fixture: ComponentFixture<SignInComponent>;
   let debugElement: DebugElement;
   let router: Router;
+  let authService: AuthService;
+  let toastrService: ToastrService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -19,7 +38,12 @@ describe('SignInComponent', () => {
         SignInComponent,
         ReactiveFormsModule,
         FormsModule,
-        RouterTestingModule
+        RouterTestingModule,
+        HttpClientTestingModule
+      ],
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: ToastrService, useValue: mockToastr }
       ]
     })
     .compileComponents();
@@ -28,6 +52,8 @@ describe('SignInComponent', () => {
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
     router = TestBed.inject(Router);
+    authService = TestBed.inject(AuthService);
+    toastrService = TestBed.inject(ToastrService);
     fixture.detectChanges();
   });
 
@@ -151,24 +177,7 @@ describe('SignInComponent', () => {
       expect(console.log).toHaveBeenCalledWith('Form is invalid');
     });
 
-    it('should log form values when form is valid but not navigate', () => {
-      spyOn(router, 'navigate');
-      spyOn(console, 'log');
-
-      component.signInForm.patchValue({
-        username: 'testuser',
-        password: 'password123'
-      });
-
-      component.onSubmit();
-
-      expect(router.navigate).not.toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith('Form submitted:', {username: 'testuser', password: 'password123'});
-      expect(console.log).toHaveBeenCalledWith('Login successful (no redirect)');
-    });
-
     it('should mark all fields as touched when form is submitted', () => {
-      // Espiar el método markAsTouched en los controles del formulario
       const usernameControl = component.signInForm.get('username');
       const passwordControl = component.signInForm.get('password');
 
@@ -281,6 +290,66 @@ describe('SignInComponent', () => {
       // Segunda vez - mostrar mensaje de nuevo
       component.onForgotCredentials(mockEvent);
       expect(component.showForgotMessage).toBeTrue();
+    });
+  });
+
+  // Add new tests for login functionality
+  describe('Login Functionality', () => {
+    let loginSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      loginSpy = mockAuthService.login;
+      loginSpy.calls.reset();
+    });
+
+    it('should handle successful login', () => {
+      loginSpy.and.returnValue(of({
+        access_token: 'mock-token',
+        user: { username: 'testuser', role: 'user' }
+      }));
+
+      component.signInForm.setValue({
+        username: 'testuser',
+        password: 'password123'
+      });
+
+      component.onSubmit();
+
+      expect(component.isLoading).toBeFalse();
+      expect(component.invalidCredentials).toBeFalse();
+      expect(toastrService.success).toHaveBeenCalled();
+      expect(loginSpy).toHaveBeenCalledWith('testuser', 'password123');
+    });
+
+    it('should handle failed login', () => {
+      loginSpy.and.returnValue(throwError(() => ({
+        error: { message: 'Invalid credentials' }
+      })));
+
+      component.signInForm.setValue({
+        username: 'testuser',
+        password: 'wrongpass'
+      });
+
+      component.onSubmit();
+
+      expect(component.isLoading).toBeFalse();
+      expect(component.invalidCredentials).toBeTrue();
+      expect(toastrService.error).toHaveBeenCalled();
+      expect(loginSpy).toHaveBeenCalledWith('testuser', 'wrongpass');
+    });
+
+    it('should handle invalid form', () => {
+      component.signInForm.setValue({
+        username: '',
+        password: ''
+      });
+
+      component.onSubmit();
+
+      expect(component.isLoading).toBeFalse();
+      expect(toastrService.warning).toHaveBeenCalled();
+      expect(loginSpy).not.toHaveBeenCalled();
     });
   });
 });

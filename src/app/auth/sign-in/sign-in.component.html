@@ -38,6 +38,11 @@
       <div class="form-actions">
         <button type="button" class="btn btn-primary" [disabled]="signInForm.invalid" (click)="onSubmit()">Sign In</button>
       </div>
+
+      <!-- Mensaje de error de credenciales inválidas -->
+      <div *ngIf="invalidCredentials" class="error-message text-center mt-3">
+        Username and/or password not valid, please try again
+      </div>
     </form>
 
     <!-- Mensaje de recuperación de credenciales -->

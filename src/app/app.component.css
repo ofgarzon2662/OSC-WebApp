@@ -87,6 +87,7 @@
   font-size: 20px;
   font-weight: 600;
   color: #FFFFFF;
+  border: 1px solid transparent;
   font-family: 'Open Sans', sans-serif !important;
 }
 
@@ -120,11 +121,6 @@
   position: absolute;
   right: 10px;
   animation: slideRight 0.5s ease;
-}
-
-/* Estilos para el enlace Sign out (para uso futuro) */
-.signout-link {
-  cursor: pointer;
 }
 
 .signout-link:hover {

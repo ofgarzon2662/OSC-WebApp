@@ -5,6 +5,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { filter } from 'rxjs/operators';
 import { ArtifactsPreviewComponent } from './components/artifacts-preview/artifacts-preview.component';
 import { WorkflowsPreviewComponent } from './components/workflows-preview/workflows-preview.component';
+import { AuthService } from './services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
@@ -37,8 +39,14 @@ export class AppComponent implements OnInit {
 
   constructor(
     public router: Router,
-    private readonly location: Location
-  ) {}
+    private readonly location: Location,
+    private readonly authService: AuthService,
+    private readonly toastr: ToastrService
+  ) {
+    this.authService.isAuthenticated$.subscribe(
+      isAuth => this.isAuthenticated = isAuth
+    );
+  }
 
   ngOnInit() {
     // Suscribirse a los eventos de navegación
@@ -81,14 +89,29 @@ export class AppComponent implements OnInit {
 
   // Método para cerrar sesión (implementación futura)
   logout(): void {
-    // Aquí iría la lógica para cerrar sesión
-    this.isAuthenticated = false;
-    this.router.navigate(['/']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.toastr.success('Successfully signed out', 'Goodbye!');
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Still show success message since we're cleaning up the session anyway
+        this.toastr.success('Successfully signed out', 'Goodbye!');
+      }
+    });
   }
 
   title = 'OSC-WebApp';
   logoError = false;
 
+  onContributeClick(): void {
+    if (!this.isAuthenticated) {
+      this.toastr.info("We'd love to have your contribution, but first Sign in to continue", 'Welcome!');
+      this.router.navigate(['/auth/sign-in']);
+    } else {
+      this.router.navigate(['/contribute']);
+    }
+  }
 
   onLogoError() {
     this.logoError = true;
