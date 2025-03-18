@@ -17,12 +17,12 @@ interface LoginResponse {
 })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/users`;
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(
-    private http: HttpClient,
-    private router: Router
+    private readonly http: HttpClient,
+    private readonly router: Router
   ) {
     // Check if there's a token in localStorage on service initialization
     const token = localStorage.getItem('token');
