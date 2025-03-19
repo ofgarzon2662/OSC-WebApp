@@ -43,3 +43,9 @@ Thumbs.db
 
 # Test files
 test-output.txt
+
+# Cypress
+cypress.env.json
+cypress/videos
+cypress/screenshots
+cypress/downloads/downloads.html

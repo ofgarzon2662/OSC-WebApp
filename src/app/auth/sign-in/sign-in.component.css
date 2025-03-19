@@ -1,0 +1,137 @@
+.sign-in-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 250px;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.sign-in-form-container {
+  width: 100%;
+  max-width: 350px;
+  padding: 20px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: #1D3557;
+  border-radius: 15px;
+  padding: 20px 20px;
+}
+
+.logo {
+  width: 55%;
+  height: auto;
+}
+
+.logo img {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.sign-in-form .form-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+/* Estilos para los placeholders */
+.form-control::placeholder {
+  color: #aaa; /* Color del texto */
+  font-size: 14px; /* Tamaño de fuente más pequeño */
+  opacity: 0.8; /* Transparencia */
+  font-family: 'Open Sans', sans-serif; /* Fuente */
+  text-align: left; /* Alinea el texto del placeholder a la izquierda */
+  top: 20px; /* Ajusta la posición vertical */
+  transform-origin: left top; /* Establece el origen de la transformación */
+  pointer-events: none; /* Permite que los clics pasen a través del placeholder */
+}
+
+.form-control:focus {
+  border-color: #1D3557;
+  outline: none;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: -2px;
+  margin-top: -8px;
+  font-size: 12px;
+}
+
+.forgot-password a {
+  color: #888;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.btn {
+  cursor: pointer;
+  padding: 5px 45px;
+  border-radius: 25px;
+  border: none;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 18px;
+  font-family: 'Open Sans', sans-serif;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+  background-color: #1D3557;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #152538;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Error message styles */
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  text-align: left;
+  padding-left: 15px;
+}
+
+.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
+
+/* Estilos para el mensaje de recuperación de credenciales */
+.forgot-message {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #1D3557;
+  color: #333;
+  font-size: 13px;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

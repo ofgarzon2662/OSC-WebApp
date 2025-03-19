@@ -1,0 +1,65 @@
+<div class="sign-in-container">
+  <div class="sign-in-form-container">
+    <div class="logo-container">
+      <img src="assets/images/OpenScienceChain_logo_horiz_white.png" alt="Open Science Chain Logo" class="logo">
+    </div>
+
+    <form [formGroup]="signInForm" class="sign-in-form">
+      <div class="form-group">
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          placeholder="username or email"
+          required
+          data-cy="username-input">
+        <div *ngIf="signInForm.get('username')?.invalid && signInForm.get('username')?.touched"
+             class="error-message"
+             data-cy="username-error">
+          Username is required
+        </div>
+      </div>
+
+      <div class="forgot-password">
+        <a href="#" (click)="onForgotCredentials($event)">Forgot password or username?</a>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="password"
+          required
+          data-cy="password-input">
+        <div *ngIf="signInForm.get('password')?.invalid && signInForm.get('password')?.touched"
+             class="error-message"
+             data-cy="password-error">
+          Password is required
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button"
+                class="btn btn-primary"
+                [disabled]="signInForm.invalid"
+                (click)="onSubmit()"
+                data-cy="login-button">Sign In</button>
+      </div>
+
+      <!-- Mensaje de error de credenciales inválidas -->
+      <div *ngIf="invalidCredentials"
+           class="error-message text-center mt-3"
+           data-cy="invalid-credentials">
+        Username and/or password not valid, please try again
+      </div>
+    </form>
+
+    <!-- Mensaje de recuperación de credenciales -->
+    <div *ngIf="showForgotMessage" class="forgot-message">
+      If you forgot your password or username, please send an email to block&#64;manager.com
+    </div>
+  </div>
+</div>
