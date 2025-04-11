@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../guards/auth.guard';
 
 export const artifactsRoutes: Routes = [
   {
     path: 'create',
-    loadComponent: () => import('./create-artifact/create-artifact.component').then(m => m.CreateArtifactComponent)
+    redirectTo: '/contribute',
+    pathMatch: 'full'
   }
 ]; 

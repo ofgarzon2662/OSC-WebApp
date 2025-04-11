@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
+import { authGuard } from './guards/auth.guard';
 
 // Componente vacío para la ruta raíz
 @Component({
@@ -21,6 +22,13 @@ export const routes: Routes = [
   {
     path: 'artifacts',
     loadChildren: () => import('./artifacts/artifacts.module').then(m => m.ArtifactsModule)
+  },
+
+  // Ruta protegida para crear artefactos
+  {
+    path: 'contribute',
+    loadComponent: () => import('./artifacts/create-artifact/create-artifact.component').then(m => m.CreateArtifactComponent),
+    canActivate: [authGuard]
   },
 
   // Ruta de fallback para cualquier ruta no definida
