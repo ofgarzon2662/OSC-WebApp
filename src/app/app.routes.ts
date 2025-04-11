@@ -17,6 +17,12 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
   },
 
+  // Artifacts module
+  {
+    path: 'artifacts',
+    loadChildren: () => import('./artifacts/artifacts.module').then(m => m.ArtifactsModule)
+  },
+
   // Ruta de fallback para cualquier ruta no definida
   { path: '**', redirectTo: '' }
 ];
