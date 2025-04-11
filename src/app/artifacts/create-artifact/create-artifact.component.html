@@ -143,4 +143,97 @@
       </div>
     </div>
   </form>
+
+  <div class="file-upload-divider"></div>
+
+  <div class="file-upload-section">
+    <h2 class="section-title">Select folders or files</h2>
+    
+    <!-- Drag & Drop Zone -->
+    <div 
+      class="drop-zone" 
+      (dragover)="onDragOver($event)" 
+      (dragleave)="onDragLeave($event)" 
+      (drop)="onDrop($event)"
+      [class.drag-over]="isDragging"
+    >
+      <div class="drop-zone-content" *ngIf="!selectedFile && !isProcessing">
+        <div class="icon-container">
+          <i class="bi bi-cloud-upload"></i>
+        </div>
+        <h3>Drop Folders or Files here</h3>
+        <p>Or</p>
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="selectFolder()">
+            <i class="bi bi-folder-plus"></i> Select a Folder
+          </button>
+          <button type="button" class="btn btn-primary" (click)="selectFile()">
+            <i class="bi bi-file-earmark-plus"></i> Select a File
+          </button>
+        </div>
+        <p class="max-size-info">Max File/folder size is 500MB</p>
+      </div>
+
+      <!-- Processing State -->
+      <div class="processing-state" *ngIf="isProcessing">
+        <div class="processing-animation">
+          <i class="bi bi-gear-fill rotating"></i>
+        </div>
+        <h3>🧠 We're hashing this out for you!</h3>
+        <p>Sit tight, don't click away – we're turning your file into a beautiful, immutable truth nugget 🔐✨</p>
+        <div class="loading-animation">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-state" *ngIf="uploadError">
+        <div class="error-icon">
+          <i class="bi bi-exclamation-circle"></i>
+        </div>
+        <h3>😬 Well, that didn't go as planned...</h3>
+        <p>{{errorMessage}}</p>
+        <button type="button" class="btn btn-primary" (click)="resetUpload()">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Success State -->
+      <div class="success-state" *ngIf="selectedFile && !isProcessing">
+        <div class="success-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <h3>File Successfully Processed!</h3>
+        <div class="file-info">
+          <p><strong>Name:</strong> {{selectedFile.name}}</p>
+          <p><strong>Hash:</strong> {{fileHash}}</p>
+          <p><strong>Size:</strong> {{formatFileSize(selectedFile.size)}}</p>
+        </div>
+        <button type="button" class="btn btn-outline-primary" (click)="resetUpload()">
+          Choose Different File
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="form-navigation">
+    <button type="button" class="btn btn-secondary" (click)="goBack()">
+      Cancel and Go Back
+    </button>
+    <button 
+      type="button" 
+      class="btn btn-primary" 
+      [disabled]="!artifactForm.valid || !selectedFile || isProcessing"
+      (click)="onSubmit()"
+    >
+      Continue
+    </button>
+  </div>
+
+  <!-- Hidden file inputs -->
+  <input #fileInput type="file" style="display: none" (change)="handleFileSelection($event)">
+  <input #folderInput type="file" webkitdirectory style="display: none" (change)="handleFileSelection($event)">
 </div> 
