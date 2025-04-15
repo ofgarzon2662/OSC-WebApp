@@ -6,8 +6,10 @@ import { Location } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 import JSZip from 'jszip';
 
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB in bytes
-const MAX_FILES_COUNT = 1000; // Límite razonable de archivos
+// Size limits
+const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;  // 20MB for single files
+const MAX_FOLDER_SIZE = 15 * 1024 * 1024;       // 15MB for folders
+const MAX_FILES_IN_FOLDER = 50;                 // Maximum files in a folder
 
 @Component({
   selector: 'app-create-artifact',
@@ -183,8 +185,8 @@ export class CreateArtifactComponent implements OnInit {
       return;
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      this.showError('File size exceeds 500MB limit');
+    if (file.size > MAX_SINGLE_FILE_SIZE) {
+      this.showError(`File size (${this.formatFileSize(file.size)}) exceeds the limit of ${this.formatFileSize(MAX_SINGLE_FILE_SIZE)}.`);
       return;
     }
 
@@ -208,8 +210,8 @@ export class CreateArtifactComponent implements OnInit {
       return;
     }
 
-    if (files.length > MAX_FILES_COUNT) {
-      this.showError(`Folder contains too many files (${files.length}). Maximum allowed is ${MAX_FILES_COUNT} files.`);
+    if (files.length > MAX_FILES_IN_FOLDER) {
+      this.showError(`Folder contains too many files (${files.length}). Maximum allowed is ${MAX_FILES_IN_FOLDER} files.`);
       return;
     }
 
@@ -217,8 +219,8 @@ export class CreateArtifactComponent implements OnInit {
     let totalSize = 0;
     for (const file of Array.from(files)) {
       totalSize += file.size;
-      if (totalSize > MAX_FILE_SIZE) {
-        this.showError(`Total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FILE_SIZE)}`);
+      if (totalSize > MAX_FOLDER_SIZE) {
+        this.showError(`Total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FOLDER_SIZE)}.`);
         return;
       }
     }
@@ -266,21 +268,8 @@ export class CreateArtifactComponent implements OnInit {
       // Get folder name from the first file's path
       const folderName = fileContents[0].path.split('/')[0];
 
-      // Create ZIP after hash calculation
-      const zip = new JSZip();
-      for (const file of fileContents) {
-        zip.file(file.path, file.content);
-      }
-
-      const zipBlob = await zip.generateAsync({
-        type: 'blob',
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 9
-        }
-      });
-
-      this.selectedFile = new File([zipBlob], `${folderName}.zip`);
+      // Store the folder name as the selected file
+      this.selectedFile = new File([concatenatedContents], folderName);
       this.fileHash = hash;
       this.uploadError = false;
     } catch (error) {
