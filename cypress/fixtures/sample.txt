@@ -1,0 +1,9 @@
+This is a sample text file for Cypress testing purposes.
+It's used to test the file upload functionality in the artifact submission form.
+The content is not important, but the file needs to exist for the tests to work properly.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies
+tincidunt, nunc nisl aliquam nunc, vitae aliquam nisl nunc eget nunc. Nullam auctor, nisl eget
+ultricies tincidunt, nunc nisl aliquam nunc, vitae aliquam nisl nunc eget nunc.
+
+Test file created for OSC-IS WebApp Cypress tests. 

@@ -224,7 +224,8 @@
       Cancel and Go Back
     </button>
     <button 
-      type="button" 
+      data-cy="submit-btn"
+      type="button"
       class="btn btn-primary" 
       [disabled]="!artifactForm.valid || !selectedFile || isProcessing || isSubmitting"
       (click)="onSubmit()"

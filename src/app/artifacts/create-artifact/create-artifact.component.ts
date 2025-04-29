@@ -109,7 +109,17 @@ export class CreateArtifactComponent implements OnInit {
       // Validar que no haya valores vacíos
       const hasEmptyValues = urls.some((url: string) => url === '');
       
-      return hasEmptyValues ? { invalidLinks: true } : null;
+      if (hasEmptyValues) {
+        return { invalidLinks: true };
+      }
+      
+      // URL validation regex pattern
+      const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+      
+      // Check if any URL is invalid
+      const hasInvalidUrls = urls.some((url: string) => !urlPattern.test(url));
+      
+      return hasInvalidUrls ? { invalidLinks: true } : null;
     };
   }
 
@@ -354,15 +364,23 @@ export class CreateArtifactComponent implements OnInit {
   /**
    * Process comma-separated string into a string array
    * @param value Comma-separated string
+   * @param fieldName Optional field name to apply different processing rules
    * @returns Array of strings
    */
-  private processCommaSeparatedField(value: string): string[] {
-    if (!value) return [""];
+  private processCommaSeparatedField(value: string, fieldName?: string): string[] {
+    if (!value) {
+      // For links, return empty array instead of [""]
+      if (fieldName === 'links') return [];
+      return [""];
+    }
     
     const items = value
       .split(',')
       .map(item => item.trim())
       .filter(item => item !== '');
+    
+    // For links, return empty array instead of [""] when no valid items
+    if (items.length === 0 && fieldName === 'links') return [];
     
     return items.length === 0 ? [""] : items;
   }
@@ -400,7 +418,7 @@ export class CreateArtifactComponent implements OnInit {
   private createArtifactDto(formValues: any): CreateArtifactDTO {
     // Process arrays from comma-separated strings
     const keywords = this.processCommaSeparatedField(formValues.keywords);
-    const links = this.processCommaSeparatedField(formValues.links);
+    const links = this.processCommaSeparatedField(formValues.links, 'links');
     const dois = this.processCommaSeparatedField(formValues.doi);
     const fundingAgencies = this.processFundingAgencies(formValues);
     
