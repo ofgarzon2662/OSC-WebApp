@@ -1,7 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import * as CryptoJS from 'crypto-js';
 import { ArtifactService } from '../services/artifact.service';
 import { CreateArtifactDTO } from '../models/artifact';
