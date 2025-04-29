@@ -223,7 +223,18 @@ export class ArtifactService {
     createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<void> {
         // Debug logs
         console.log('=== DEBUG: Sending metadata only ===');
-        console.log('Metadata:', dto);
+        
+        // Log each property separately to avoid truncation in console
+        console.log('Metadata - title:', dto.title);
+        console.log('Metadata - description:', dto.description);
+        console.log('Metadata - keywords:', dto.keywords);
+        console.log('Metadata - links:', dto.links);
+        console.log('Metadata - dois:', dto.dois);
+        console.log('Metadata - fundingAgencies:', dto.fundingAgencies);
+        console.log('Metadata - acknowledgements:', dto.acknowledgements);
+        console.log('Metadata - fileName:', dto.fileName);
+        console.log('Metadata - hash:', dto.hash);
+        
         console.log('=== END DEBUG ===');
         
         // Simplemente enviamos el DTO como JSON, sin FormData ni archivos

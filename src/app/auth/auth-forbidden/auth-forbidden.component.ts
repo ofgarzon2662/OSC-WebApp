@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-auth-forbidden',
   standalone: true,
-  imports: [RouterLink, NgIf],
+  imports: [RouterLink],
   templateUrl: './auth-forbidden.component.html',
   styleUrls: ['./auth-forbidden.component.css']
 })

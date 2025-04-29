@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 
 // Size limits
 const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;  // 20MB for single files
-const MAX_FOLDER_SIZE = 15 * 1024 * 1024;       // 15MB for folders
+const MAX_FOLDER_SIZE = 20 * 1024 * 1024;       // 20MB for folders
 const MAX_FILES_IN_FOLDER = 50;                 // Maximum files in a folder
 
 @Component({
