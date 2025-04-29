@@ -113,7 +113,7 @@ describe('AppComponent', () => {
       (link as HTMLAnchorElement).textContent?.trim() ?? '');
 
     expect(linkTexts).toContain('Contribute');
-    expect(linkTexts).toContain('Sign in');
+    expect(linkTexts).toContain('Sign In');
   });
 
   it('should include artifacts-preview component', () => {

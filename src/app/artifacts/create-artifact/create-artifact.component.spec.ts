@@ -634,7 +634,7 @@ describe('CreateArtifactComponent', () => {
       // Validate correct empty array handling
       const submitArgs = artifactServiceSpy.createArtifactMetadataOnly.calls.mostRecent().args[0];
       expect(submitArgs.keywords).toEqual(['']);
-      expect(submitArgs.links).toEqual(['']);
+      expect(submitArgs.links).toEqual([]);
       expect(submitArgs.dois).toEqual(['']);
       expect(submitArgs.fundingAgencies).toEqual(['']);
       

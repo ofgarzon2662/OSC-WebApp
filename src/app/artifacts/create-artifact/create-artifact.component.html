@@ -227,10 +227,10 @@
       data-cy="submit-btn"
       type="button"
       class="btn btn-primary" 
-      [disabled]="!artifactForm.valid || !selectedFile || isProcessing || isSubmitting"
+      [disabled]="!artifactForm.valid || !selectedFile"
       (click)="onSubmit()"
     >
-      {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+      Submit
     </button>
   </div>
 
