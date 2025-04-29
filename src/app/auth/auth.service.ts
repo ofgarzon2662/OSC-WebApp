@@ -103,14 +103,21 @@ export class AuthService {
     // Clear any existing interval
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
+      this.tokenCheckInterval = null;
     }
     
-    // Check token validity every 5 minutes
-    this.tokenCheckInterval = setInterval(() => {
-      if (this.isAuthenticatedSubject.value) {
-        this.validateTokenLocallyAndWithBackend();
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    // In test environments, setInterval might be replaced by Jasmine clock mock
+    try {
+      // Check token validity every 5 minutes
+      this.tokenCheckInterval = setInterval(() => {
+        if (this.isAuthenticatedSubject.value) {
+          this.validateTokenLocallyAndWithBackend();
+        }
+      }, 5 * 60 * 1000); // 5 minutes
+    } catch (e) {
+      console.warn('Error setting up token refresh timer:', e);
+      // Avoid breaking the app - we'll still validate on navigation and other actions
+    }
   }
 
   /**
@@ -186,9 +193,20 @@ export class AuthService {
       const storedDataStr = localStorage.getItem('tokenData');
       if (!storedDataStr) return null;
       
-      return JSON.parse(storedDataStr) as StoredTokenData;
+      const parsedData = JSON.parse(storedDataStr) as StoredTokenData;
+      
+      // Validate required properties exist
+      if (!parsedData.token || typeof parsedData.expiresAt !== 'number') {
+        // If data is invalid, clean up and return null
+        localStorage.removeItem('tokenData');
+        return null;
+      }
+      
+      return parsedData;
     } catch (e) {
       console.error('Error parsing stored token data:', e);
+      // Clean up corrupt data
+      localStorage.removeItem('tokenData');
       return null;
     }
   }
