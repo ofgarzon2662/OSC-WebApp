@@ -453,4 +453,36 @@ textarea.form-control {
   40% { 
     transform: scale(1.0);
   }
+}
+
+/* Submit Buttons */
+.submit-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  background-color: #f8f9fa;
+  color: #545b62;
+  border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+  background-color: #e2e6ea;
+}
+
+.submit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #218838;
+}
+
+.submit-btn:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
 } 

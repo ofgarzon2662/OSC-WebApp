@@ -8,7 +8,7 @@ import { inject } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 export const authInterceptor: HttpInterceptorFn = (

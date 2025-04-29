@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
 import { authGuard } from './guards/auth.guard';
+import { canCreateArtifactGuard } from './guards/role.guard';
 
 // Componente vacío para la ruta raíz
 @Component({
@@ -24,11 +25,17 @@ export const routes: Routes = [
     loadChildren: () => import('./artifacts/artifacts.module').then(m => m.ArtifactsModule)
   },
 
-  // Ruta protegida para crear artefactos
+  // Ruta protegida para crear artefactos (verifica autenticación y rol)
   {
     path: 'contribute',
     loadComponent: () => import('./artifacts/create-artifact/create-artifact.component').then(m => m.CreateArtifactComponent),
-    canActivate: [authGuard]
+    canActivate: [canCreateArtifactGuard]
+  },
+
+  // Ruta para la página de acceso prohibido
+  {
+    path: 'forbidden',
+    loadComponent: () => import('./auth/auth-forbidden/auth-forbidden.component').then(m => m.AuthForbiddenComponent)
   },
 
   // Ruta de fallback para cualquier ruta no definida
