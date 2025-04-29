@@ -9,9 +9,9 @@ import { environment } from '../../../environments/environment';
     providedIn: 'root'
 })
 export class ArtifactService {
-    private apiUrl = `${environment.apiUrl}/artifacts`;
+    private readonly apiUrl = `${environment.apiUrl}/artifacts`;
 
-    constructor(private http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {}
 
     /**
      * Creates a new artifact
@@ -144,7 +144,7 @@ export class ArtifactService {
         formData.append('fundingAgencies', JSON.stringify(dto.fundingAgencies || [""]));
         
         // Acknowledgements
-        formData.append('acknowledgements', dto.acknowledgements || "");
+        formData.append('acknowledgements', dto.acknowledgements ?? "");
         
         // Añadir el archivo al final
         formData.append('file', fileData.content, fileData.name);
@@ -185,7 +185,7 @@ export class ArtifactService {
             links: dto.links || [""],
             dois: dto.dois || [""],
             fundingAgencies: dto.fundingAgencies || [""],
-            acknowledgements: dto.acknowledgements || ""
+            acknowledgements: dto.acknowledgements ?? ""
         };
         
         // Convertir a string y añadir como 'data'

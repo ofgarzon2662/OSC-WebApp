@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
-import { authGuard } from './guards/auth.guard';
 import { canCreateArtifactGuard } from './guards/role.guard';
 
 // Componente vacío para la ruta raíz

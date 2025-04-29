@@ -1,12 +1,10 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
-import JSZip from 'jszip';
 import { ArtifactService } from '../services/artifact.service';
-import { CreateArtifactDTO, FileData } from '../models/artifact';
+import { CreateArtifactDTO } from '../models/artifact';
 import { ToastrService } from 'ngx-toastr';
 
 // Size limits
@@ -37,11 +35,10 @@ export class CreateArtifactComponent implements OnInit {
   @ViewChild('folderInput') folderInput!: ElementRef;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private location: Location,
-    private artifactService: ArtifactService,
-    private toastr: ToastrService
+    private readonly fb: FormBuilder,
+    private readonly location: Location,
+    private readonly artifactService: ArtifactService,
+    private readonly toastr: ToastrService
   ) {
     this.artifactForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
@@ -124,7 +121,7 @@ export class CreateArtifactComponent implements OnInit {
         return null; // Campo vacío es válido
       }
 
-      const doiPattern = /^10.\d{4,9}\/[-._;()\/:A-Z0-9]+$/i;
+      const doiPattern = /^10.\d{4,9}\/[-._;()/:A-Z0-9]+$/i;
       const dois = control.value.split(',').map((doi: string) => doi.trim());
       
       const invalidDois = dois.some((doi: string) => !doiPattern.test(doi));
@@ -206,7 +203,9 @@ export class CreateArtifactComponent implements OnInit {
       this.fileHash = hash;
       this.uploadError = false;
     } catch (error) {
-      this.showError('Error processing file');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error processing file';
+      this.showError(`Error processing file: ${errorMessage}`);
+      console.error('File processing error:', error);
     } finally {
       this.isProcessing = false;
     }
@@ -246,8 +245,7 @@ export class CreateArtifactComponent implements OnInit {
       const fileContents: { path: string; content: ArrayBuffer }[] = [];
 
       // Read all files
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (const file of Array.from(files)) {
         const content = await file.arrayBuffer();
         fileContents.push({
           path: file.webkitRelativePath,
@@ -354,133 +352,172 @@ export class CreateArtifactComponent implements OnInit {
     this.isSubmitting = false;
   }
 
+  /**
+   * Process comma-separated string into a string array
+   * @param value Comma-separated string
+   * @returns Array of strings
+   */
+  private processCommaSeparatedField(value: string): string[] {
+    if (!value) return [""];
+    
+    const items = value
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item !== '');
+    
+    return items.length === 0 ? [""] : items;
+  }
+
+  /**
+   * Process funding agencies from form values
+   * @param formValues Form values containing agency checkboxes and other agency field
+   * @returns Array of funding agency strings
+   */
+  private processFundingAgencies(formValues: any): string[] {
+    const agencies: string[] = [];
+    
+    // Add selected checkbox agencies
+    if (formValues.nsf) agencies.push('NSF');
+    if (formValues.nih) agencies.push('NIH');
+    if (formValues.noaa) agencies.push('NOAA');
+    if (formValues.nasa) agencies.push('NASA');
+    
+    // Add other agencies if provided
+    if (formValues.otherAgency) {
+      const otherAgencies = this.processCommaSeparatedField(formValues.otherAgency);
+      if (otherAgencies[0] !== "") {
+        agencies.push(...otherAgencies);
+      }
+    }
+    
+    return agencies.length === 0 ? [""] : agencies;
+  }
+
+  /**
+   * Create artifact DTO from form values and file data
+   * @param formValues Raw form values
+   * @returns Formatted CreateArtifactDTO object
+   */
+  private createArtifactDto(formValues: any): CreateArtifactDTO {
+    // Process arrays from comma-separated strings
+    const keywords = this.processCommaSeparatedField(formValues.keywords);
+    const links = this.processCommaSeparatedField(formValues.links);
+    const dois = this.processCommaSeparatedField(formValues.doi);
+    const fundingAgencies = this.processFundingAgencies(formValues);
+    
+    // Log for debugging
+    this.logProcessedData(keywords, links, dois, fundingAgencies);
+    
+    // Create and return the DTO
+    return {
+      title: formValues.title,
+      description: formValues.description,
+      keywords,
+      links,
+      dois,
+      fundingAgencies,
+      acknowledgements: formValues.acknowledgment ?? '', // Ensure it's never undefined or null
+      fileName: this.selectedFile!.name,
+      hash: this.fileHash
+    };
+  }
+
+  /**
+   * Log processed form data for debugging
+   */
+  private logProcessedData(keywords: string[], links: string[], dois: string[], fundingAgencies: string[]): void {
+    console.log('=== DEBUG: Processed Form Data ===');
+    console.log('Keywords:', keywords);
+    console.log('Links:', links);
+    console.log('DOIs:', dois);
+    console.log('Funding Agencies:', fundingAgencies);
+    console.log('=== END DEBUG ===');
+  }
+
+  /**
+   * Submit the artifact to the backend
+   * @param artifactDto The prepared artifact data
+   */
+  private submitArtifact(artifactDto: CreateArtifactDTO): void {
+    // Show processing state
+    this.isProcessing = true;
+    
+    // Log for debugging
+    console.log('=== DEBUG: Final DTO ===');
+    console.log('Final DTO object:', artifactDto);
+    console.log('=== END DEBUG ===');
+    
+    // Submit to backend using metadata-only approach
+    this.artifactService.createArtifactMetadataOnly(artifactDto)
+      .subscribe({
+        next: () => this.handleSubmitSuccess(),
+        error: (error) => this.handleSubmitError(error),
+        complete: () => this.isProcessing = false
+      });
+  }
+
+  /**
+   * Handle successful artifact submission
+   */
+  private handleSubmitSuccess(): void {
+    // Show success message
+    this.toastr.success('Your artifact has been successfully submitted!', 'Success!');
+    
+    // Update form state
+    this.isSubmitted = true;
+    
+    // Reset form for new entry
+    this.resetForm();
+    
+    // End processing state
+    this.isProcessing = false;
+  }
+
+  /**
+   * Handle error during artifact submission
+   * @param error The error object
+   */
+  private handleSubmitError(error: any): void {
+    // Display error message
+    this.showError(`Error creating artifact: ${error.message}`);
+    this.isProcessing = false;
+  }
+
+  /**
+   * Submit form data if valid
+   */
   onSubmit(): void {
     this.isSubmitting = true;
-    if (this.artifactForm.valid && this.selectedFile && this.fileHash && !this.isProcessing) {
-      const formValues = this.artifactForm.value;
-      
-      // Debug - log form values
-      console.log('=== DEBUG: Form Values ===');
-      console.log('Raw form values:', formValues);
-      console.log('=== END DEBUG ===');
-      
-      // Extract arrays from comma-separated strings
-      let keywords: string[] = [];
-      if (formValues.keywords) {
-        keywords = formValues.keywords
-          .split(',')
-          .map((k: string) => k.trim())
-          .filter((k: string) => k !== '');
-      }
-      
-      // Si keywords está vacío, enviamos [""] en lugar de []
-      if (keywords.length === 0) {
-        keywords = [""];
-      }
-      
-      let links: string[] = [];
-      if (formValues.links) {
-        links = formValues.links
-          .split(',')
-          .map((l: string) => l.trim())
-          .filter((l: string) => l !== '');
-      }
-      
-      // Si links está vacío, enviamos [""] en lugar de []
-      if (links.length === 0) {
-        links = [""];
-      }
-      
-      let dois: string[] = [];
-      if (formValues.doi) {
-        dois = formValues.doi
-          .split(',')
-          .map((d: string) => d.trim())
-          .filter((d: string) => d !== '');
-      }
-      
-      // Si dois está vacío, enviamos [""] en lugar de []
-      if (dois.length === 0) {
-        dois = [""];
-      }
-      
-      let fundingAgencies: string[] = [];
-      if (formValues.nsf) fundingAgencies.push('NSF');
-      if (formValues.nih) fundingAgencies.push('NIH');
-      if (formValues.noaa) fundingAgencies.push('NOAA');
-      if (formValues.nasa) fundingAgencies.push('NASA');
-      
-      if (formValues.otherAgency) {
-        const otherAgencies = formValues.otherAgency
-          .split(',')
-          .map((a: string) => a.trim())
-          .filter((a: string) => a !== '');
-        fundingAgencies.push(...otherAgencies);
-      }
-      
-      // Si fundingAgencies está vacío, enviamos [""] en lugar de []
-      if (fundingAgencies.length === 0) {
-        fundingAgencies = [""];
-      }
-      
-      // Debug - log processed arrays
-      console.log('=== DEBUG: Processed Form Data ===');
-      console.log('Keywords:', keywords);
-      console.log('Links:', links);
-      console.log('DOIs:', dois);
-      console.log('Funding Agencies:', fundingAgencies);
-      console.log('=== END DEBUG ===');
-      
-      // Create final DTO
-      const artifactDto: CreateArtifactDTO = {
-        title: formValues.title,
-        description: formValues.description,
-        keywords,
-        links,
-        dois,
-        fundingAgencies,
-        acknowledgements: formValues.acknowledgment || '', // Asegurarse de que nunca sea undefined o null
-        fileName: this.selectedFile.name,
-        hash: this.fileHash
-      };
-      
-      // Debug - log final DTO
-      console.log('=== DEBUG: Final DTO ===');
-      console.log('Final DTO object:', artifactDto);
-      console.log('=== END DEBUG ===');
-      
-      // Show processing state
-      this.isProcessing = true;
-      
-      // Submit to backend using metadata-only approach (no file upload)
-      this.artifactService.createArtifactMetadataOnly(artifactDto)
-        .subscribe({
-          next: () => {
-            // Mostrar mensaje de éxito
-            this.toastr.success('Your artifact has been successfully submitted!', 'Success!');
-            
-            // Marcar como enviado (para deshabilitar el botón)
-            this.isSubmitted = true;
-            
-            // Resetear el formulario para una nueva entrada
-            this.resetForm();
-            
-            // Finalizar el estado de procesamiento
-            this.isProcessing = false;
-          },
-          error: (error) => {
-            // Handle error
-            this.showError(`Error creating artifact: ${error.message}`);
-            this.isProcessing = false;
-          },
-          complete: () => {
-            this.isProcessing = false;
-          }
-        });
-    } else {
+    
+    // Validate form and file data
+    if (!this.isFormAndFileValid()) {
       console.log('Form invalid', this.artifactForm);
       this.isSubmitting = false;
+      return;
     }
+    
+    // Process form data
+    const formValues = this.artifactForm.value;
+    
+    // Debug - log raw form values
+    console.log('=== DEBUG: Form Values ===');
+    console.log('Raw form values:', formValues);
+    console.log('=== END DEBUG ===');
+    
+    // Create DTO and submit
+    const artifactDto = this.createArtifactDto(formValues);
+    this.submitArtifact(artifactDto);
+  }
+
+  /**
+   * Check if form and file data are valid for submission
+   * @returns true if valid, false otherwise
+   */
+  private isFormAndFileValid(): boolean {
+    return this.artifactForm.valid && 
+           !!this.selectedFile && 
+           !!this.fileHash && 
+           !this.isProcessing;
   }
 
   formatFileSize(bytes: number): string {

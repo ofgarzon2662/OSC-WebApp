@@ -54,7 +54,7 @@ export class SignInComponent {
           console.error('Login error:', error);
           this.invalidCredentials = true;
           this.toastr.error(
-            error.error?.message || 'Invalid credentials',
+            error.error?.message ?? 'Invalid credentials',
             'Login Failed'
           );
           this.isLoading = false;

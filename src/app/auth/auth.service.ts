@@ -233,12 +233,14 @@ export class AuthService {
     
     try {
       const payload = this.parseJwt(token);
-      if (payload && payload.exp) {
+      if (payload?.exp) {
         // exp is in seconds, convert to milliseconds
         expiresAtMs = payload.exp * 1000;
       }
-    } catch (e) {
-      console.warn('Could not parse JWT expiration, using default expiration time');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.warn(`Could not parse JWT expiration: ${errorMessage}. Using default expiration time.`);
+      console.error('JWT Parsing Error:', error);
     }
     
     // Store token and expiration
@@ -377,7 +379,7 @@ export class AuthService {
   
   getUserRoles(): UserRole[] {
     const payload = this.decodeToken();
-    if (!payload || !payload.roles) return [];
+    if (!payload?.roles) return [];
     
     // Convertir los roles del token a UserRole (asumiendo que coinciden con nuestro enum)
     return payload.roles.map(role => role.toLowerCase() as UserRole);
@@ -409,12 +411,12 @@ export class AuthService {
   // Obtener el nombre de usuario del token
   getUsername(): string | null {
     const payload = this.decodeToken();
-    return payload?.username || null;
+    return payload?.username ?? null;
   }
 
   // Obtener el email del usuario del token
   getUserEmail(): string | null {
     const payload = this.decodeToken();
-    return payload?.email || null;
+    return payload?.email ?? null;
   }
 }
