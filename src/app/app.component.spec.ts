@@ -167,6 +167,9 @@ describe('AppComponent', () => {
 
     it('should handle logout error gracefully', () => {
       const error = new Error('Logout failed');
+      // Guardar la implementación original
+      const originalLogout = authService.logout;
+      // Configurar temporalmente para que devuelva un error
       (authService.logout as jasmine.Spy).and.returnValue(throwError(() => error));
       spyOn(console, 'error');
 
@@ -174,6 +177,9 @@ describe('AppComponent', () => {
 
       expect(console.error).toHaveBeenCalledWith('Logout error:', error);
       expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
+      
+      // Restaurar la implementación original después de la prueba
+      (authService.logout as jasmine.Spy).and.returnValue(of({}));
     });
   });
 
