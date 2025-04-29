@@ -8,7 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, of, throwError } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './auth/auth.service';
 
 // Mock services
 const mockToastr = {

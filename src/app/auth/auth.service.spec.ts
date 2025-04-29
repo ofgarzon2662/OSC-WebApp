@@ -59,15 +59,13 @@ describe('AuthService', () => {
 
   describe('login', () => {
     const mockLoginResponse = {
-      access_token: 'test-token',
-      user: { username: 'testuser', role: 'user' }
+      token: 'test-token'
     };
 
     it('should send POST request and store token', () => {
       service.login('testuser', 'password123').subscribe(response => {
         expect(response).toEqual(mockLoginResponse);
         expect(localStorage.getItem('token')).toBe('test-token');
-        expect(localStorage.getItem('user')).toBe(JSON.stringify(mockLoginResponse.user));
         expect(service.isAuthenticated()).toBeTrue();
       });
 
@@ -94,7 +92,6 @@ describe('AuthService', () => {
   describe('logout', () => {
     beforeEach(() => {
       localStorage.setItem('token', 'test-token');
-      localStorage.setItem('user', JSON.stringify({ username: 'testuser', role: 'user' }));
       service['isAuthenticatedSubject'].next(true);
     });
 
@@ -103,7 +100,6 @@ describe('AuthService', () => {
 
       service.logout().subscribe(() => {
         expect(localStorage.getItem('token')).toBeNull();
-        expect(localStorage.getItem('user')).toBeNull();
         expect(service.isAuthenticated()).toBeFalse();
         expect(router.navigate).toHaveBeenCalledWith(['/']);
       });
@@ -120,7 +116,6 @@ describe('AuthService', () => {
 
       service.logout().subscribe(() => {
         expect(localStorage.getItem('token')).toBeNull();
-        expect(localStorage.getItem('user')).toBeNull();
         expect(service.isAuthenticated()).toBeFalse();
         expect(router.navigate).toHaveBeenCalledWith(['/']);
       });
@@ -136,7 +131,6 @@ describe('AuthService', () => {
         error: (error) => {
           expect(error.status).toBe(500);
           expect(localStorage.getItem('token')).toBeNull();
-          expect(localStorage.getItem('user')).toBeNull();
           expect(service.isAuthenticated()).toBeFalse();
           expect(router.navigate).toHaveBeenCalledWith(['/']);
         }

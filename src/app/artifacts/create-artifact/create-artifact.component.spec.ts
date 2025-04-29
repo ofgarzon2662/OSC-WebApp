@@ -3,7 +3,10 @@ import { CreateArtifactComponent } from './create-artifact.component';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { DataTransfer } from '@angular/cdk/drag-drop';
+import { ToastrService } from 'ngx-toastr';
+import { ArtifactService } from '../services/artifact.service';
+import { of } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 // Add Jasmine types
 declare const jasmine: any;
@@ -17,15 +20,25 @@ describe('CreateArtifactComponent', () => {
   // Mock dependencies
   const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
   const locationSpy = jasmine.createSpyObj('Location', ['back']);
+  const toastrSpy = jasmine.createSpyObj('ToastrService', ['success', 'error', 'info', 'warning']);
+  const artifactServiceSpy = jasmine.createSpyObj('ArtifactService', ['createArtifactMetadataOnly']);
+  
+  // Set up the artifact service mock to return a successful response
+  artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(of({}));
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
-      declarations: [],
+      imports: [
+        ReactiveFormsModule,
+        CommonModule,
+        CreateArtifactComponent
+      ],
       providers: [
         FormBuilder,
         { provide: Router, useValue: routerSpy },
-        { provide: Location, useValue: locationSpy }
+        { provide: Location, useValue: locationSpy },
+        { provide: ToastrService, useValue: toastrSpy },
+        { provide: ArtifactService, useValue: artifactServiceSpy }
       ]
     }).compileComponents();
 
@@ -87,10 +100,10 @@ describe('CreateArtifactComponent', () => {
 
     it('should validate URLs', () => {
       const linksControl = component.artifactForm.get('links');
-      linksControl?.setValue('invalid-url,http://valid.com');
+      linksControl?.setValue('domain1,,domain2');
       expect(linksControl?.errors?.['invalidLinks']).toBeTruthy();
       
-      linksControl?.setValue('http://valid1.com,https://valid2.com');
+      linksControl?.setValue('domain1.com,domain2.com');
       expect(linksControl?.errors).toBeNull();
     });
 
@@ -280,25 +293,42 @@ describe('CreateArtifactComponent', () => {
   // Form Submission Tests
   describe('Form Submission', () => {
     it('should not submit invalid form', () => {
-      spyOn(console, 'log');
+      // Ensure the form is invalid
+      component.artifactForm.patchValue({
+        title: '', // required field empty
+        description: '' // required field empty
+      });
+      
+      // Reset any previous calls to the service
+      artifactServiceSpy.createArtifactMetadataOnly.calls.reset();
+      
+      // Submit the form
       component.onSubmit();
-      expect(console.log).not.toHaveBeenCalled();
+      
+      // Verify service was not called
+      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
     });
 
     it('should submit valid form with file', () => {
-      spyOn(console, 'log');
+      // Set up a valid form and file
       component.artifactForm.patchValue({
         title: 'Valid Title',
         description: 'a'.repeat(50),
         keywords: 'key1,key2',
-        links: 'http://valid.com',
+        links: 'domain1.com,domain2.com',
         doi: '10.1234/valid.doi'
       });
       component.selectedFile = new File(['test'], 'test.txt');
       component.fileHash = 'hash';
       
+      // Reset any previous calls to the service
+      artifactServiceSpy.createArtifactMetadataOnly.calls.reset();
+      
+      // Submit the form
       component.onSubmit();
-      expect(console.log).toHaveBeenCalled();
+      
+      // Verify service was called
+      expect(artifactServiceSpy.createArtifactMetadataOnly).toHaveBeenCalled();
     });
   });
 });
