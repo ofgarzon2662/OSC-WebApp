@@ -226,10 +226,10 @@
     <button 
       type="button" 
       class="btn btn-primary" 
-      [disabled]="!artifactForm.valid || !selectedFile || isProcessing"
+      [disabled]="!artifactForm.valid || !selectedFile || isProcessing || isSubmitting"
       (click)="onSubmit()"
     >
-      Submit
+      {{ isSubmitting ? 'Submitting...' : 'Submit' }}
     </button>
   </div>
 

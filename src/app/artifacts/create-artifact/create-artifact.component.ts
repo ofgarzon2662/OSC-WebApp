@@ -48,7 +48,7 @@ export class CreateArtifactComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(3000)]],
       keywords: ['', [Validators.maxLength(1000), this.validateCommaSeparated()]],
       links: ['', [Validators.maxLength(2000), this.validateLinks()]],
-      dois: ['', [this.validateDoi()]],
+      doi: ['', [this.validateDoi()]],
       nsf: [false],
       nih: [false],
       noaa: [false],
@@ -110,19 +110,10 @@ export class CreateArtifactComponent implements OnInit {
 
       const urls = control.value.split(',').map((url: string) => url.trim());
       
-      // Verificar que cada URL tenga el protocolo correcto
-      const invalidUrls = urls.some((url: string) => {
-        // Si no tiene protocolo, es inválida
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          return true;
-        }
-        
-        // Validar el formato general de la URL
-        const urlPattern = /^(https?:\/\/)[\w.-]+\.[a-z]{2,}(\/.*)?$/i;
-        return !urlPattern.test(url);
-      });
+      // Validar que no haya valores vacíos
+      const hasEmptyValues = urls.some((url: string) => url === '');
       
-      return invalidUrls ? { invalidLinks: true } : null;
+      return hasEmptyValues ? { invalidLinks: true } : null;
     };
   }
 
@@ -360,6 +351,7 @@ export class CreateArtifactComponent implements OnInit {
     
     // Resetear el estado de envío
     this.isSubmitted = false;
+    this.isSubmitting = false;
   }
 
   onSubmit(): void {
@@ -391,14 +383,7 @@ export class CreateArtifactComponent implements OnInit {
         links = formValues.links
           .split(',')
           .map((l: string) => l.trim())
-          .filter((l: string) => l !== '')
-          .map((l: string) => {
-            // Añadir automáticamente https:// si no tiene protocolo
-            if (!l.startsWith('http://') && !l.startsWith('https://')) {
-              return `https://${l}`;
-            }
-            return l;
-          });
+          .filter((l: string) => l !== '');
       }
       
       // Si links está vacío, enviamos [""] en lugar de []
@@ -407,8 +392,8 @@ export class CreateArtifactComponent implements OnInit {
       }
       
       let dois: string[] = [];
-      if (formValues.dois) {
-        dois = formValues.dois
+      if (formValues.doi) {
+        dois = formValues.doi
           .split(',')
           .map((d: string) => d.trim())
           .filter((d: string) => d !== '');
