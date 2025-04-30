@@ -5,7 +5,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { filter } from 'rxjs/operators';
 import { ArtifactsPreviewComponent } from './components/artifacts-preview/artifacts-preview.component';
 import { WorkflowsPreviewComponent } from './components/workflows-preview/workflows-preview.component';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './auth/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({

@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { of, throwError } from 'rxjs';
 
 import { SignInComponent } from './sign-in.component';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 // Mock services
 const mockToastr = {

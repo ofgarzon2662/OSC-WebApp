@@ -24,12 +24,12 @@
       </a>
 
       <!-- Condicional basado en autenticación -->
-      <a *ngIf="!isAuthenticated" class="nav-link signin-link" routerLink="/auth/sign-in">Sign in</a>
+      <a *ngIf="!isAuthenticated" class="nav-link signin-link" routerLink="/auth/sign-in">Sign In</a>
       <a *ngIf="isAuthenticated"
               class="nav-link signin-link"
               (click)="logout()"
               type="button">
-        Sign out
+        Sign Out
     </a>
     </div>
   </div>

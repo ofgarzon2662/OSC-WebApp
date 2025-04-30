@@ -103,7 +103,7 @@ describe('Login/Logout Flow', () => {
     });
 
     // Logout
-    cy.get('a:contains("Sign out")').click();
+    cy.get('a:contains("Sign Out")').click();
     cy.wait('@logoutRequest');
 
     // Verify logout
@@ -136,7 +136,7 @@ describe('Login/Logout Flow', () => {
     });
 
     // Logout
-    cy.get('a:contains("Sign out")').click();
+    cy.get('a:contains("Sign Out")').click();
     cy.wait('@logoutRequest');
 
     // Verify logout
@@ -169,7 +169,7 @@ describe('Login/Logout Flow', () => {
     });
 
     // Logout
-    cy.get('a:contains("Sign out")').click();
+    cy.get('a:contains("Sign Out")').click();
     cy.wait('@logoutRequest');
 
     // Verify logout
@@ -202,7 +202,7 @@ describe('Login/Logout Flow', () => {
     });
 
     // Logout
-    cy.get('a:contains("Sign out")').click();
+    cy.get('a:contains("Sign Out")').click();
     cy.wait('@logoutRequest');
 
     // Verify logout

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../auth.service';
 // Importa otros módulos que necesites, como ReactiveFormsModule si usas formularios
 
 @Component({
@@ -54,7 +54,7 @@ export class SignInComponent {
           console.error('Login error:', error);
           this.invalidCredentials = true;
           this.toastr.error(
-            error.error?.message || 'Invalid credentials',
+            error.error?.message ?? 'Invalid credentials',
             'Login Failed'
           );
           this.isLoading = false;
