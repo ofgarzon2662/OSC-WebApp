@@ -114,7 +114,7 @@ export class CreateArtifactComponent implements OnInit {
       }
       
       // URL validation regex pattern
-      const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+      const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
       
       // Check if any URL is invalid
       const hasInvalidUrls = urls.some((url: string) => !urlPattern.test(url));
