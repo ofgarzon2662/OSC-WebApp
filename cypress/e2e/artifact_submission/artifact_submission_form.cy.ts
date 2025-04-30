@@ -131,4 +131,84 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.get('.toast-success').should('contain', 'Your artifact has been successfully submitted');
     cy.url().should('include', '/contribute');
   });
+
+  it('Submits artifact with basic information only', () => {
+    const uniqueTitle = `Valid Artifact Title ${Date.now()}`;
+
+    cy.get('#title').type(uniqueTitle).blur();
+    cy.contains('Title must be at least 3 characters').should('not.exist');
+    cy.contains('Title cannot exceed 200 characters').should('not.exist');
+
+    cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
+    cy.contains('Description must be at least 50 characters').should('not.exist');
+    cy.contains('Description cannot exceed 3000 characters').should('not.exist');
+
+    // Upload file
+    cy.fixture('sample.txt', 'base64').then(fileContent => {
+      const testFile = Cypress.Blob.base64StringToBlob(fileContent, 'text/plain');
+      const file = new File([testFile], 'sample.txt', { type: 'text/plain' });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+
+      cy.get('.drop-zone').trigger('drop', { dataTransfer });
+      cy.get('.file-info').should('contain', 'sample.txt');
+      cy.get('.file-hash').should('not.be.empty');
+    });
+
+    cy.intercept('POST', '**/api/v1/artifacts').as('submitArtifact');
+    cy.get('[data-cy="submit-btn"]').should('not.be.disabled').click();
+    cy.wait('@submitArtifact').its('response.statusCode').should('eq', 201);
+    cy.get('.toast-success').should('contain', 'Your artifact has been successfully submitted');
+    cy.url().should('include', '/contribute');
+  });
+
+  it("Submits Artifact with repeated title", () => {
+    const uniqueTitle = `Valid Artifact Title ${Date.now()}`;
+
+    cy.get('#title').type(uniqueTitle).blur();
+
+    cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
+
+    // Upload file
+    cy.fixture('sample.txt', 'base64').then(fileContent => {
+      const testFile = Cypress.Blob.base64StringToBlob(fileContent, 'text/plain');
+      const file = new File([testFile], 'sample.txt', { type: 'text/plain' });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+
+      cy.get('.drop-zone').trigger('drop', { dataTransfer });
+      cy.get('.file-info').should('contain', 'sample.txt');
+      cy.get('.file-hash').should('not.be.empty');
+    });
+
+    cy.intercept('POST', '**/api/v1/artifacts').as('submitArtifact');
+    cy.get('[data-cy="submit-btn"]').should('not.be.disabled').click();
+    cy.wait('@submitArtifact').its('response.statusCode').should('eq', 201);
+    cy.get('.toast-success').should('contain', 'Your artifact has been successfully submitted');
+    cy.url().should('include', '/contribute');
+
+
+    // Submit again with the same title
+    cy.get('#title').type(uniqueTitle).blur();
+    cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
+    // Upload file
+    cy.fixture('sample.txt', 'base64').then(fileContent => {
+      const testFile = Cypress.Blob.base64StringToBlob(fileContent, 'text/plain');
+      const file = new File([testFile], 'sample.txt', { type: 'text/plain' });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+
+      cy.get('.drop-zone').trigger('drop', { dataTransfer });
+      cy.get('.file-info').should('contain', 'sample.txt');
+      cy.get('.file-hash').should('not.be.empty');
+    });
+
+    cy.intercept('POST', '**/api/v1/artifacts').as('submitArtifact');
+    cy.get('[data-cy="submit-btn"]').should('not.be.disabled').click();
+    cy.wait('@submitArtifact').its('response.statusCode').should('eq', 412);
+    cy.contains('An artifact with this title already exists in the organization');
+  });
+    
+    
+    
 });
