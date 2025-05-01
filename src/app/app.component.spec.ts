@@ -8,7 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, of, throwError } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './auth/auth.service';
 
 // Mock services
 const mockToastr = {
@@ -113,7 +113,7 @@ describe('AppComponent', () => {
       (link as HTMLAnchorElement).textContent?.trim() ?? '');
 
     expect(linkTexts).toContain('Contribute');
-    expect(linkTexts).toContain('Sign in');
+    expect(linkTexts).toContain('Sign In');
   });
 
   it('should include artifacts-preview component', () => {
@@ -167,6 +167,9 @@ describe('AppComponent', () => {
 
     it('should handle logout error gracefully', () => {
       const error = new Error('Logout failed');
+      // Guardar la implementación original
+      const originalLogout = authService.logout;
+      // Configurar temporalmente para que devuelva un error
       (authService.logout as jasmine.Spy).and.returnValue(throwError(() => error));
       spyOn(console, 'error');
 
@@ -174,6 +177,9 @@ describe('AppComponent', () => {
 
       expect(console.error).toHaveBeenCalledWith('Logout error:', error);
       expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
+      
+      // Restaurar la implementación original después de la prueba
+      (authService.logout as jasmine.Spy).and.returnValue(of({}));
     });
   });
 
