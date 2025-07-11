@@ -1,0 +1,240 @@
+<div class="create-artifact-container">
+  <header class="header">
+    <h1>Add a New Artifact to your Org's Vault! 🚀</h1>
+    <div class="header-divider"></div>
+  </header>
+
+  <form [formGroup]="artifactForm" (ngSubmit)="onSubmit()" class="artifact-form">
+    <div class="form-grid">
+      <!-- Left Column -->
+      <div class="left-column">
+        <div class="form-group">
+          <label for="title" class="field-label">Title</label>
+          <input 
+            id="title"
+            type="text"
+            formControlName="title"
+            class="form-control"
+            [ngClass]="{'is-invalid': artifactForm.get('title')?.invalid && artifactForm.get('title')?.touched}"
+          >
+          <div *ngIf="artifactForm.get('title')?.invalid && artifactForm.get('title')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('title')?.errors?.['required']">Title is required</small>
+            <small *ngIf="artifactForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters long</small>
+            <small *ngIf="artifactForm.get('title')?.errors?.['maxlength']">Title cannot exceed 200 characters</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="field-label">Description</label>
+          <textarea 
+            id="description"
+            formControlName="description"
+            class="form-control"
+            rows="4"
+            [ngClass]="{'is-invalid': artifactForm.get('description')?.invalid && artifactForm.get('description')?.touched}"
+          ></textarea>
+          <div *ngIf="artifactForm.get('description')?.invalid && artifactForm.get('description')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('description')?.errors?.['required']">Description is required</small>
+            <small *ngIf="artifactForm.get('description')?.errors?.['minlength']">Description must be at least 50 characters long</small>
+            <small *ngIf="artifactForm.get('description')?.errors?.['maxlength']">Description cannot exceed 3000 characters</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="keywords" class="field-label">Key Words</label>
+          <input 
+            id="keywords"
+            type="text"
+            formControlName="keywords"
+            class="form-control"
+            placeholder="Enter keywords, separated by commas"
+            [ngClass]="{'is-invalid': artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched}"
+          >
+          <div *ngIf="artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('keywords')?.errors?.['maxlength']">Keywords cannot exceed 1000 characters</small>
+            <small *ngIf="artifactForm.get('keywords')?.errors?.['invalidFormat']">Please enter valid keywords separated by commas</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="links" class="field-label">Links of interest</label>
+          <input 
+            id="links"
+            type="text"
+            formControlName="links"
+            class="form-control"
+            placeholder="Enter URLs, separated by commas"
+            [ngClass]="{'is-invalid': artifactForm.get('links')?.invalid && artifactForm.get('links')?.touched}"
+          >
+          <div *ngIf="artifactForm.get('links')?.invalid && artifactForm.get('links')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('links')?.errors?.['maxlength']">Links cannot exceed 2000 characters</small>
+            <small *ngIf="artifactForm.get('links')?.errors?.['invalidLinks']">Please enter valid URLs separated by commas</small>
+          </div>
+        </div>
+
+        <div class="form-group last-field">
+          <label for="doi" class="field-label">DOI</label>
+          <input 
+            id="doi"
+            type="text"
+            formControlName="doi"
+            class="form-control"
+            placeholder="ex. DOI: 10.1234/abc123"
+            [ngClass]="{'is-invalid': artifactForm.get('doi')?.invalid && artifactForm.get('doi')?.touched}"
+          >
+          <div *ngIf="artifactForm.get('doi')?.invalid && artifactForm.get('doi')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('doi')?.errors?.['invalidDoi']">Please enter valid DOIs separated by commas</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        <div class="form-group">
+          <label for="fundingAgencies" class="field-label">Funding Agencies</label>
+          <div id="fundingAgencies" class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="nsf">
+              NSF
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="nih">
+              NIH
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="noaa">
+              NOAA
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="nasa">
+              NASA
+            </label>
+          </div>
+          <div class="other-agency">
+            <label for="otherAgency">Other:</label>
+            <input 
+              id="otherAgency"
+              type="text"
+              formControlName="otherAgency"
+              class="form-control"
+              placeholder="Enter agencies, separated by commas"
+              [ngClass]="{'is-invalid': artifactForm.get('otherAgency')?.invalid && artifactForm.get('otherAgency')?.touched}"
+            >
+            <div *ngIf="artifactForm.get('otherAgency')?.invalid && artifactForm.get('otherAgency')?.touched" class="error-message">
+              <small *ngIf="artifactForm.get('otherAgency')?.errors?.['maxlength']">Other agencies cannot exceed 100 characters</small>
+              <small *ngIf="artifactForm.get('otherAgency')?.errors?.['invalidFormat']">Please enter valid agencies separated by commas</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="acknowledgment" class="field-label">Acknowledgment</label>
+          <textarea 
+            id="acknowledgment"
+            formControlName="acknowledgment"
+            class="form-control"
+            rows="4"
+            [ngClass]="{'is-invalid': artifactForm.get('acknowledgment')?.invalid && artifactForm.get('acknowledgment')?.touched}"
+          ></textarea>
+          <div *ngIf="artifactForm.get('acknowledgment')?.invalid && artifactForm.get('acknowledgment')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('acknowledgment')?.errors?.['maxlength']">Acknowledgment cannot exceed 3000 characters</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="file-upload-divider"></div>
+
+  <div class="file-upload-section">
+    <h2 class="section-title">Select folders or files</h2>
+    
+    <!-- Drag & Drop Zone -->
+    <div 
+      class="drop-zone" 
+      (dragover)="onDragOver($event)" 
+      (dragleave)="onDragLeave($event)" 
+      (drop)="onDrop($event)"
+      [class.drag-over]="isDragging"
+    >
+      <div class="drop-zone-content" *ngIf="!selectedFile && !isProcessing">
+        <div class="icon-container">
+          <i class="bi bi-cloud-upload"></i>
+        </div>
+        <h3>Drop Folders or Files here</h3>
+        <p>Or</p>
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="selectFolder()">
+            <i class="bi bi-folder-plus"></i> Select a Folder
+          </button>
+          <button type="button" class="btn btn-primary" (click)="selectFile()">
+            <i class="bi bi-file-earmark-plus"></i> Select a File
+          </button>
+        </div>
+        <p class="max-size-info">Files up to 20MB, Folders up to 20MB and max 50 files</p>
+      </div>
+
+      <!-- Processing State -->
+      <div class="processing-state" *ngIf="isProcessing">
+        <div class="processing-animation">
+          <i class="bi bi-gear-fill rotating"></i>
+        </div>
+        <h3>🧠 We're hashing this out for you!</h3>
+        <p>Sit tight, don't click away – we're turning your file into a beautiful, immutable truth nugget 🔐✨</p>
+        <div class="loading-animation">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-state" *ngIf="uploadError">
+        <div class="error-icon">
+          <i class="bi bi-exclamation-circle"></i>
+        </div>
+        <h3>😬 Well, that didn't go as planned...</h3>
+        <p>{{errorMessage}}</p>
+        <button type="button" class="btn btn-primary" (click)="resetUpload()">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Success State -->
+      <div class="success-state" *ngIf="selectedFile && !isProcessing">
+        <div class="success-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <h3>File Successfully Processed!</h3>
+        <div class="file-info">
+          <p><strong>Name:</strong> {{selectedFile.name}}</p>
+          <p><strong>Hash:</strong> {{fileHash}}</p>
+          <p><strong>Size:</strong> {{formatFileSize(selectedFile.size)}}</p>
+        </div>
+        <button type="button" class="btn btn-outline-primary" (click)="resetUpload()">
+          Choose Different File
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="form-navigation">
+    <button type="button" class="btn btn-secondary" (click)="goBack()">
+      Cancel and Go Back
+    </button>
+    <button 
+      data-cy="submit-btn"
+      type="button"
+      class="btn btn-primary" 
+      [disabled]="!artifactForm.valid || !selectedFile"
+      (click)="onSubmit()"
+    >
+      Submit
+    </button>
+  </div>
+
+  <!-- Hidden file inputs -->
+  <input #fileInput type="file" style="display: none" (change)="handleFileSelection($event)">
+  <input #folderInput type="file" webkitdirectory style="display: none" (change)="handleFileSelection($event)">
+</div> 
