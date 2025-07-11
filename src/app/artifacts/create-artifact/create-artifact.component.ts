@@ -7,6 +7,10 @@ import { CreateArtifactDTO, FileData, ManifestItem } from '../models/artifact';
 import { ToastrService } from 'ngx-toastr';
 
 // Size limits
+//export const MAX_SINGLE_FILE_SIZE = 1024 * 1024 * 1024;   // 1 GB MB
+//export const MAX_FOLDER_SIZE      = 1024 * 1024 * 1024;   // 1 GB MB
+//export const MAX_FILES_IN_FOLDER  = 10000;                 // max files in a folder
+
 export const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;   // 20 MB
 export const MAX_FOLDER_SIZE      = 20 * 1024 * 1024;   // 20 MB
 export const MAX_FILES_IN_FOLDER  = 50;                 // max files in a folder
