@@ -15,7 +15,7 @@ export class ArtifactService {
 
     /**
      * Creates a new artifact by sending only metadata (no file upload)
-     * @param dto The artifact data including hash and filename
+     * @param dto The artifact data including the manifest of files
      * @returns Observable of the creation status
      */
     createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<void> {
@@ -30,8 +30,7 @@ export class ArtifactService {
         console.log('Metadata - dois:', dto.dois);
         console.log('Metadata - fundingAgencies:', dto.fundingAgencies);
         console.log('Metadata - acknowledgements:', dto.acknowledgements);
-        console.log('Metadata - fileName:', dto.fileName);
-        console.log('Metadata - hash:', dto.hash);
+        console.log('Metadata - manifest:', dto.manifest);
         
         console.log('=== END DEBUG ===');
         

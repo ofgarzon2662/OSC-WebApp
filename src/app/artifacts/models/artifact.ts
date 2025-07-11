@@ -12,9 +12,17 @@ export interface CreateArtifactDTO {
     fundingAgencies?: string[]; // Optional array of agency names
     acknowledgements?: string;  // Optional, Length: 0-3000
 
-    // File processing fields (added after file/folder processing)
-    fileName: string;           // Length: 1-1000
-    hash: string;               // SHA-256 hash of the file
+    // Manifest containing details about each file in the artifact
+    manifest: ManifestItem[];
+}
+
+/**
+ * Interface for an item in the artifact's manifest
+ */
+export interface ManifestItem {
+    hash: string;
+    filename: string;
+    algorithm: string;
 }
 
 /**
@@ -27,3 +35,4 @@ export interface FileData {
     hash: string;
     size: number;
 }
+
