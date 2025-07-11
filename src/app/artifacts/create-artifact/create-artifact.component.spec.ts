@@ -7,6 +7,11 @@ import { ToastrService } from 'ngx-toastr';
 import { ArtifactService } from '../services/artifact.service';
 import { of, throwError } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import {
+  MAX_SINGLE_FILE_SIZE,
+  MAX_FOLDER_SIZE,
+  MAX_FILES_IN_FOLDER
+} from './create-artifact.component';   // or from the shared constants file
 
 // Add Jasmine types
 declare const jasmine: any;
@@ -94,8 +99,10 @@ describe('CreateArtifactComponent', () => {
     location = TestBed.inject(Location);
     fixture.detectChanges();
 
-    // Reset spies before each test to prevent state leakage
+    // Reset spies before each test to prevent state leakage,
+    // and ALWAYS restore the stubbed success response.
     artifactServiceSpy.createArtifactMetadataOnly.calls.reset();
+    artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(of({}));
   });
 
   it('should create', () => {
@@ -259,9 +266,9 @@ describe('CreateArtifactComponent', () => {
     }));
 
     it('should reject oversized single files', fakeAsync(() => {
-      const largeFile = new File(['content'], 'large.bin');
-      // Mock the size property reliably for the test
-      Object.defineProperty(largeFile, 'size', { value: 20 * 1024 * 1024 + 1 });
+      // real 20 MB + 1 byte payload
+      const bigPayload = new Uint8Array(MAX_SINGLE_FILE_SIZE + 1);
+      const largeFile  = new File([bigPayload], 'large.bin');
 
       component.handleSingleFileSelection(largeFile);
       tick();
@@ -382,32 +389,6 @@ describe('CreateArtifactComponent', () => {
       expect(component.isProcessing).toBe(false);
     }));
     
-    it('should handle folder with valid files', fakeAsync(() => {
-      // Create mock folder with files using our helper method
-      const files = [
-        createMockFileWithPath('file1 content', 'file1.txt', 'folder/file1.txt'),
-        createMockFileWithPath('file2 content', 'file2.txt', 'folder/file2.txt')
-      ];
-      
-      const fileList = createMockFileList(files);
-      
-      // Mock array buffer creation
-      spyOn(File.prototype, 'arrayBuffer').and.callFake(function(this: File) {
-        return Promise.resolve(new Uint8Array(this.size).buffer);
-      });
-      
-      component.handleFolderSelection(fileList);
-      tick(1000); // Allow async operations to complete
-      
-      expect(component.selectedFilesData.length).toBe(2);
-      expect(component.selectedFilesData[0].name).toBe('folder/file1.txt');
-      expect(component.selectedFilesData[0].hash).toBe('hash1');
-      expect(component.selectedFilesData[1].name).toBe('folder/file2.txt');
-      expect(component.selectedFilesData[1].hash).toBe('hash2');
-      expect(component.uploadError).toBe(false);
-      expect(component.isProcessing).toBe(false);
-    }));
-    
     it('should reject empty folders', fakeAsync(() => {
       const emptyFileList = createMockFileList([]);
       
@@ -420,7 +401,9 @@ describe('CreateArtifactComponent', () => {
     }));
     
     it('should reject folders with too many files', fakeAsync(() => {
-      const manyFiles = Array.from({ length: 51 }, (_, i) => new File([`c${i}`], `f${i}.txt`));
+      const manyFiles = Array.from({ length: MAX_FILES_IN_FOLDER + 1 }, (_, i) =>
+        new File([`c${i}`], `f${i}.txt`)
+      );
       const fileList = createMockFileList(manyFiles);
       
       component.handleFolderSelection(fileList);
@@ -432,10 +415,9 @@ describe('CreateArtifactComponent', () => {
     }));
 
     it('should reject oversized folders', fakeAsync(() => {
-      const file1 = new File(['content1'], 'file1.bin');
-      const file2 = new File(['content2'], 'file2.bin');
-      Object.defineProperty(file1, 'size', { value: 15 * 1024 * 1024 });
-      Object.defineProperty(file2, 'size', { value: 15 * 1024 * 1024 });
+      const big15 = new Uint8Array(MAX_FOLDER_SIZE);          // 15 MB
+      const file1 = new File([big15], 'file1.bin');
+      const file2 = new File([big15], 'file2.bin');
       
       const fileList = createMockFileList([file1, file2]);
       
@@ -468,17 +450,18 @@ describe('CreateArtifactComponent', () => {
       ];
       const fileList = createMockFileList(files);
       
-      // Use a generic spy that returns a predictable hash for any file
-      spyOn(component as any, 'calculateFileHash').and.returnValue(Promise.resolve('mockedHash'));
+      // one generic spy for every file
+      spyOn(component as any, 'calculateFileHash')
+        .and.returnValue(Promise.resolve('mockHash'));
 
       component.handleFolderSelection(fileList);
       tick();
 
       expect(component.selectedFilesData.length).toBe(2);
       expect(component.selectedFilesData[0].name).toBe('folder/file1.txt');
-      expect(component.selectedFilesData[0].hash).toBe('mockedHash');
+      expect(component.selectedFilesData[0].hash).toBe('mockHash');
       expect(component.selectedFilesData[1].name).toBe('folder/file2.txt');
-      expect(component.selectedFilesData[1].hash).toBe('mockedHash');
+      expect(component.selectedFilesData[1].hash).toBe('mockHash');
       expect(component.uploadError).toBe(false);
       expect(component.isProcessing).toBe(false);
     }));
