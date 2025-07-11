@@ -352,27 +352,8 @@ export class AuthService {
   private decodeToken(): TokenPayload | null {
     const token = this.getToken();
     if (!token) return null;
-
-    try {
-      // Dividir el token en sus partes (header, payload, signature)
-      const parts = token.split('.');
-      if (parts.length !== 3) return null;
-
-      // Decodificar la parte del payload (Base64Url)
-      const payload = parts[1];
-      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-
-      return JSON.parse(jsonPayload) as TokenPayload;
-    } catch (e) {
-      console.error('Error decoding token', e);
-      return null;
-    }
+    
+    return this.parseJwt(token) as TokenPayload;
   }
 
   // Métodos relacionados con roles
