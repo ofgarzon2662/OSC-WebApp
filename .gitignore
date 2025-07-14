@@ -49,3 +49,7 @@ cypress.env.json
 cypress/videos
 cypress/screenshots
 cypress/downloads/downloads.html
+
+random_files/
+
+bigfile.bin

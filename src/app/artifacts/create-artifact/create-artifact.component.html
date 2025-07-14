@@ -157,7 +157,7 @@
       (drop)="onDrop($event)"
       [class.drag-over]="isDragging"
     >
-      <div class="drop-zone-content" *ngIf="!selectedFile && !isProcessing">
+      <div class="drop-zone-content" *ngIf="selectedFilesData.length === 0 && !isProcessing">
         <div class="icon-container">
           <i class="bi bi-cloud-upload"></i>
         </div>
@@ -180,7 +180,7 @@
           <i class="bi bi-gear-fill rotating"></i>
         </div>
         <h3>🧠 We're hashing this out for you!</h3>
-        <p>Sit tight, don't click away – we're turning your file into a beautiful, immutable truth nugget 🔐✨</p>
+        <p>{{ processingMessage || 'Sit tight, we are turning your file into a beautiful, immutable truth nugget 🔐✨' }}</p>
         <div class="loading-animation">
           <div class="dot"></div>
           <div class="dot"></div>
@@ -201,18 +201,26 @@
       </div>
 
       <!-- Success State -->
-      <div class="success-state" *ngIf="selectedFile && !isProcessing">
+      <div class="success-state" *ngIf="selectedFilesData.length > 0 && !isProcessing">
         <div class="success-icon">
           <i class="bi bi-check-circle"></i>
         </div>
-        <h3>File Successfully Processed!</h3>
-        <div class="file-info">
-          <p><strong>Name:</strong> {{selectedFile.name}}</p>
-          <p><strong>Hash:</strong> {{fileHash}}</p>
-          <p><strong>Size:</strong> {{formatFileSize(selectedFile.size)}}</p>
+        <h3>Successfully Processed!</h3>
+        
+        <div class="file-list-container">
+          <div *ngFor="let file of selectedFilesData.slice(0, 10)" class="file-item">
+            <span class="file-name" title="{{ file.name }}">{{ formatFileName(file.name) }}</span>
+            <span class="file-hash" title="{{ file.hash }}">sha256:{{ file.hash }}</span>
+            <span class="file-size">({{ formatFileSize(file.size) }})</span>
+          </div>
         </div>
+
+        <div *ngIf="selectedFilesData.length > 10" class="more-files-notice">
+          <p>... and {{ selectedFilesData.length - 10 }} more files.</p>
+        </div>
+        
         <button type="button" class="btn btn-outline-primary" (click)="resetUpload()">
-          Choose Different File
+          Choose Different File/Folder
         </button>
       </div>
     </div>
@@ -227,7 +235,7 @@
       data-cy="submit-btn"
       type="button"
       class="btn btn-primary" 
-      [disabled]="!artifactForm.valid || !selectedFile"
+      [disabled]="!isFormAndFileValid()"
       (click)="onSubmit()"
     >
       Submit

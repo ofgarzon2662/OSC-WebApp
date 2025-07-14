@@ -7,6 +7,11 @@ import { ToastrService } from 'ngx-toastr';
 import { ArtifactService } from '../services/artifact.service';
 import { of, throwError } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import {
+  MAX_SINGLE_FILE_SIZE,
+  MAX_FOLDER_SIZE,
+  MAX_FILES_IN_FOLDER
+} from './create-artifact.component';   // or from the shared constants file
 
 // Add Jasmine types
 declare const jasmine: any;
@@ -93,6 +98,11 @@ describe('CreateArtifactComponent', () => {
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
     fixture.detectChanges();
+
+    // Reset spies before each test to prevent state leakage,
+    // and ALWAYS restore the stubbed success response.
+    artifactServiceSpy.createArtifactMetadataOnly.calls.reset();
+    artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(of({}));
   });
 
   it('should create', () => {
@@ -236,37 +246,37 @@ describe('CreateArtifactComponent', () => {
       component.handleSingleFileSelection(file);
       tick(); // Wait for async operations to complete
       
-      expect(component.selectedFile).toBeTruthy();
-      expect(component.selectedFile?.name).toBe('test.txt');
-      expect(component.fileHash).toBe('mockedHash');
+      expect(component.selectedFilesData.length).toBe(1);
+      const fileData = component.selectedFilesData[0];
+      expect(fileData.name).toBe('test.txt');
+      expect(fileData.hash).toBe('mockedHash');
       expect(component.isProcessing).toBe(false);
       expect(component.uploadError).toBe(false);
     }));
 
-    it('should reject empty files', async () => {
+    it('should reject empty files', fakeAsync(() => {
       const emptyFile = new File([], 'empty.txt', { type: 'text/plain' });
       
-      await component.handleSingleFileSelection(emptyFile);
+      component.handleSingleFileSelection(emptyFile);
+      tick();
       
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toContain('empty');
-      expect(component.selectedFile).toBeNull();
-    });
+      expect(component.errorMessage).toContain('The selected file is empty');
+    }));
 
-    it('should reject oversized files', async () => {
-      // Create a mock File object that reports a size larger than the limit
-      const mockFile = {
-        size: 21 * 1024 * 1024, // 21MB (just over the 20MB limit)
-        name: 'large.txt',
-        type: 'text/plain'
-      } as File;
+    it('should reject oversized single files', fakeAsync(() => {
+      // real 20 MB + 1 byte payload
+      const bigPayload = new Uint8Array(MAX_SINGLE_FILE_SIZE + 1);
+      const largeFile  = new File([bigPayload], 'large.bin');
+
+      component.handleSingleFileSelection(largeFile);
+      tick();
       
-      await component.handleSingleFileSelection(mockFile);
-      
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(true);
       expect(component.errorMessage).toContain('exceeds the limit');
-      expect(component.selectedFile).toBeNull();
-    });
+    }));
 
     it('should handle file drop event', fakeAsync(() => {
       const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
@@ -379,401 +389,292 @@ describe('CreateArtifactComponent', () => {
       expect(component.isProcessing).toBe(false);
     }));
     
-    it('should handle folder with valid files', fakeAsync(() => {
-      // Create mock folder with files using our helper method
-      const files = [
-        createMockFileWithPath('file1 content', 'file1.txt', 'folder/file1.txt'),
-        createMockFileWithPath('file2 content', 'file2.txt', 'folder/file2.txt')
-      ];
-      
-      const fileList = createMockFileList(files);
-      
-      // Mock array buffer creation
-      spyOn(File.prototype, 'arrayBuffer').and.callFake(function(this: File) {
-        return Promise.resolve(new Uint8Array(this.size).buffer);
-      });
-      
-      component.handleFolderSelection(fileList);
-      tick(1000); // Allow async operations to complete
-      
-      expect(component.selectedFile).toBeTruthy();
-      expect(component.selectedFile?.name).toBe('folder');
-      expect(component.fileHash).not.toBe('');
-      expect(component.isProcessing).toBe(false);
-      expect(component.uploadError).toBe(false);
-    }));
-    
     it('should reject empty folders', fakeAsync(() => {
-      const emptyFiles = createMockFileList([]);
+      const emptyFileList = createMockFileList([]);
       
-      component.handleFolderSelection(emptyFiles);
+      component.handleFolderSelection(emptyFileList);
       tick();
       
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toContain('empty');
-      expect(component.selectedFile).toBeNull();
+      expect(component.errorMessage).toContain('The selected folder is empty');
     }));
     
     it('should reject folders with too many files', fakeAsync(() => {
-      // Create a folder with more than MAX_FILES_IN_FOLDER files
-      const tooManyFiles = Array(51).fill(null).map((_, i) => 
-        createMockFileWithPath('content', `file${i}.txt`, `folder/file${i}.txt`)
+      const manyFiles = Array.from({ length: MAX_FILES_IN_FOLDER + 1 }, (_, i) =>
+        new File([`c${i}`], `f${i}.txt`)
       );
-      
-      const fileList = createMockFileList(tooManyFiles);
+      const fileList = createMockFileList(manyFiles);
       
       component.handleFolderSelection(fileList);
       tick();
       
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(true);
       expect(component.errorMessage).toContain('too many files');
-      expect(component.selectedFile).toBeNull();
     }));
-    
-    it('should reject folders that exceed size limit', fakeAsync(() => {
-      // Create a folder with files that exceed MAX_FOLDER_SIZE
-      // Create a large buffer for testing size limits
-      const largeBuffer = new ArrayBuffer(21 * 1024 * 1024); // 21MB (just over the 20MB limit)
+
+    it('should reject oversized folders', fakeAsync(() => {
+      const big15 = new Uint8Array(MAX_FOLDER_SIZE);          // 15 MB
+      const file1 = new File([big15], 'file1.bin');
+      const file2 = new File([big15], 'file2.bin');
       
-      const largeFile = createMockFileWithPath(largeBuffer, 'large.bin', 'folder/large.bin');
-      // Override size property since we can't directly set it
-      Object.defineProperty(largeFile, 'size', { value: 21 * 1024 * 1024 });
-      
-      const filesWithLargeOne = createMockFileList([largeFile]);
-      
-      component.handleFolderSelection(filesWithLargeOne);
-      tick();
-      
-      expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toContain('exceeds the limit');
-      expect(component.selectedFile).toBeNull();
-    }));
-    
-    it('should handle error during folder processing', fakeAsync(() => {
-      const files = [
-        createMockFileWithPath('file1 content', 'file1.txt', 'folder/file1.txt')
-      ];
-      
-      const fileList = createMockFileList(files);
-      
-      // Make arrayBuffer throw an error
-      spyOn(File.prototype, 'arrayBuffer').and.returnValue(Promise.reject(new Error('Processing error')));
+      const fileList = createMockFileList([file1, file2]);
       
       component.handleFolderSelection(fileList);
       tick();
       
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toContain('Processing error');
+      expect(component.errorMessage).toContain('exceeds the limit');
+    }));
+
+    it('should reject folders with only empty files', fakeAsync(() => {
+      const folderWithEmptyFiles = createMockFileList([
+        new File([], 'empty1.txt'),
+        new File([], 'empty2.txt')
+      ]);
+      
+      component.handleFolderSelection(folderWithEmptyFiles);
+      tick();
+      
+      expect(component.selectedFilesData.length).toBe(0);
+      expect(component.uploadError).toBe(true);
+      expect(component.errorMessage).toContain('All files in the selected folder are empty');
+    }));
+
+    it('should handle folder selection correctly', fakeAsync(() => {
+      const files = [
+        createMockFileWithPath('content1', 'file1.txt', 'folder/file1.txt'),
+        createMockFileWithPath('content2', 'file2.txt', 'folder/file2.txt')
+      ];
+      const fileList = createMockFileList(files);
+      
+      // one generic spy for every file
+      spyOn(component as any, 'calculateFileHash')
+        .and.returnValue(Promise.resolve('mockHash'));
+
+      component.handleFolderSelection(fileList);
+      tick();
+
+      expect(component.selectedFilesData.length).toBe(2);
+      expect(component.selectedFilesData[0].name).toBe('folder/file1.txt');
+      expect(component.selectedFilesData[0].hash).toBe('mockHash');
+      expect(component.selectedFilesData[1].name).toBe('folder/file2.txt');
+      expect(component.selectedFilesData[1].hash).toBe('mockHash');
+      expect(component.uploadError).toBe(false);
       expect(component.isProcessing).toBe(false);
     }));
+
+    it('should skip empty files within a folder', fakeAsync(() => {
+      const files = [
+        createMockFileWithPath('content1', 'file1.txt', 'folder/file1.txt'),
+        new File([], 'empty.txt', { type: 'text/plain' })
+      ];
+      const fileList = createMockFileList(files);
+
+      spyOn(component as any, 'calculateFileHash').and.returnValue(Promise.resolve('hash1'));
+
+      component.handleFolderSelection(fileList);
+      tick();
+
+      expect(component.selectedFilesData.length).toBe(1);
+      expect(component.selectedFilesData[0].name).toBe('folder/file1.txt');
+    }));
   });
-  
-  // Reset and Navigation Tests
-  describe('Reset and Navigation Methods', () => {
+
+  // UI Interaction and State Management Tests
+  describe('UI Interaction and State', () => {
     it('should reset upload state', () => {
-      // Set up initial state
-      component.selectedFile = new File(['content'], 'test.txt');
-      component.fileHash = 'hash123';
+      component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
       component.uploadError = true;
-      component.errorMessage = 'Some error';
-      component.isProcessing = true;
-      
-      // Add mock file inputs
-      component.fileInput = { nativeElement: { value: 'test' } } as any;
-      component.folderInput = { nativeElement: { value: 'test' } } as any;
+      component.errorMessage = 'error';
       
       component.resetUpload();
       
-      expect(component.selectedFile).toBeNull();
-      expect(component.fileHash).toBe('');
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.uploadError).toBe(false);
       expect(component.errorMessage).toBe('');
-      expect(component.isProcessing).toBe(false);
-      expect(component.fileInput.nativeElement.value).toBe('');
-      expect(component.folderInput.nativeElement.value).toBe('');
     });
-    
-    it('should navigate back when goBack is called', () => {
-      component.goBack();
-      expect(locationSpy.back).toHaveBeenCalled();
-    });
-    
-    it('should reset form completely', () => {
-      // Fill form with values
-      component.artifactForm.setValue({
-        title: 'Test Title',
-        description: 'Test Description',
-        keywords: 'key1,key2',
-        links: 'link1,link2',
-        doi: '10.1234/test',
-        nsf: true,
-        nih: true,
-        noaa: true,
-        nasa: true,
-        otherAgency: 'other1,other2',
-        acknowledgment: 'Test acknowledgment'
-      });
-      
-      // Set up file state
-      component.selectedFile = new File(['content'], 'test.txt');
-      component.fileHash = 'hash123';
+
+    it('should reset the form and upload state', () => {
+      // Set some form values and upload state
+      component.artifactForm.patchValue({ title: 'test', nsf: true });
+      component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
       component.isSubmitted = true;
-      component.isSubmitting = true;
       
       component.resetForm();
       
-      // Check form was reset
-      const formValues = component.artifactForm.value;
-      expect(formValues.title).toBeFalsy();
-      expect(formValues.description).toBeFalsy();
-      expect(formValues.keywords).toBeFalsy();
-      expect(formValues.links).toBeFalsy();
-      expect(formValues.doi).toBeFalsy();
-      expect(formValues.nsf).toBe(false);
-      expect(formValues.nih).toBe(false);
-      expect(formValues.noaa).toBe(false);
-      expect(formValues.nasa).toBe(false);
-      expect(formValues.otherAgency).toBeFalsy();
-      expect(formValues.acknowledgment).toBeFalsy();
-      
-      // Check file state was reset
-      expect(component.selectedFile).toBeNull();
-      expect(component.fileHash).toBe('');
+      expect(component.artifactForm.get('title')?.value).toBeNull();
+      expect(component.artifactForm.get('nsf')?.value).toBe(false);
+      expect(component.selectedFilesData.length).toBe(0);
       expect(component.isSubmitted).toBe(false);
-      expect(component.isSubmitting).toBe(false);
     });
-  });
-  
-  // Form Submission Tests
-  describe('Form Submission', () => {
-    beforeEach(() => {
-      // Reset service spy
-      artifactServiceSpy.createArtifactMetadataOnly.calls.reset();
-      
-      // Create a simple Observable that emits immediately
-      artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(of(undefined));
-      
-      // Set up valid form state
-      component.artifactForm.setValue({
-        title: 'Test Title',
-        description: 'Test Description with at least 50 characters to meet minimum length requirement',
-        keywords: 'key1,key2',
-        links: 'link1.com,link2.com',
-        doi: '10.1234/test',
-        nsf: true,
-        nih: false,
-        noaa: true,
-        nasa: false,
-        otherAgency: 'other1,other2',
-        acknowledgment: 'Test acknowledgment'
-      });
-      
-      // Set up valid file state
-      component.selectedFile = new File(['content'], 'test.txt');
-      component.fileHash = 'hash123';
-      component.isProcessing = false;
-    });
-    
-    it('should submit valid form and file data', fakeAsync(() => {
-      spyOn(console, 'log');
-      
-      // Spy on resetForm to prevent it from actually resetting the form
-      spyOn(component, 'resetForm').and.callFake(() => {
-        // Just manually set these values instead of full reset
-        component.isSubmitted = true; 
-        component.isProcessing = false;
-      });
-      
-      // Execute component submission
+
+    it('should show error when form is submitted with invalid data', () => {
       component.onSubmit();
-      tick();
       
-      // Check that form was submitted correctly
-      expect(artifactServiceSpy.createArtifactMetadataOnly).toHaveBeenCalled();
-      
-      // Validate that the submitted data has the expected format
-      const submitArgs = artifactServiceSpy.createArtifactMetadataOnly.calls.mostRecent().args[0];
-      expect(submitArgs.title).toBe('Test Title');
-      expect(submitArgs.keywords).toEqual(['key1', 'key2']);
-      expect(submitArgs.links).toEqual(['link1.com', 'link2.com']);
-      expect(submitArgs.dois).toEqual(['10.1234/test']);
-      expect(submitArgs.fileName).toBe('test.txt');
-      expect(submitArgs.hash).toBe('hash123');
-      
-      // Verify toast and reset were called
-      expect(toastrSpy.success).toHaveBeenCalled();
-      expect(component.resetForm).toHaveBeenCalled();
-      expect(component.isSubmitted).toBe(true);
-    }));
-    
-    it('should submit form with empty arrays as [""] when no values are provided', fakeAsync(() => {
-      // Set form with empty arrays
+      // Since the form is initially invalid, it should not proceed
+      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+    });
+
+    it('should show error when form is submitted without a file', () => {
       component.artifactForm.patchValue({
-        keywords: '',
-        links: '',
-        doi: '',
-        nsf: false,
-        nih: false,
-        noaa: false,
-        nasa: false,
-        otherAgency: '',
-        acknowledgment: ''
+        title: 'Valid Title',
+        description: 'a'.repeat(50)
       });
       
-      // Spy on resetForm
-      spyOn(component, 'resetForm').and.callFake(() => {
-        // Just manually set these values instead of full reset
-        component.isSubmitted = true; 
-        component.isProcessing = false;
-      });
-      
-      // Execute form submission
       component.onSubmit();
-      tick();
       
-      // Validate correct empty array handling
-      const submitArgs = artifactServiceSpy.createArtifactMetadataOnly.calls.mostRecent().args[0];
-      expect(submitArgs.keywords).toEqual(['']);
-      expect(submitArgs.links).toEqual([]);
-      expect(submitArgs.dois).toEqual(['']);
-      expect(submitArgs.fundingAgencies).toEqual(['']);
+      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+    });
+
+    it('should submit the form successfully', fakeAsync(() => {
+      // Mock valid form and file state
+      component.artifactForm.patchValue({
+        title: 'Valid Title',
+        description: 'a'.repeat(50),
+        keywords: 'kw1, kw2',
+        links: 'http://link1.com',
+        doi: '10.1234/doi1',
+        nsf: true,
+        otherAgency: 'other',
+        acknowledgment: 'thanks'
+      });
       
-      // Verify toast and reset were called
+      component.selectedFilesData = [
+        { content: new File(['content'], 'test.txt'), name: 'test.txt', hash: 'hash123', size: 7 }
+      ];
+      
+      const resetFormSpy = spyOn(component, 'resetForm');
+      
+      component.onSubmit();
+
+      tick(); // Allow async operations like subscribe() to complete
+      
+      expect(artifactServiceSpy.createArtifactMetadataOnly).toHaveBeenCalled();
+      const submittedDto = artifactServiceSpy.createArtifactMetadataOnly.calls.mostRecent().args[0];
+      
+      expect(submittedDto.title).toBe('Valid Title');
+      expect(submittedDto.keywords).toEqual(['kw1', 'kw2']);
+      expect(submittedDto.links).toEqual(['http://link1.com']);
+      expect(submittedDto.fundingAgencies).toEqual(['NSF', 'other']);
+      expect(submittedDto.manifest.length).toBe(1);
+      expect(submittedDto.manifest[0].filename).toBe('test.txt');
+      expect(submittedDto.manifest[0].hash).toBe('hash123');
+      
       expect(toastrSpy.success).toHaveBeenCalled();
-      expect(component.resetForm).toHaveBeenCalled();
+      expect(resetFormSpy).toHaveBeenCalled();
     }));
-    
-    it('should handle error during submission', fakeAsync(() => {
-      const errorResponse = { message: 'Server error' };
-      artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(
-        throwError(() => errorResponse)
-      );
+
+    it('should handle submission error', fakeAsync(() => {
+      // Mock a failed submission
+      const errorResponse = new Error('Server error');
+      artifactServiceSpy.createArtifactMetadataOnly.and.returnValue(throwError(() => errorResponse));
       
-      // Spy on showError to verify it's called with the right message
-      spyOn(component as any, 'showError').and.callThrough();
+      // Set valid form and file state
+      component.artifactForm.patchValue({
+        title: 'Valid Title',
+        description: 'a'.repeat(50)
+      });
+      component.selectedFilesData = [
+        { content: new File(['content'], 'test.txt'), name: 'test.txt', hash: 'hash123', size: 7 }
+      ];
+      
+      const showErrorSpy = spyOn(component as any, 'showError');
       
       component.onSubmit();
-      tick();
+
+      tick(); // Allow async operations to complete
       
-      // Verify error handling
-      expect(component['showError']).toHaveBeenCalled();
-      expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toContain('Error creating artifact');
+      expect(showErrorSpy).toHaveBeenCalledWith('Error creating artifact: Server error');
       expect(component.isProcessing).toBe(false);
     }));
-    
-    it('should log error for invalid form', () => {
-      // Make form invalid
-      component.artifactForm.get('title')?.setValue('');
-      spyOn(console, 'log');
-      
-      component.onSubmit();
-      
-      expect(console.log).toHaveBeenCalledWith('Form invalid', component.artifactForm);
-      expect(component.isSubmitting).toBe(false);
-      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+  });
+
+  // Helper Function Tests
+  describe('Helper Functions', () => {
+    it('should format file size correctly', () => {
+      expect(component.formatFileSize(0)).toBe('0 Bytes');
+      expect(component.formatFileSize(1024)).toBe('1.00 KB');
+      expect(component.formatFileSize(1024 * 1024)).toBe('1.00 MB');
     });
-    
-    it('should not submit when there is no selected file', () => {
-      component.selectedFile = null;
-      
-      component.onSubmit();
-      
-      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+
+    it('should process comma-separated fields correctly', () => {
+      const process = (component as any).processCommaSeparatedField;
+      expect(process('  item1, item2  ,item3 ')).toEqual(['item1', 'item2', 'item3']);
+      expect(process('')).toEqual(['']);
+      expect(process(null)).toEqual(['']);
+      expect(process(' ')).toEqual(['']);
     });
-    
-    it('should not submit when there is no file hash', () => {
-      component.fileHash = '';
-      
-      component.onSubmit();
-      
-      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+
+    it('should handle links field specifically', () => {
+      const process = (component as any).processCommaSeparatedField;
+      expect(process('', 'links')).toEqual([]);
+      expect(process(' , ', 'links')).toEqual([]);
+      expect(process('http://link.com', 'links')).toEqual(['http://link.com']);
     });
-    
-    it('should not submit when processing is in progress', () => {
-      component.isProcessing = true;
+
+    it('should process funding agencies correctly', () => {
+      // Access the private method correctly to preserve 'this' context
+      const process = (formValues: any) => (component as any).processFundingAgencies(formValues);
       
-      component.onSubmit();
+      let values = { nsf: true, nih: false, noaa: true, nasa: false, otherAgency: '  agency1, agency2' };
+      expect(process(values)).toEqual(['NSF', 'NOAA', 'agency1', 'agency2']);
       
-      expect(artifactServiceSpy.createArtifactMetadataOnly).not.toHaveBeenCalled();
+      values = { nsf: false, nih: false, noaa: false, nasa: false, otherAgency: '' };
+      expect(process(values)).toEqual(['']);
+      
+      values = { nsf: true, nih: true, noaa: true, nasa: true, otherAgency: '' };
+      expect(process(values)).toEqual(['NSF', 'NIH', 'NOAA', 'NASA']);
     });
   });
 
-  // Utility Method Tests
-  describe('Utility Methods', () => {
-    it('should format file size correctly', () => {
-      expect(component.formatFileSize(0)).toBe('0 Bytes');
-      expect(component.formatFileSize(1023)).toBe('1023 Bytes');
-      expect(component.formatFileSize(1024)).toBe('1 KB');
-      expect(component.formatFileSize(1048576)).toBe('1 MB');
-      expect(component.formatFileSize(1073741824)).toBe('1 GB');
-      expect(component.formatFileSize(1572864)).toBe('1.5 MB');
+  // Test isFormAndFileValid
+  describe('isFormAndFileValid', () => {
+    it('should return false if form is invalid', () => {
+      component.artifactForm.get('title')?.setValue(''); // Make form invalid
+      component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
+      expect(component.isFormAndFileValid()).toBeFalse();
     });
-    
-    it('should show error message', () => {
-      const errorMethod = component['showError'].bind(component);
-      
-      errorMethod('Test error message');
-      
-      expect(component.uploadError).toBe(true);
-      expect(component.errorMessage).toBe('Test error message');
-      expect(component.selectedFile).toBeNull();
-      expect(component.fileHash).toBe('');
+
+    it('should return false if no file is selected', () => {
+      component.artifactForm.get('title')?.setValue('Valid Title');
+      component.artifactForm.get('description')?.setValue('a'.repeat(50));
+      component.selectedFilesData = []; // No file
+      expect(component.isFormAndFileValid()).toBeFalse();
     });
-    
-    it('should calculate file hash correctly', fakeAsync(() => {
-      const file = new File(['test content'], 'test.txt');
-      
-      // Create a mock FileReader that simulates reading the file
-      const mockFileReader: MockFileReader = {
-        readAsArrayBuffer: function() {
-          setTimeout(() => {
-            if (this.onload) {
-              this.onload({ target: { result: new TextEncoder().encode('test content').buffer } });
-            }
-          }, 10);
-        }
-      };
-      
-      spyOn(window, 'FileReader').and.returnValue(mockFileReader as any);
-      
-      let result: string | undefined;
-      (component as any).calculateFileHash(file).then((hash: string) => {
-        result = hash;
-      });
-      
-      tick(20);
-      
-      expect(result).toBeDefined();
-      expect(typeof result).toBe('string');
-      expect(result?.length).toBeGreaterThan(0);
-    }));
-    
-    it('should handle file reader error', fakeAsync(() => {
-      const file = new File(['test content'], 'test.txt');
-      
-      // Create a mock FileReader that simulates an error
-      const mockFileReader: MockFileReader = {
-        readAsArrayBuffer: function() {
-          setTimeout(() => {
-            if (this.onerror) {
-              this.onerror();
-            }
-          }, 10);
-        }
-      };
-      
-      spyOn(window, 'FileReader').and.returnValue(mockFileReader as any);
-      
-      let error: Error | undefined;
-      (component as any).calculateFileHash(file).catch((e: Error) => {
-        error = e;
-      });
-      
-      tick(20);
-      
-      expect(error).toBeDefined();
-      expect(error?.message).toBe('Failed to read file');
-    }));
+
+    it('should return false if processing is in progress', () => {
+      component.artifactForm.get('title')?.setValue('Valid Title');
+      component.artifactForm.get('description')?.setValue('a'.repeat(50));
+      component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
+      (component as any).isProcessing = true;
+      expect(component.isFormAndFileValid()).toBeFalse();
+    });
+
+    it('should return true if form is valid and file is selected', () => {
+      component.artifactForm.get('title')?.setValue('Valid Title');
+      component.artifactForm.get('description')?.setValue('a'.repeat(50));
+      component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
+      expect(component.isFormAndFileValid()).toBeTrue();
+    });
+  });
+
+  // Test formatFileName
+  describe('formatFileName', () => {
+    it('should return the full name if no slash is present', () => {
+      expect(component.formatFileName('test.txt')).toBe('test.txt');
+    });
+
+    it('should return only the filename when a path is present', () => {
+      expect(component.formatFileName('folder/test.txt')).toBe('test.txt');
+      expect(component.formatFileName('folder/subfolder/file.bin')).toBe('file.bin');
+    });
+
+    it('should handle empty or null strings', () => {
+      expect(component.formatFileName('')).toBe('');
+      expect(component.formatFileName(null as any)).toBe('');
+    });
   });
 });

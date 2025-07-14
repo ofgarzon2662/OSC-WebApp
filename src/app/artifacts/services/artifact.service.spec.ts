@@ -37,8 +37,7 @@ describe('ArtifactService', () => {
         dois: ['10.1234/test.123'],
         fundingAgencies: ['NSF', 'NIH'],
         acknowledgements: 'Thanks to everyone',
-        fileName: 'test.txt',
-        hash: 'abc123'
+        manifest: [{ filename: 'test.txt', hash: 'abc123', algorithm: 'sha256' }]
       };
 
       // Use any since the flush will return empty object {}, not undefined
@@ -62,8 +61,7 @@ describe('ArtifactService', () => {
         dois: ['10.1234/test.123'],
         fundingAgencies: ['NSF'],
         acknowledgements: 'Thanks',
-        fileName: 'test.txt',
-        hash: 'abc123'
+        manifest: [{ filename: 'test.txt', hash: 'abc123', algorithm: 'sha256' }]
       };
 
       // Spy on console.error to prevent pollution in test output
@@ -94,8 +92,7 @@ describe('ArtifactService', () => {
         dois: ['10.1234/test'],
         fundingAgencies: ['TestAgency'],
         acknowledgements: 'Test acknowledgement',
-        fileName: 'test.txt',
-        hash: 'abcdef123456'
+        manifest: [{ filename: 'test.txt', hash: 'abcdef123456', algorithm: 'sha256' }]
       };
 
       // Spy on console.error to avoid cluttering test output
@@ -125,8 +122,7 @@ describe('ArtifactService', () => {
         dois: ['10.1234/test'],
         fundingAgencies: ['TestAgency'],
         acknowledgements: 'Test acknowledgement',
-        fileName: 'test.txt',
-        hash: 'abcdef123456'
+        manifest: [{ filename: 'test.txt', hash: 'abcdef123456', algorithm: 'sha256' }]
       };
 
       const statusCodes = [
@@ -164,8 +160,7 @@ describe('ArtifactService', () => {
         dois: ['10.1234/test'],
         fundingAgencies: ['TestAgency'],
         acknowledgements: 'Test acknowledgement',
-        fileName: 'test.txt',
-        hash: 'abcdef123456'
+        manifest: [{ filename: 'test.txt', hash: 'abcdef123456', algorithm: 'sha256' }]
       };
 
       // Spy on console.error to avoid cluttering test output

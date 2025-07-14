@@ -3,13 +3,17 @@ import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as CryptoJS from 'crypto-js';
 import { ArtifactService } from '../services/artifact.service';
-import { CreateArtifactDTO } from '../models/artifact';
+import { CreateArtifactDTO, FileData, ManifestItem } from '../models/artifact';
 import { ToastrService } from 'ngx-toastr';
 
 // Size limits
-const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;  // 20MB for single files
-const MAX_FOLDER_SIZE = 20 * 1024 * 1024;       // 20MB for folders
-const MAX_FILES_IN_FOLDER = 50;                 // Maximum files in a folder
+//export const MAX_SINGLE_FILE_SIZE = 1024 * 1024 * 1024;   // 1 GB MB
+//export const MAX_FOLDER_SIZE      = 1024 * 1024 * 1024;   // 1 GB MB
+//export const MAX_FILES_IN_FOLDER  = 10000;                 // max files in a folder
+
+export const MAX_SINGLE_FILE_SIZE = 20 * 1024 * 1024;   // 20 MB
+export const MAX_FOLDER_SIZE      = 20 * 1024 * 1024;   // 20 MB
+export const MAX_FILES_IN_FOLDER  = 50;                 // max files in a folder
 
 @Component({
   selector: 'app-create-artifact',
@@ -24,8 +28,7 @@ export class CreateArtifactComponent implements OnInit {
   isProcessing = false;
   uploadError = false;
   errorMessage = '';
-  selectedFile: File | null = null;
-  fileHash = '';
+  selectedFilesData: FileData[] = [];
   isSubmitted = false;
   isSubmitting = false;
   processingMessage = '';
@@ -156,19 +159,30 @@ export class CreateArtifactComponent implements OnInit {
     event.stopPropagation();
     this.isDragging = false;
 
+    if (this.isProcessing) return;
+
     const items = event.dataTransfer?.items;
     if (!items) return;
 
-    // Verificar si es un archivo o carpeta
-    const entry = items[0].webkitGetAsEntry();
-    if (entry?.isDirectory) {
-      this.showError('Please use the "Select a Folder" button to upload folders');
-      return;
-    }
+    // Check if it's a file or a folder
+    try {
+      const entry = items[0].webkitGetAsEntry();
+      if (entry?.isDirectory) {
+        this.showError('Drag-and-drop for folders is not supported. Please use the "Select a Folder" button.');
+        return;
+      }
 
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      await this.handleSingleFileSelection(files[0]);
+      const files = event.dataTransfer?.files;
+      if (files && files.length > 0) {
+        // If multiple files are dragged, treat as a folder selection
+        if (files.length > 1) {
+            this.showError('You can only drag and drop a single file. For multiple files, please use the "Select a Folder" button.');
+            return;
+        }
+        await this.handleSingleFileSelection(files[0]);
+      }
+    } catch (error) {
+        this.showError('Could not process the dropped item. It might be a folder or an unsupported file type.');
     }
   }
 
@@ -205,11 +219,17 @@ export class CreateArtifactComponent implements OnInit {
     }
 
     this.isProcessing = true;
-    this.selectedFile = file;
+    this.processingMessage = 'Calculating file hash...';
+    this.selectedFilesData = []; // Reset any previous selection
     
     try {
       const hash = await this.calculateFileHash(file);
-      this.fileHash = hash;
+      this.selectedFilesData.push({
+        content: file,
+        name: file.name,
+        hash: hash,
+        size: file.size
+      });
       this.uploadError = false;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error processing file';
@@ -217,6 +237,7 @@ export class CreateArtifactComponent implements OnInit {
       console.error('File processing error:', error);
     } finally {
       this.isProcessing = false;
+      this.processingMessage = '';
     }
   }
 
@@ -231,70 +252,66 @@ export class CreateArtifactComponent implements OnInit {
       return;
     }
 
-    // Calculate total size before processing
+    // Calculate total size and check for empty files
     let totalSize = 0;
-    for (const file of Array.from(files)) {
-      totalSize += file.size;
-      if (totalSize > MAX_FOLDER_SIZE) {
-        this.showError(`Total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FOLDER_SIZE)}.`);
-        return;
-      }
+    let hasNonEmptyFiles = false;
+    for (let i = 0; i < files.length; i++) {
+        const file = files.item(i);
+        if (file) {
+            totalSize += file.size;
+            if (file.size > 0) hasNonEmptyFiles = true;
+        }
     }
 
-    if (totalSize === 0) {
+    if (totalSize > MAX_FOLDER_SIZE) {
+      this.showError(`Total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FOLDER_SIZE)}.`);
+      return;
+    }
+
+    if (!hasNonEmptyFiles) {
       this.showError('All files in the selected folder are empty. Please choose a folder with content.');
       return;
     }
 
-    // Set processing state after validations
     this.isProcessing = true;
     this.uploadError = false;
+    this.selectedFilesData = []; // Reset previous selection
+    this.processingMessage = `Processing ${files.length} files...`;
     
     try {
-      const fileContents: { path: string; content: ArrayBuffer }[] = [];
+      // Process each file to calculate its hash
+      const filePromises = [];
+      for (let i = 0; i < files.length; i++) {
+          const file = files.item(i);
+          if (file) {
+              filePromises.push((async () => {
+                  if (file.size === 0) return null; // Skip empty files
 
-      // Read all files
-      for (const file of Array.from(files)) {
-        const content = await file.arrayBuffer();
-        fileContents.push({
-          path: file.webkitRelativePath,
-          content
-        });
+                  const hash = await this.calculateFileHash(file);
+                  return {
+                      content: file,
+                      name: file.webkitRelativePath || file.name,
+                      hash: hash,
+                      size: file.size,
+                  };
+              })());
+          }
       }
 
-      // Sort files by path for consistent order
-      fileContents.sort((a, b) => a.path.localeCompare(b.path));
+      const filesData = (await Promise.all(filePromises)).filter(Boolean) as FileData[];
 
-      // Create a single buffer with all file contents in a consistent order
-      const concatenatedContents = new Uint8Array(totalSize);
-      let offset = 0;
+      // Sort files by name for a consistent order
+      filesData.sort((a, b) => a.name.localeCompare(b.name));
+      
+      this.selectedFilesData = filesData;
 
-      for (const file of fileContents) {
-        const content = new Uint8Array(file.content);
-        concatenatedContents.set(content, offset);
-        offset += content.length;
-      }
-
-      // Calculate hash from the concatenated contents
-      const hash = CryptoJS.SHA256(
-        CryptoJS.lib.WordArray.create(concatenatedContents)
-      ).toString();
-
-      // Get folder name from the first file's path
-      const folderName = fileContents[0].path.split('/')[0];
-
-      // Store the folder name as the selected file
-      this.selectedFile = new File([concatenatedContents], folderName);
-      this.fileHash = hash;
-      this.uploadError = false;
     } catch (error) {
-      if (error instanceof Error) {
-        this.showError(error.message);
-      } else {
-        this.showError('Error processing folder');
-      }
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error processing folder';
+        this.showError(`Error processing folder: ${errorMessage}`);
+        console.error('Folder processing error:', error);
     } finally {
       this.isProcessing = false;
+      this.processingMessage = '';
     }
   }
 
@@ -323,13 +340,11 @@ export class CreateArtifactComponent implements OnInit {
   private showError(message: string): void {
     this.uploadError = true;
     this.errorMessage = message;
-    this.selectedFile = null;
-    this.fileHash = '';
+    this.selectedFilesData = [];
   }
 
   resetUpload(): void {
-    this.selectedFile = null;
-    this.fileHash = '';
+    this.selectedFilesData = [];
     this.uploadError = false;
     this.errorMessage = '';
     this.isProcessing = false;
@@ -425,6 +440,13 @@ export class CreateArtifactComponent implements OnInit {
     // Log for debugging
     this.logProcessedData(keywords, links, dois, fundingAgencies);
     
+    // Create the manifest from the selected files
+    const manifest: ManifestItem[] = this.selectedFilesData.map(fileData => ({
+        hash: fileData.hash,
+        filename: this.formatFileName(fileData.name),
+        algorithm: 'sha256'
+    }));
+
     // Create and return the DTO
     return {
       title: formValues.title,
@@ -434,8 +456,7 @@ export class CreateArtifactComponent implements OnInit {
       dois,
       fundingAgencies,
       acknowledgements: formValues.acknowledgment ?? '', // Ensure it's never undefined or null
-      fileName: this.selectedFile!.name,
-      hash: this.fileHash
+      manifest
     };
   }
 
@@ -530,20 +551,30 @@ export class CreateArtifactComponent implements OnInit {
    * Check if form and file data are valid for submission
    * @returns true if valid, false otherwise
    */
-  private isFormAndFileValid(): boolean {
+  isFormAndFileValid(): boolean {
     return this.artifactForm.valid && 
-           !!this.selectedFile && 
-           !!this.fileHash && 
+           this.selectedFilesData.length > 0 && 
            !this.isProcessing;
   }
 
-  formatFileSize(bytes: number): string {
+  public formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+  }
+
+  /**
+   * Format the file name to remove the path.
+   * @param name The full file name, possibly with a path.
+   * @returns The file name without the path.
+   */
+  public formatFileName(name: string): string {
+    if (!name) return '';
+    const lastSlash = name.lastIndexOf('/');
+    return lastSlash === -1 ? name : name.substring(lastSlash + 1);
   }
 } 
