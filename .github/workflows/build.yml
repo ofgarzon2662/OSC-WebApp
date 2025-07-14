@@ -46,6 +46,8 @@ jobs:
     - name: Check SONAR_TOKEN present
       run: echo "Token length: ${#SONAR_TOKEN}"
       shell: bash
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     # 6. SonarCloud analysis
     - name: SonarCloud Scan
