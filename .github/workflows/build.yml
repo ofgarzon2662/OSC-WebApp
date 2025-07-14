@@ -42,6 +42,10 @@ jobs:
       with:
         distribution: temurin
         java-version: '17'
+    
+    - name: Check SONAR_TOKEN present
+      run: echo "Token length: ${#SONAR_TOKEN}"
+      shell: bash
 
     # 6. SonarCloud analysis
     - name: SonarCloud Scan
