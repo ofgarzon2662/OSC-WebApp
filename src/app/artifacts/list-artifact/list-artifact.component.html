@@ -1,0 +1,28 @@
+<div class="artifacts-vault-container">
+  <header class="vault-header">
+    <h1>Artifacts Vault</h1>
+    <p>Discover, Search & Explore Artifacts</p>
+    <div class="search-container">
+      <input type="text" placeholder="Search for artifacts..." />
+      <button>Search</button>
+    </div>
+  </header>
+
+  <main class="artifacts-grid" *ngIf="paginatedArtifacts$ | async as artifacts">
+    <app-artifact-card *ngFor="let artifact of artifacts" [artifact]="artifact"></app-artifact-card>
+  </main>
+
+  <footer class="pagination-container" *ngIf="totalPages > 1">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+      &laquo;
+    </button>
+    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button (click)="onPageChange(i + 1)" [class.active]="currentPage === i + 1">
+        {{ i + 1 }}
+      </button>
+    </ng-container>
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
+      &raquo;
+    </button>
+  </footer>
+</div> 

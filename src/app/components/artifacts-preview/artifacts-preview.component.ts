@@ -2,14 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArtifactCardComponent } from './artifact-card/artifact-card.component';
 import { Artifact } from '../../models/artifact.model';
-import { ArtifactService } from '../../services/artifact.service';
+import { ArtifactService } from '../../artifacts/services/artifact.service';
+import { map } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-artifacts-preview',
   templateUrl: './artifacts-preview.component.html',
   styleUrls: ['./artifacts-preview.component.css'],
   standalone: true,
-  imports: [CommonModule, ArtifactCardComponent]
+  imports: [CommonModule, ArtifactCardComponent, RouterModule]
 })
 export class ArtifactsPreviewComponent implements OnInit {
   artifacts: Artifact[] = [];
@@ -17,7 +19,9 @@ export class ArtifactsPreviewComponent implements OnInit {
   constructor(private readonly artifactService: ArtifactService) { }
 
   ngOnInit(): void {
-    this.artifactService.getArtifacts().subscribe(artifacts => {
+    this.artifactService.getArtifacts().pipe(
+      map(artifacts => artifacts.slice(0, 3))
+    ).subscribe(artifacts => {
       this.artifacts = artifacts;
     });
   }

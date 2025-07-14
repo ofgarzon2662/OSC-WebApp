@@ -24,6 +24,12 @@ export const routes: Routes = [
     loadChildren: () => import('./artifacts/artifacts.module').then(m => m.ArtifactsModule)
   },
 
+  // list artifacts
+  {
+    path: 'list-artifacts',
+    loadComponent: () => import('./artifacts/list-artifact/list-artifact.component').then(m => m.ListArtifactComponent)
+  },
+
   // Ruta protegida para crear artefactos (verifica autenticación y rol)
   {
     path: 'contribute',
