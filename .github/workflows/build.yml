@@ -48,6 +48,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: bash
+        run: echo "TEST"
         run: echo "Token length: ${#SONAR_TOKEN}"
 
       # 6 – SonarCloud analysis
