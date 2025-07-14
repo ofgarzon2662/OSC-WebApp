@@ -1,41 +1,57 @@
+# .github/workflows/build.yml
+# ──────────────────────────────────────────────────────────────
+# CI pipeline with SonarCloud analysis (fixed JDK + pinned action)
+# ──────────────────────────────────────────────────────────────
 name: Build
+
 on:
   push:
-    branches:
-      - master
-      - develop
-      - 'feature**'
+    branches: [ master, develop, 'feature**' ]
   pull_request:
-    branches:
-      - master  # Asegura que los PRs a master sean analizados
-      - develop
-    types: [opened, synchronize, reopened]
+    branches: [ master, develop ]   # ensure PRs to these branches are analysed
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.18.3'  # Ajusta según la versión que uses
+    # 1. Checkout sources
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm install
+    # 2. Node.js for Angular build/tests (pin to major version, not a patch)
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'          # LTS / valid semver for the action
 
-      - name: Run tests with coverage
-        run: npx ng test --no-watch --browsers=ChromeHeadless --code-coverage
+    # 3. Project dependencies
+    - name: Install dependencies
+      run: npm ci                  # faster & reproducible
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.branch.name=${{ github.ref_name }}
-            -Dsonar.cpd.exclusions=**/*.spec.ts
+    # 4. Run unit tests + coverage
+    - name: Run tests with coverage
+      run: npx ng test --no-watch --browsers=ChromeHeadless --code-coverage
+
+    # 5. Set up JDK 17 so the scanner re-uses it instead of auto-downloading one
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    # 6. SonarCloud analysis
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v5.1.0   # pinned version
+      env:
+        GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN:       ${{ secrets.SONAR_TOKEN }}
+        # Force the scanner to skip JRE auto-provisioning and use the Java we installed
+        SONAR_SCANNER_OPTS: -Dsonar.scanner.skipJreProvisioning=true
+      with:
+        args: >
+          -Dsonar.branch.name=${{ github.ref_name }}
+          -Dsonar.cpd.exclusions=**/*.spec.ts
