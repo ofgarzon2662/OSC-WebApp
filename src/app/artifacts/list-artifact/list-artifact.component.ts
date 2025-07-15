@@ -64,34 +64,33 @@ export class ListArtifactComponent implements OnInit {
     const total = this.totalPages;
     const current = this.currentPage;
     const delta = 2;
-    const range = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l;
+    const left = current - delta;
+    const right = current + delta + 1;
+    const result: (number | string)[] = [];
+    const range: number[] = [];
 
-    if (total === 0) return [];
+    if (total <= 1) {
+      return [];
+    }
 
-    range.push(1);
-    for (let i = current - delta; i <= current + delta; i++) {
-      if (i < total && i > 1) {
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || (i >= left && i < right)) {
         range.push(i);
       }
     }
-    if (total > 1) {
-      range.push(total);
-    }
 
+    let l: number | null = null;
     for (const i of range) {
       if (l) {
         if (i - l === 2) {
-          rangeWithDots.push(l + 1);
-        } else if (i - l !== 1) {
-          rangeWithDots.push('...');
+          result.push(l + 1);
+        } else if (i - l > 2) {
+          result.push('...');
         }
       }
-      rangeWithDots.push(i);
+      result.push(i);
       l = i;
     }
-
-    return rangeWithDots;
+    return result;
   }
 } 

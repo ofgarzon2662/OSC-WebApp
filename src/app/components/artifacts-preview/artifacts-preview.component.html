@@ -5,10 +5,17 @@
   </div>
 
   <div class="col-12">
-    <div class="row justify-content-center">
-      <div class="col-md-4 mb-4 d-flex justify-content-center" *ngFor="let artifact of artifacts">
-        <app-artifact-card [artifact]="artifact"></app-artifact-card>
+    <div *ngIf="artifacts.length > 0; else noArtifacts">
+      <div class="row justify-content-center">
+        <div class="col-md-4 mb-4 d-flex justify-content-center" *ngFor="let artifact of artifacts">
+          <app-artifact-card [artifact]="artifact"></app-artifact-card>
+        </div>
       </div>
     </div>
+    <ng-template #noArtifacts>
+      <div class="no-content-message">
+        <p>No artifacts have been created yet. Be the first to contribute!</p>
+      </div>
+    </ng-template>
   </div>
 </div>
