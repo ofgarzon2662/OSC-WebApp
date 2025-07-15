@@ -1,6 +1,10 @@
 export interface Artifact {
-  id: string;
-  name: string;
-  description: string;
-  lastUpdated: Date;
+    id: string;
+    title: string;
+    description: string;
+    keywords: string[];
+    submittedAt: string;
+    verified: boolean;
+    lastTimeVerified: string | null;
+    lastTimeUpdated: string | null;
 }

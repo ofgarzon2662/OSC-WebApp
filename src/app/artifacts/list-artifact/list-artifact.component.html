@@ -1,0 +1,55 @@
+<div class="artifacts-vault-container">
+  <h1 class="main-title">Artifacts Vault</h1>
+  <div class="title-divider"></div>
+
+  <div class="search-container">
+    <input type="text" 
+           placeholder="Artifact's title contains" 
+           class="search-input"
+           [(ngModel)]="titleSearchTerm"
+           (keyup.enter)="onSearch()" />
+    <select class="search-operator" [(ngModel)]="searchOperator">
+      <option value="OR">Or</option>
+      <option value="AND">And</option>
+    </select>
+    <input type="text" 
+           placeholder="Artifact's keyword list contains" 
+           class="search-input"
+           [(ngModel)]="keywordSearchTerm"
+           (keyup.enter)="onSearch()" />
+    <button class="search-button" (click)="onSearch()" [disabled]="isLoading">Search</button>
+  </div>
+
+  <div class="content-wrapper">
+    <p class="subtitle">Discover, Search & Explore Artifacts</p>
+
+    <main class="artifacts-grid" *ngIf="!isLoading; else loading">
+      <app-artifact-card *ngFor="let artifact of paginatedArtifacts" [artifact]="artifact"></app-artifact-card>
+      <p *ngIf="filteredArtifacts.length === 0">No artifacts found matching your search.</p>
+    </main>
+  </div>
+
+  <ng-template #loading>
+    <p>Loading artifacts...</p> 
+  </ng-template>
+
+  <footer class="pagination-container" *ngIf="totalPages > 1">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="page-arrow">
+      &laquo;
+    </button>
+    <ng-container *ngFor="let page of getPages()">
+      <button *ngIf="page !== '...'; else ellipsis"
+              (click)="onPageChange(page)"
+              class="page-number"
+              [class.active]="currentPage === page">
+        {{ page }}
+      </button>
+      <ng-template #ellipsis>
+        <span class="page-ellipsis">...</span>
+      </ng-template>
+    </ng-container>
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="page-arrow">
+      &raquo;
+    </button>
+  </footer>
+</div> 

@@ -1,17 +1,32 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, shareReplay } from 'rxjs/operators';
 import { CreateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
+import { Artifact } from '../../models/artifact.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ArtifactService {
     private readonly apiUrl = `${environment.apiUrl}/artifacts`;
+    private artifactsCache$?: Observable<Artifact[]>;
 
     constructor(private readonly http: HttpClient) {}
+
+    /**
+     * Gets all artifacts, with caching.
+     */
+    getArtifacts(): Observable<Artifact[]> {
+        if (!this.artifactsCache$) {
+            this.artifactsCache$ = this.http.get<Artifact[]>(this.apiUrl).pipe(
+                shareReplay(1),
+                catchError(this.handleError)
+            );
+        }
+        return this.artifactsCache$;
+    }
 
     /**
      * Creates a new artifact by sending only metadata (no file upload)
