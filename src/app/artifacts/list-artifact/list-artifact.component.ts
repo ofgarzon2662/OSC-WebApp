@@ -18,7 +18,9 @@ export class ListArtifactComponent implements OnInit {
   allArtifacts: Artifact[] = [];
   filteredArtifacts: Artifact[] = [];
   paginatedArtifacts: Artifact[] = [];
-  searchTerm = '';
+  titleSearchTerm = '';
+  keywordSearchTerm = '';
+  searchOperator = 'OR';
   
   // Pagination
   currentPage = 1;
@@ -36,10 +38,35 @@ export class ListArtifactComponent implements OnInit {
   }
 
   onSearch(): void {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredArtifacts = this.allArtifacts.filter(artifact => 
-      artifact.title.toLowerCase().includes(term)
-    );
+    const titleTerm = this.titleSearchTerm.toLowerCase().trim();
+    const searchKeywords = this.keywordSearchTerm.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+
+    const keywordTermIsPresent = searchKeywords.length > 0;
+
+    if (!titleTerm && !keywordTermIsPresent) {
+      this.filteredArtifacts = this.allArtifacts;
+    } else {
+      this.filteredArtifacts = this.allArtifacts.filter(artifact => {
+        const titleMatch = titleTerm ? artifact.title.toLowerCase().includes(titleTerm) : false;
+
+        const artifactKeywordsLower = artifact.keywords ? artifact.keywords.map(k => k.toLowerCase()) : [];
+        const keywordMatch = keywordTermIsPresent && artifact.keywords
+          ? searchKeywords.every(searchKeyword => artifactKeywordsLower.includes(searchKeyword))
+          : false;
+
+        if (titleTerm && keywordTermIsPresent) {
+          if (this.searchOperator === 'AND') {
+            return titleMatch && keywordMatch;
+          }
+          return titleMatch || keywordMatch;
+        } else if (titleTerm) {
+          return titleMatch;
+        } else {
+          return keywordMatch;
+        }
+      });
+    }
+
     this.currentPage = 1;
     this.refreshView();
   }

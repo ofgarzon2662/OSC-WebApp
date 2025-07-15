@@ -20,8 +20,8 @@ class MockArtifactCardComponent {
 
 // Mock Artifact Data
 const mockArtifacts: Artifact[] = [
-  { id: '1', title: 'Test Artifact 1', description: 'Desc 1', submittedAt: new Date().toISOString(), verified: false, lastTimeVerified: null, lastTimeUpdated: null },
-  { id: '2', title: 'Test Artifact 2', description: 'Desc 2', submittedAt: new Date().toISOString(), verified: true, lastTimeVerified: new Date().toISOString(), lastTimeUpdated: null }
+  { id: '1', title: 'Test Artifact 1', description: 'Desc 1', keywords: [], submittedAt: new Date().toISOString(), verified: false, lastTimeVerified: null, lastTimeUpdated: null },
+  { id: '2', title: 'Test Artifact 2', description: 'Desc 2', keywords: [], submittedAt: new Date().toISOString(), verified: true, lastTimeVerified: new Date().toISOString(), lastTimeUpdated: null }
 ];
 
 describe('ArtifactsPreviewComponent', () => {

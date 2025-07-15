@@ -12,6 +12,7 @@ const createMockArtifacts = (count: number): Artifact[] => {
     id: `${i + 1}`,
     title: `Artifact ${i + 1}`,
     description: `Description for artifact ${i + 1}`,
+    keywords: [`keyword${i + 1}`],
     submittedAt: new Date().toISOString(),
     verified: false,
     lastTimeVerified: null,
@@ -55,25 +56,25 @@ describe('ListArtifactComponent', () => {
     });
 
     it('should filter artifacts by search term', () => {
-      component.searchTerm = 'Artifact 1'; // This should match Artifact 1, 10, 11...19
+      component.titleSearchTerm = 'Artifact 1'; // This should match Artifact 1, 10, 11...19
       component.onSearch();
       expect(component.filteredArtifacts.length).toBe(11);
       expect(component.filteredArtifacts[0].title).toBe('Artifact 1');
     });
 
     it('should reset to full list when search term is empty', () => {
-      component.searchTerm = 'Artifact 1';
+      component.titleSearchTerm = 'Artifact 1';
       component.onSearch();
       expect(component.filteredArtifacts.length).not.toBe(20);
       
-      component.searchTerm = '';
+      component.titleSearchTerm = '';
       component.onSearch();
       expect(component.filteredArtifacts.length).toBe(20);
     });
 
     it('should reset to page 1 after a search', () => {
       component.currentPage = 3;
-      component.searchTerm = 'Artifact 2';
+      component.titleSearchTerm = 'Artifact 2';
       component.onSearch();
       expect(component.currentPage).toBe(1);
     });

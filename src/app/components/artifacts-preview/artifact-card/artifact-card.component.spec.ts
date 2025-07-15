@@ -11,6 +11,7 @@ describe('ArtifactCardComponent', () => {
     id: '1',
     title: 'Test Artifact Title',
     description: 'This is a test description for the artifact.',
+    keywords: ['test', 'artifact'],
     submittedAt: new Date().toISOString(),
     verified: false,
     lastTimeVerified: null,
