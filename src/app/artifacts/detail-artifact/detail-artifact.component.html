@@ -49,13 +49,17 @@
                   <div *ngFor="let link of artifact.links"><a [href]="link" target="_blank">{{ link }}</a></div>
                 </td>
               </tr>
-              <tr *ngIf="artifact.fundingAgencies?.length">
-                <th>Funding</th>
-                <td>{{ artifact.fundingAgencies.join(', ') }}</td>
+              <tr>
+                <th>Funding Agencies</th>
+                <td>
+                  {{ artifact.fundingAgencies && artifact.fundingAgencies.length > 0 ? artifact.fundingAgencies.join(', ') : '—' }}
+                </td>
               </tr>
-              <tr *ngIf="artifact.dois?.length">
-                <th>DOI</th>
-                <td>{{ artifact.dois.join(', ') }}</td>
+              <tr>
+                <th>DOIs</th>
+                <td>
+                  {{ artifact.dois && artifact.dois.length > 0 ? artifact.dois.join(', ') : '—' }}
+                </td>
               </tr>
 
               <!-- Verification status -->
