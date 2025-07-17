@@ -26,7 +26,7 @@ export class ListArtifactComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 6;
 
-  constructor(private artifactService: ArtifactService) {}
+  constructor(private readonly artifactService: ArtifactService) {}
 
   ngOnInit(): void {
     this.artifactService.getArtifacts().subscribe(artifacts => {
