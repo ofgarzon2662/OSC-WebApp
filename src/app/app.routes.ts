@@ -43,6 +43,12 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/auth-forbidden/auth-forbidden.component').then(m => m.AuthForbiddenComponent)
   },
 
+  // Artifact detail
+  {
+    path: 'artifacts/:id',
+    loadComponent: () => import('./artifacts/detail-artifact/detail-artifact.component').then(m => m.DetailArtifactComponent)
+  },
+
   // Ruta de fallback para cualquier ruta no definida
   { path: '**', redirectTo: '' }
 ];

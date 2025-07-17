@@ -10,7 +10,7 @@
     <p class="card-text">Submitted at {{ artifact.submittedAt | date:'medium' }}</p>
 
     <div class="mt-auto button-container">
-      <button class="btn btn-primary view-button">View</button>
+      <button class="btn btn-primary view-button" [routerLink]="['/artifacts', artifact.id]">View</button>
     </div>
   </div>
 </div>

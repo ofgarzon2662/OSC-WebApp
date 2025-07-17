@@ -1,0 +1,160 @@
+<ng-container *ngIf="!isLoading && artifact; else loadingTpl">
+  <div class="artifact-wrapper container">
+    <div class="artifact-header">
+      <h1 class="artifact-title">{{ artifact.title }}</h1>
+    </div>
+
+    <div class="artifact-body">
+      <div class="row g-4">
+        <!-- Description column -->
+        <div class="col-lg-6 description-col">
+          <h4 class="section-heading">Description</h4>
+          <p class="pre-wrap">{{ artifact.description }}</p>
+        </div>
+
+        <!-- Details column -->
+        <div class="col-lg-6 details-col">
+          <h4 class="section-heading">Details</h4>
+          <table class="table table-borderless artifact-meta">
+            <tbody>
+              <tr>
+                <th>ID</th>
+                <td>{{ artifact.id }}</td>
+              </tr>
+              <tr *ngIf="artifact.organization?.name">
+                <th>Organization</th>
+                <td>{{ artifact.organization.name }}</td>
+              </tr>
+              <tr>
+                <th>Submitted</th>
+                <td>{{ artifact.submittedAt | date:'medium' }}</td>
+              </tr>
+              <tr *ngIf="artifact.submitterUsername">
+                <th>Contributor</th>
+                <td>{{ artifact.submitterUsername }}</td>
+              </tr>
+              <tr>
+                  <th>Contributor's email</th>
+                  <td>{{ artifact.submitterEmail }}</td>
+                </tr>
+              <tr *ngIf="artifact.keywords?.length">
+                <th>Keywords</th>
+                <td>
+                  <span *ngFor="let k of artifact.keywords" class="badge bg-primary-subtle text-dark me-1 mb-1 keyword-badge">{{ k }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="artifact.links?.length">
+                <th>Links</th>
+                <td>
+                  <div *ngFor="let link of artifact.links"><a [href]="link" target="_blank">{{ link }}</a></div>
+                </td>
+              </tr>
+              <tr *ngIf="artifact.fundingAgencies?.length">
+                <th>Funding</th>
+                <td>{{ artifact.fundingAgencies.join(', ') }}</td>
+              </tr>
+              <tr *ngIf="artifact.dois?.length">
+                <th>DOI</th>
+                <td>{{ artifact.dois.join(', ') }}</td>
+              </tr>
+
+              <!-- Verification status -->
+              <tr>
+                <th>Verified</th>
+                <td>
+                  <span class="badge" [ngClass]="artifact.verified ? 'bg-success' : 'bg-danger'">
+                    {{ artifact.verified ? 'Verified' : 'Not Verified' }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>Last Verified</th>
+                <td>{{ artifact.lastTimeVerified ? (artifact.lastTimeVerified | date:'medium') : 'Not verified yet' }}</td>
+              </tr>
+
+              <!-- Submission state -->
+              <tr>
+                <th>State</th>
+                <td>
+                  <span class="badge"
+                        [ngClass]="{
+                          'bg-warning': artifact.submissionState === 'PENDING',
+                          'bg-success': artifact.submissionState === 'CONFIRMED' || artifact.submissionState === 'APPROVED' || artifact.submissionState === 'SUCCESS',
+                          'bg-danger': artifact.submissionState === 'FAILED' || artifact.submissionState === 'REJECTED',
+                          'bg-secondary': artifact.submissionState !== 'PENDING' && artifact.submissionState !== 'CONFIRMED' && artifact.submissionState !== 'APPROVED' && artifact.submissionState !== 'FAILED' && artifact.submissionState !== 'REJECTED'
+                        }">
+                    {{ artifact.submissionState }}
+                  </span>
+                </td>
+              </tr>
+
+              
+
+              <tr>
+                <th>Blockchain Tx</th>
+                <td>
+                  <span *ngIf="!showBlockchain">{{ truncated(artifact.blockchainTxId) }}</span>
+                  <span *ngIf="showBlockchain" class="monospace">{{ artifact.blockchainTxId || '—' }}</span>
+                  <button *ngIf="artifact.blockchainTxId" class="btn btn-link btn-sm p-0 ms-2" (click)="showBlockchain = !showBlockchain">
+                    {{ showBlockchain ? 'Hide' : 'Show' }}
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <th>Peer ID</th>
+                <td>
+                  <span *ngIf="!showPeer">{{ truncated(artifact.peerId) }}</span>
+                  <span *ngIf="showPeer" class="monospace">{{ artifact.peerId || '—' }}</span>
+                  <button *ngIf="artifact.peerId" class="btn btn-link btn-sm p-0 ms-2" (click)="showPeer = !showPeer">
+                    {{ showPeer ? 'Hide' : 'Show' }}
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="artifact.acknowledgements">
+                <th>Acknowledgements</th>
+                <td>{{ artifact.acknowledgements }}</td>
+              </tr>
+
+              <tr *ngIf="artifact.submissionError">
+                <th>Error</th>
+                <td class="text-danger">{{ artifact.submissionError }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> <!-- row -->
+
+      <!-- Manifest -->
+      <div class="manifest-section mt-5" *ngIf="artifact.manifest?.length">
+        <h4 class="section-heading mb-3">Manifest</h4>
+        <p class="small text-muted">{{ artifact.manifest.length }} files total, showing only 10</p>
+        <div class="table-responsive">
+          <table class="table table-sm manifest-table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Filename</th>
+                <th scope="col">Hash</th>
+                <th scope="col">Alg.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of artifact.manifest | slice:0:10">
+                <td class="filename">{{ item.filename }}</td>
+                <td class="hash text-truncate">{{ item.hash }}</td>
+                <td class="algorithm">{{ item.algorithm }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-outline-primary mt-2" (click)="printManifest()">Print full Manifest</button>
+      </div>
+    </div> <!-- artifact-body -->
+  </div>
+</ng-container>
+
+<ng-template #loadingTpl>
+  <div class="loading text-center">
+    Loading artifact details…
+  </div>
+</ng-template> 
