@@ -10,21 +10,19 @@ import { Artifact } from '../../models/artifact.model';
     providedIn: 'root'
 })
 export class ArtifactService {
-    private readonly apiUrl = `${environment.apiUrl}/artifacts`;
-    private artifactsCache$?: Observable<Artifact[]>;
+    private apiUrl = `${environment.apiUrl}/artifacts`;
+    private artifactsCache$: Observable<Artifact[]> | undefined;
 
-    constructor(private readonly http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     /**
      * Gets all artifacts, with caching.
      */
     getArtifacts(): Observable<Artifact[]> {
-        if (!this.artifactsCache$) {
-            this.artifactsCache$ = this.http.get<Artifact[]>(this.apiUrl).pipe(
-                shareReplay(1),
-                catchError(this.handleError)
-            );
-        }
+        this.artifactsCache$ ??= this.http.get<Artifact[]>(this.apiUrl).pipe(
+            shareReplay(1),
+            catchError(this.handleError)
+        );
         return this.artifactsCache$;
     }
 

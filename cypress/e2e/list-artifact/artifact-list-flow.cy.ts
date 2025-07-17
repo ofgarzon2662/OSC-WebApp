@@ -73,7 +73,7 @@ describe('Artifacts List and Creation Flow', () => {
     cy.get(searchButton).click();
     cy.get('app-artifact-card').should('have.length.at.least', 1);
 
-    // Search for "pineapple" AND a real keyword
+    // Search for "pineapple ..." AND a real keyword
     cy.get(keywordSearchInput).type(', pineappleHorseRandomLightBulbStreet');
     cy.get(searchButton).click();
     cy.contains('No artifacts found matching your search.').should('be.visible');

@@ -182,6 +182,7 @@ export class CreateArtifactComponent implements OnInit {
         await this.handleSingleFileSelection(files[0]);
       }
     } catch (error) {
+        console.error('Error processing dropped item:', error);
         this.showError('Could not process the dropped item. It might be a folder or an unsupported file type.');
     }
   }
@@ -242,77 +243,66 @@ export class CreateArtifactComponent implements OnInit {
   }
 
   async handleFolderSelection(files: FileList) {
-    if (files.length === 0) {
-      this.showError('The selected folder is empty. Please choose a folder with files.');
-      return;
-    }
-
-    if (files.length > MAX_FILES_IN_FOLDER) {
-      this.showError(`Folder contains too many files (${files.length}). Maximum allowed is ${MAX_FILES_IN_FOLDER} files.`);
-      return;
-    }
-
-    // Calculate total size and check for empty files
-    let totalSize = 0;
-    let hasNonEmptyFiles = false;
-    for (let i = 0; i < files.length; i++) {
-        const file = files.item(i);
-        if (file) {
-            totalSize += file.size;
-            if (file.size > 0) hasNonEmptyFiles = true;
-        }
-    }
-
-    if (totalSize > MAX_FOLDER_SIZE) {
-      this.showError(`Total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FOLDER_SIZE)}.`);
-      return;
-    }
-
-    if (!hasNonEmptyFiles) {
-      this.showError('All files in the selected folder are empty. Please choose a folder with content.');
-      return;
-    }
+    if (!this.validateFolder(files)) return;
 
     this.isProcessing = true;
-    this.uploadError = false;
-    this.selectedFilesData = []; // Reset previous selection
-    this.processingMessage = `Processing ${files.length} files...`;
-    
+    this.processingMessage = 'Processing folder...';
+    this.selectedFilesData = [];
+
     try {
-      // Process each file to calculate its hash
-      const filePromises = [];
-      for (let i = 0; i < files.length; i++) {
-          const file = files.item(i);
-          if (file) {
-              filePromises.push((async () => {
-                  if (file.size === 0) return null; // Skip empty files
-
-                  const hash = await this.calculateFileHash(file);
-                  return {
-                      content: file,
-                      name: file.webkitRelativePath || file.name,
-                      hash: hash,
-                      size: file.size,
-                  };
-              })());
-          }
-      }
-
-      const filesData = (await Promise.all(filePromises)).filter(Boolean) as FileData[];
-
-      // Sort files by name for a consistent order
-      filesData.sort((a, b) => a.name.localeCompare(b.name));
-      
-      this.selectedFilesData = filesData;
-
+        const filesData = await this.processFiles(files);
+        this.selectedFilesData = filesData.sort((a, b) => a.name.localeCompare(b.name));
+        this.uploadError = false;
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error processing folder';
         this.showError(`Error processing folder: ${errorMessage}`);
         console.error('Folder processing error:', error);
     } finally {
-      this.isProcessing = false;
-      this.processingMessage = '';
+        this.isProcessing = false;
+        this.processingMessage = '';
     }
+  }
+
+  private validateFolder(files: FileList): boolean {
+      if (files.length === 0) {
+          this.showError('The selected folder is empty. Please choose a folder with files.');
+          return false;
+      }
+      if (files.length > MAX_FILES_IN_FOLDER) {
+          this.showError(`The folder contains too many files (${files.length}). The maximum allowed is ${MAX_FILES_IN_FOLDER}.`);
+          return false;
+      }
+      const totalSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
+      if (totalSize > MAX_FOLDER_SIZE) {
+          this.showError(`The total folder size (${this.formatFileSize(totalSize)}) exceeds the limit of ${this.formatFileSize(MAX_FOLDER_SIZE)}.`);
+          return false;
+      }
+
+      if (Array.from(files).every(file => file.size === 0)) {
+        this.showError('All files in the selected folder are empty. Please choose a folder with content.');
+        return false;
+      }
+      
+      return true;
+  }
+
+  private async processFiles(files: FileList): Promise<FileData[]> {
+      const filePromises = Array.from(files).map(async (file, index) => {
+          this.processingMessage = `Processing file ${index + 1} of ${files.length}: ${file.name}`;
+          if (file.size > 0) {
+              const hash = await this.calculateFileHash(file);
+              return {
+                  content: file,
+                  name: (file as any).webkitRelativePath || file.name,
+                  hash,
+                  size: file.size,
+              };
+          }
+          return null;
+      });
+
+      const filesData = await Promise.all(filePromises);
+      return filesData.filter(Boolean) as FileData[];
   }
 
   private async calculateFileHash(file: File): Promise<string> {

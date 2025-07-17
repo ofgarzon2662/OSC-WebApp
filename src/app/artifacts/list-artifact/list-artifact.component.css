@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   margin: 0 auto 1rem auto;
-  max-width: 1200px;
+  max-width: 60%;
   gap: 1rem;
 }
 
@@ -35,7 +35,7 @@
   border-radius: 25px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  width: 400px;
+  width: 40%;
 }
 
 .search-operator {
@@ -78,11 +78,12 @@
 .content-wrapper {
   /* No max-width here anymore */
   margin: 0 auto;
+  max-width: 95%;
 }
 
 .subtitle {
   text-align: left;
-  padding-left: 250px;
+  padding-left: 3%;
   font-size: 2rem;
   color: #1D3557;
   margin-bottom: 2rem;
