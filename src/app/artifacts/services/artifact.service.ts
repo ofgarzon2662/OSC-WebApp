@@ -5,15 +5,16 @@ import { catchError, shareReplay } from 'rxjs/operators';
 import { CreateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
 import { Artifact } from '../../models/artifact.model';
+import { ArtifactDetail } from '../../models/artifact-detail.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ArtifactService {
-    private apiUrl = `${environment.apiUrl}/artifacts`;
+    private readonly apiUrl = `${environment.apiUrl}/artifacts`;
     private artifactsCache$: Observable<Artifact[]> | undefined;
 
-    constructor(private http: HttpClient) { }
+    constructor(private readonly http: HttpClient) { }
 
     /**
      * Gets all artifacts, with caching.
@@ -24,6 +25,14 @@ export class ArtifactService {
             catchError(this.handleError)
         );
         return this.artifactsCache$;
+    }
+
+    /**
+     * Gets a single artifact by its ID
+     */
+    getArtifactById(id: string): Observable<ArtifactDetail> {
+        return this.http.get<ArtifactDetail>(`${this.apiUrl}/${id}`)
+            .pipe(catchError(this.handleError));
     }
 
     /**
