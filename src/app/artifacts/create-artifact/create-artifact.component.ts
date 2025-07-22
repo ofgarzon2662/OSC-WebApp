@@ -251,7 +251,8 @@ export class CreateArtifactComponent implements OnInit {
 
     try {
         const filesData = await this.processFiles(files);
-        this.selectedFilesData = filesData.sort((a, b) => a.name.localeCompare(b.name));
+        const sortedFilesData = filesData.sort((a, b) => a.name.localeCompare(b.name));
+        this.selectedFilesData = sortedFilesData;
         this.uploadError = false;
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error processing folder';

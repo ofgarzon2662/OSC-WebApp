@@ -76,7 +76,11 @@ describe('DetailArtifactComponent', () => {
     it('printManifest should open new window and write manifest', () => {
       component.artifact = mockArtifact;
       const mockWin = {
-        document: { write: jasmine.createSpy('write'), close: jasmine.createSpy('close') },
+        document: {
+          createElement: () => ({ textContent: '' }),
+          body: { appendChild: jasmine.createSpy('appendChild') },
+          title: '',
+        },
         print: jasmine.createSpy('print')
       } as unknown as Window;
 
@@ -85,7 +89,7 @@ describe('DetailArtifactComponent', () => {
       component.printManifest();
 
       expect(window.open).toHaveBeenCalled();
-      expect(mockWin.document.write).toHaveBeenCalled();
+      expect(mockWin.document.body.appendChild).toHaveBeenCalled();
       expect(mockWin.print).toHaveBeenCalled();
     });
   });

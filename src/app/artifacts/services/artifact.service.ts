@@ -11,10 +11,10 @@ import { ArtifactDetail } from '../../models/artifact-detail.model';
     providedIn: 'root'
 })
 export class ArtifactService {
-    private apiUrl = `${environment.apiUrl}/artifacts`;
+    private readonly apiUrl = `${environment.apiUrl}/artifacts`;
     private artifactsCache$: Observable<Artifact[]> | undefined;
 
-    constructor(private http: HttpClient) { }
+    constructor(private readonly http: HttpClient) { }
 
     /**
      * Gets all artifacts, with caching.

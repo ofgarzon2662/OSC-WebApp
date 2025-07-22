@@ -45,10 +45,13 @@ export class DetailArtifactComponent implements OnInit {
       .map(item => `${item.filename}\t${item.hash}\t${item.algorithm}`)
       .join('\n');
 
-    const newWin = window.open('', '_blank');
+    const newWin = window.open('', '_blank', 'noopener,noreferrer');
     if (newWin) {
-      newWin.document.write('<pre>' + manifestText + '</pre>');
-      newWin.document.close();
+      const doc = newWin.document;
+      doc.title = 'Artifact Manifest';
+      const pre = doc.createElement('pre');
+      pre.textContent = manifestText;
+      doc.body.appendChild(pre);
       newWin.print();
     }
   }
