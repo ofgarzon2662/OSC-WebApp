@@ -18,7 +18,7 @@
 }
 
 .view-all-link:hover {
-  color: white;
+  color: #457B9D;
   background-color: #1D3557;
   text-decoration: none;
   transform: translateY(-2px);
@@ -36,4 +36,13 @@
 .view-all-link:hover::after {
   opacity: 1;
   transform: translateX(0);
+}
+
+.no-content-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1.1rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }

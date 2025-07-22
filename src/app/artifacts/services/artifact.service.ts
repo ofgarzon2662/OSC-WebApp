@@ -1,21 +1,43 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, shareReplay } from 'rxjs/operators';
 import { CreateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
+import { Artifact } from '../../models/artifact.model';
+import { ArtifactDetail } from '../../models/artifact-detail.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ArtifactService {
     private readonly apiUrl = `${environment.apiUrl}/artifacts`;
+    private artifactsCache$: Observable<Artifact[]> | undefined;
 
-    constructor(private readonly http: HttpClient) {}
+    constructor(private readonly http: HttpClient) { }
+
+    /**
+     * Gets all artifacts, with caching.
+     */
+    getArtifacts(): Observable<Artifact[]> {
+        this.artifactsCache$ ??= this.http.get<Artifact[]>(this.apiUrl).pipe(
+            shareReplay(1),
+            catchError(this.handleError)
+        );
+        return this.artifactsCache$;
+    }
+
+    /**
+     * Gets a single artifact by its ID
+     */
+    getArtifactById(id: string): Observable<ArtifactDetail> {
+        return this.http.get<ArtifactDetail>(`${this.apiUrl}/${id}`)
+            .pipe(catchError(this.handleError));
+    }
 
     /**
      * Creates a new artifact by sending only metadata (no file upload)
-     * @param dto The artifact data including hash and filename
+     * @param dto The artifact data including the manifest of files
      * @returns Observable of the creation status
      */
     createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<void> {
@@ -30,8 +52,7 @@ export class ArtifactService {
         console.log('Metadata - dois:', dto.dois);
         console.log('Metadata - fundingAgencies:', dto.fundingAgencies);
         console.log('Metadata - acknowledgements:', dto.acknowledgements);
-        console.log('Metadata - fileName:', dto.fileName);
-        console.log('Metadata - hash:', dto.hash);
+        console.log('Metadata - manifest:', dto.manifest);
         
         console.log('=== END DEBUG ===');
         

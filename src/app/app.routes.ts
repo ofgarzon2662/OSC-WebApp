@@ -24,6 +24,12 @@ export const routes: Routes = [
     loadChildren: () => import('./artifacts/artifacts.module').then(m => m.ArtifactsModule)
   },
 
+  // list artifacts
+  {
+    path: 'list-artifacts',
+    loadComponent: () => import('./artifacts/list-artifact/list-artifact.component').then(m => m.ListArtifactComponent)
+  },
+
   // Ruta protegida para crear artefactos (verifica autenticación y rol)
   {
     path: 'contribute',
@@ -35,6 +41,12 @@ export const routes: Routes = [
   {
     path: 'forbidden',
     loadComponent: () => import('./auth/auth-forbidden/auth-forbidden.component').then(m => m.AuthForbiddenComponent)
+  },
+
+  // Artifact detail
+  {
+    path: 'artifacts/:id',
+    loadComponent: () => import('./artifacts/detail-artifact/detail-artifact.component').then(m => m.DetailArtifactComponent)
   },
 
   // Ruta de fallback para cualquier ruta no definida
