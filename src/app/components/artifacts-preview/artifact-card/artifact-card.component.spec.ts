@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ArtifactCardComponent } from './artifact-card.component';
 import { Artifact } from '../../../models/artifact.model';
 import { By } from '@angular/platform-browser';
@@ -20,7 +21,7 @@ describe('ArtifactCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ArtifactCardComponent]
+      imports: [ArtifactCardComponent, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArtifactCardComponent);

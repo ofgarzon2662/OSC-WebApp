@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
 import { ListArtifactComponent } from './list-artifact.component';
@@ -29,7 +30,7 @@ describe('ListArtifactComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListArtifactComponent, HttpClientTestingModule],
+      imports: [ListArtifactComponent, HttpClientTestingModule, RouterTestingModule],
       providers: [ArtifactService],
     }).compileComponents();
 

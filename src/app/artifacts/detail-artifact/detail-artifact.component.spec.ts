@@ -3,7 +3,7 @@ import { DetailArtifactComponent } from './detail-artifact.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { ArtifactService } from '../services/artifact.service';
-import { Artifact } from '../../models/artifact.model';
+import { ArtifactDetail } from '../../models/artifact-detail.model';
 
 declare const jasmine: any;
 
@@ -11,19 +11,36 @@ describe('DetailArtifactComponent', () => {
   let component: DetailArtifactComponent;
   let fixture: ComponentFixture<DetailArtifactComponent>;
 
-  const mockArtifact: Artifact = {
+  const mockArtifact: ArtifactDetail = {
     id: '123',
     title: 'Test Artifact',
     description: 'Test description',
     keywords: ['test'],
+    links: [],
+    dois: [],
+    fundingAgencies: [],
+    acknowledgements: '',
+    manifest: [
+      {
+        filename: 'sample.txt',
+        hash: 'abcdef',
+        algorithm: 'sha256'
+      }
+    ],
     submittedAt: '',
     verified: false,
     lastTimeVerified: null,
-    lastTimeUpdated: null
-  };
+    submissionState: 'PENDING',
+    submitterEmail: 'test@example.com',
+    submitterUsername: 'tester',
+    blockchainTxId: null,
+    peerId: null,
+    submissionError: null,
+    organization: { name: 'TestOrg' }
+  } as any;
 
   const artifactServiceStub = {
-    getArtifacts: () => of([mockArtifact])
+    getArtifactById: () => of(mockArtifact)
   };
 
   beforeEach(async () => {
@@ -45,5 +62,31 @@ describe('DetailArtifactComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('utility methods', () => {
+    it('truncated should return em dash for null value', () => {
+      expect(component.truncated(null)).toBe('—');
+    });
+
+    it('truncated should shorten long strings with ellipsis', () => {
+      expect(component.truncated('abcdefghijkl', 6)).toBe('abcdef…');
+    });
+
+    it('printManifest should open new window and write manifest', () => {
+      component.artifact = mockArtifact;
+      const mockWin = {
+        document: { write: jasmine.createSpy('write'), close: jasmine.createSpy('close') },
+        print: jasmine.createSpy('print')
+      } as unknown as Window;
+
+      spyOn(window, 'open').and.returnValue(mockWin);
+
+      component.printManifest();
+
+      expect(window.open).toHaveBeenCalled();
+      expect(mockWin.document.write).toHaveBeenCalled();
+      expect(mockWin.print).toHaveBeenCalled();
+    });
   });
 }); 
