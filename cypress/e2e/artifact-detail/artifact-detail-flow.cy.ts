@@ -92,4 +92,4 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
     searchAndOpen(artifactB.title);
     assertDetailPage(artifactB);
   });
-}); 
+});
