@@ -1,6 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import * as CryptoJS from 'crypto-js';
 import { ArtifactService } from '../services/artifact.service';
 import { CreateArtifactDTO, FileData, ManifestItem } from '../models/artifact';
@@ -18,7 +19,7 @@ export const MAX_FILES_IN_FOLDER  = 50;                 // max files in a folder
 @Component({
   selector: 'app-create-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './create-artifact.component.html',
   styleUrls: ['./create-artifact.component.css']
 })
@@ -31,6 +32,7 @@ export class CreateArtifactComponent implements OnInit {
   selectedFilesData: FileData[] = [];
   isSubmitted = false;
   isSubmitting = false;
+  lastCreatedId: string | null = null;
   processingMessage = '';
 
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -479,7 +481,7 @@ export class CreateArtifactComponent implements OnInit {
     // Submit to backend using metadata-only approach
     this.artifactService.createArtifactMetadataOnly(artifactDto)
       .subscribe({
-        next: () => this.handleSubmitSuccess(),
+        next: (res: any) => this.handleSubmitSuccess(res.id),
         error: (error) => this.handleSubmitError(error),
         complete: () => this.isProcessing = false
       });
@@ -488,14 +490,18 @@ export class CreateArtifactComponent implements OnInit {
   /**
    * Handle successful artifact submission
    */
-  private handleSubmitSuccess(): void {
-    // Show success message
-    this.toastr.success('Your artifact has been successfully submitted!', 'Success!');
-    
+  private handleSubmitSuccess(newId: string): void {
+        // Store ID for navigation button and disable submit
+    this.lastCreatedId = newId;
+
+    // Show success message with link
+    const link = `/artifacts/${newId}`;
+    this.toastr.success(`Your artifact has been successfully submitted! <a href='${link}'>View artifact</a>`, 'Success!', {enableHtml: true, timeOut: 5000});
+
     // Update form state
     this.isSubmitted = true;
-    
-    // Reset form for new entry
+
+    // Reset form fields (keeping lastCreatedId)
     this.resetForm();
     
     // End processing state

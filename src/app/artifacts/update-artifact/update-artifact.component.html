@@ -229,7 +229,7 @@
     <button 
       type="button"
       class="btn btn-primary" 
-      [disabled]="!isFormAndFileValid()"
+      [disabled]="!isFormAndFileValid() || isSubmitting"
       (click)="onSubmit()"
     >
       Update

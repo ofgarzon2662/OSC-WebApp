@@ -23,10 +23,10 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     fb: FormBuilder,
     location: Location,
     private readonly artService: ArtifactService,
-    toastr: ToastrService,
+    private readonly toastrSvc: ToastrService,
     private readonly route: ActivatedRoute
   ) {
-    super(fb, location, artService, toastr);
+    super(fb, location, artService, toastrSvc);
   }
 
   override ngOnInit(): void {
@@ -67,5 +67,10 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     // Disable title & description so they cannot be edited
     this.artifactForm.get('title')?.disable();
     this.artifactForm.get('description')?.disable();
+  }
+
+  override onSubmit(): void {
+    this.isSubmitting = true;
+    this.toastrSvc.info('Your request is being processed');
   }
 }

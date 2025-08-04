@@ -235,11 +235,12 @@
       data-cy="submit-btn"
       type="button"
       class="btn btn-primary" 
-      [disabled]="!isFormAndFileValid()"
+      [disabled]="!isFormAndFileValid() || lastCreatedId"
       (click)="onSubmit()"
     >
       Submit
     </button>
+    <a *ngIf="lastCreatedId" class="btn btn-success" [routerLink]="['/artifacts', lastCreatedId]">View new artifact here</a>
   </div>
 
   <!-- Hidden file inputs -->

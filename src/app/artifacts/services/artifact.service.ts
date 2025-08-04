@@ -40,7 +40,7 @@ export class ArtifactService {
      * @param dto The artifact data including the manifest of files
      * @returns Observable of the creation status
      */
-    createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<void> {
+    createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<{id: string}> {
         // Debug logs
         console.log('=== DEBUG: Sending metadata only ===');
         
@@ -57,7 +57,7 @@ export class ArtifactService {
         console.log('=== END DEBUG ===');
         
         // Simplemente enviamos el DTO como JSON, sin FormData ni archivos
-        return this.http.post<void>(this.apiUrl, dto)
+        return this.http.post<{id: string}>(this.apiUrl, dto)
             .pipe(
                 catchError(this.handleError)
             );

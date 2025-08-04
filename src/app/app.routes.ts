@@ -51,7 +51,8 @@ export const routes: Routes = [
   // Update artifact
   {
     path: 'update-artifact/:id',
-    loadComponent: () => import('./artifacts/update-artifact/update-artifact.component').then(m => m.UpdateArtifactComponent)
+    loadComponent: () => import('./artifacts/update-artifact/update-artifact.component').then(m => m.UpdateArtifactComponent),
+    canActivate: [canCreateArtifactGuard]
   },
 
   // Ruta de fallback para cualquier ruta no definida
