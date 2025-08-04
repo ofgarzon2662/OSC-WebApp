@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ArtifactService } from '../services/artifact.service';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
 import { switchMap } from 'rxjs/operators';
@@ -21,7 +21,8 @@ export class DetailArtifactComponent implements OnInit {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly artifactService: ArtifactService
+    private readonly artifactService: ArtifactService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +55,11 @@ export class DetailArtifactComponent implements OnInit {
       doc.body.appendChild(pre);
       newWin.print();
     }
+  }
+
+  onUpdateArtifact(): void {
+    if (!this.artifact) return;
+    this.router.navigate(['/update-artifact', this.artifact.id]);
   }
 
   truncated(value: string | null, len = 12): string {

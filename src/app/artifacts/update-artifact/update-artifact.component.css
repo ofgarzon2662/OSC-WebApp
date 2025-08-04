@@ -1,0 +1,36 @@
+@import url('../create-artifact/create-artifact.component.css');
+
+/* Additional overrides for update page if needed */
+
+.manifest-hint {
+  font-size: 0.95rem;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+
+
+.manifest-section {
+  margin-top: 4rem;
+  max-width: 70%;
+  margin: 1.5rem auto 0 auto;
+}
+
+.section-heading {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+
+.manifest-table td {
+  font-family: monospace;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.manifest-table .hash {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

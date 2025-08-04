@@ -62,19 +62,7 @@
                 </td>
               </tr>
 
-              <!-- Verification status -->
-              <tr>
-                <th>Verified</th>
-                <td>
-                  <span class="badge" [ngClass]="artifact.verified ? 'bg-success' : 'bg-danger'">
-                    {{ artifact.verified ? 'Verified' : 'Not Verified' }}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <th>Last Verified</th>
-                <td>{{ artifact.lastTimeVerified ? (artifact.lastTimeVerified | date:'medium') : 'Not verified yet' }}</td>
-              </tr>
+
 
               <!-- Submission state -->
               <tr>
@@ -94,26 +82,8 @@
 
               
 
-              <tr>
-                <th>Blockchain Tx</th>
-                <td>
-                  <span *ngIf="!showBlockchain">{{ truncated(artifact.blockchainTxId) }}</span>
-                  <span *ngIf="showBlockchain" class="monospace">{{ artifact.blockchainTxId || '—' }}</span>
-                  <button *ngIf="artifact.blockchainTxId" class="btn btn-link btn-sm p-0 ms-2" (click)="showBlockchain = !showBlockchain">
-                    {{ showBlockchain ? 'Hide' : 'Show' }}
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th>Peer ID</th>
-                <td>
-                  <span *ngIf="!showPeer">{{ truncated(artifact.peerId) }}</span>
-                  <span *ngIf="showPeer" class="monospace">{{ artifact.peerId || '—' }}</span>
-                  <button *ngIf="artifact.peerId" class="btn btn-link btn-sm p-0 ms-2" (click)="showPeer = !showPeer">
-                    {{ showPeer ? 'Hide' : 'Show' }}
-                  </button>
-                </td>
-              </tr>
+
+
 
               <tr *ngIf="artifact.acknowledgements">
                 <th>Acknowledgements</th>
@@ -151,7 +121,10 @@
             </tbody>
           </table>
         </div>
-        <button class="btn btn-outline-primary mt-2" (click)="printManifest()">Print full Manifest</button>
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-outline-primary" (click)="printManifest()">Print full Manifest</button>
+          <button class="btn btn-primary" (click)="onUpdateArtifact()">Update Artifact</button>
+        </div>
       </div>
     </div> <!-- artifact-body -->
   </div>

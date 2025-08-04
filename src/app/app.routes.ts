@@ -48,6 +48,11 @@ export const routes: Routes = [
     path: 'artifacts/:id',
     loadComponent: () => import('./artifacts/detail-artifact/detail-artifact.component').then(m => m.DetailArtifactComponent)
   },
+  // Update artifact
+  {
+    path: 'update-artifact/:id',
+    loadComponent: () => import('./artifacts/update-artifact/update-artifact.component').then(m => m.UpdateArtifactComponent)
+  },
 
   // Ruta de fallback para cualquier ruta no definida
   { path: '**', redirectTo: '' }
