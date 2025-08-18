@@ -201,6 +201,10 @@
           <i class="bi bi-check-circle"></i>
         </div>
         <h3>Successfully Processed!</h3>
+        <div *ngIf="footprintPreview" class="alert alert-info mt-2">
+          <div class="fw-semibold mb-1">Footprint (SHA-256)</div>
+          <code class="text-break">{{ footprintPreview }}</code>
+        </div>
         
         <div class="file-list-container">
           <div *ngFor="let file of selectedFilesData.slice(0, 10)" class="file-item">

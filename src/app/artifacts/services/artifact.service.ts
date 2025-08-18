@@ -64,6 +64,20 @@ export class ArtifactService {
     }
 
     /**
+     * Updates an existing artifact by sending only metadata (no file upload)
+     */
+    updateArtifactMetadataOnly(id: string, dto: CreateArtifactDTO): Observable<void> {
+        console.log('=== DEBUG: Updating metadata only ===');
+        console.log('ID:', id);
+        console.log('Manifest length:', dto.manifest?.length);
+        console.log('Footprint:', dto.footprint);
+        console.log('=== END DEBUG ===');
+
+        return this.http.put<void>(`${this.apiUrl}/${id}`, dto)
+            .pipe(catchError(this.handleError));
+    }
+
+    /**
      * Handles HTTP errors
      * @param error The error response
      * @returns An observable with a user-facing error message

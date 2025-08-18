@@ -379,7 +379,7 @@ export class CreateArtifactComponent implements OnInit {
    * @param fieldName Optional field name to apply different processing rules
    * @returns Array of strings
    */
-  private processCommaSeparatedField(value: string, fieldName?: string): string[] {
+  protected processCommaSeparatedField(value: string, fieldName?: string): string[] {
     if (!value) {
       // For links, return empty array instead of [""]
       if (fieldName === 'links') return [];
@@ -402,7 +402,7 @@ export class CreateArtifactComponent implements OnInit {
    * @param formValues Form values containing agency checkboxes and other agency field
    * @returns Array of funding agency strings
    */
-  private processFundingAgencies(formValues: any): string[] {
+  protected processFundingAgencies(formValues: any): string[] {
     const agencies: string[] = [];
     
     // Add selected checkbox agencies
