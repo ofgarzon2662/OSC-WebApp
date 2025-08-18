@@ -34,6 +34,7 @@ export class CreateArtifactComponent implements OnInit {
   isSubmitting = false;
   lastCreatedId: string | null = null;
   processingMessage = '';
+  footprintPreview: string | null = null;
 
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChild('folderInput') folderInput!: ElementRef;
@@ -234,6 +235,7 @@ export class CreateArtifactComponent implements OnInit {
         size: file.size
       });
       this.uploadError = false;
+      this.computeFootprintFromSelection();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error processing file';
       this.showError(`Error processing file: ${errorMessage}`);
@@ -256,6 +258,7 @@ export class CreateArtifactComponent implements OnInit {
         const sortedFilesData = filesData.sort((a, b) => a.name.localeCompare(b.name));
         this.selectedFilesData = sortedFilesData;
         this.uploadError = false;
+        this.computeFootprintFromSelection();
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error processing folder';
         this.showError(`Error processing folder: ${errorMessage}`);
@@ -341,6 +344,7 @@ export class CreateArtifactComponent implements OnInit {
     this.uploadError = false;
     this.errorMessage = '';
     this.isProcessing = false;
+    this.footprintPreview = null;
     if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
     if (this.folderInput?.nativeElement) this.folderInput.nativeElement.value = '';
   }
@@ -418,6 +422,37 @@ export class CreateArtifactComponent implements OnInit {
     return agencies.length === 0 ? [""] : agencies;
   }
 
+  // helper (place it anywhere in the class)
+  private buildCanonicalManifest(manifest: ManifestItem[]): string {
+    return [...manifest]                        // copy → we’ll sort without mutating
+      .sort((a, b) => a.filename.localeCompare(b.filename, undefined, { sensitivity: 'base' }))
+      .map(m => `${m.filename}\t${m.hash}\t${m.algorithm}`)
+      .join('\n');                              // no trailing newline → deterministic
+  }
+
+  // helper to hash text with CryptoJS
+  private hashSHA256(text: string): string {
+    return CryptoJS.SHA256(text).toString();    // hex string
+  }
+
+  private computeFootprintFromSelection(): void {
+    if (!this.selectedFilesData.length) {
+      this.footprintPreview = null;
+      return;
+    }
+    if (this.selectedFilesData.length === 1) {
+      this.footprintPreview = this.selectedFilesData[0].hash;
+      return;
+    }
+    const manifest: ManifestItem[] = this.selectedFilesData.map(f => ({
+      hash: f.hash,
+      filename: f.name,
+      algorithm: 'sha256'
+    }));
+    const canonical = this.buildCanonicalManifest(manifest);
+    this.footprintPreview = this.hashSHA256(canonical);
+  }
+
   /**
    * Create artifact DTO from form values and file data
    * @param formValues Raw form values
@@ -436,9 +471,19 @@ export class CreateArtifactComponent implements OnInit {
     // Create the manifest from the selected files
     const manifest: ManifestItem[] = this.selectedFilesData.map(fileData => ({
         hash: fileData.hash,
-        filename: this.formatFileName(fileData.name),
+        // keep full relative path for folder uploads; a single file already has no path
+        filename: fileData.name,
         algorithm: 'sha256'
     }));
+
+    // Compute footprint: single file -> file hash; multiple files -> hash of canonical manifest
+    let footprint: string;
+    if (this.selectedFilesData.length === 1) {
+      footprint = this.selectedFilesData[0].hash;
+    } else {
+      const canonical = this.buildCanonicalManifest(manifest);
+      footprint = this.hashSHA256(canonical);
+    }
 
     // Create and return the DTO
     return {
@@ -449,7 +494,8 @@ export class CreateArtifactComponent implements OnInit {
       dois,
       fundingAgencies,
       acknowledgements: formValues.acknowledgment ?? '', // Ensure it's never undefined or null
-      manifest
+      manifest,
+      footprint
     };
   }
 

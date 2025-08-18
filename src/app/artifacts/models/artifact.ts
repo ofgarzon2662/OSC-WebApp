@@ -14,6 +14,7 @@ export interface CreateArtifactDTO {
 
     // Manifest containing details about each file in the artifact
     manifest: ManifestItem[];
+    footprint: string;
 }
 
 /**

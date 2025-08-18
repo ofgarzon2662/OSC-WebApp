@@ -40,21 +40,41 @@ export class DetailArtifactComponent implements OnInit {
   }
 
   printManifest(): void {
-    if (!this.artifact?.manifest) return;
+    if (!this.artifact?.manifest?.length) return;
 
     const manifestText = this.artifact.manifest
       .map(item => `${item.filename}\t${item.hash}\t${item.algorithm}`)
       .join('\n');
 
-    const newWin = window.open('', '_blank', 'noopener,noreferrer');
-    if (newWin) {
-      const doc = newWin.document;
-      doc.title = 'Artifact Manifest';
-      const pre = doc.createElement('pre');
-      pre.textContent = manifestText;
-      doc.body.appendChild(pre);
-      newWin.print();
+    const win = window.open('', '_blank');      // keep it simple, no “noopener,noreferrer”
+    if (!win) {
+      alert('Please allow pop-ups to print the manifest.');
+      return;
     }
+
+    // Assemble the page in one go
+    const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <title>Artifact Manifest</title>
+        <style>
+          body { font-family: monospace; white-space: pre; margin: 16px; }
+        </style>
+      </head>
+      <body>${manifestText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')}</body>
+    </html>`;
+
+    win.document.open();
+    win.document.write(html);
+    win.document.close();           // ensures the body is fully built
+
+    // give the browser one paint cycle, then print
+    setTimeout(() => {
+      win.focus();
+    }, 10);
   }
 
   onUpdateArtifact(): void {
