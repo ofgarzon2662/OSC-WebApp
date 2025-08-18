@@ -18,6 +18,20 @@ export interface CreateArtifactDTO {
 }
 
 /**
+ * DTO for updating an existing artifact's metadata (no title/description)
+ * The API rejects title/description on update, so they are intentionally omitted.
+ */
+export interface UpdateArtifactDTO {
+    keywords?: string[];
+    links?: string[];
+    dois?: string[];
+    fundingAgencies?: string[];
+    acknowledgements?: string;
+    manifest: ManifestItem[];
+    footprint: string;
+}
+
+/**
  * Interface for an item in the artifact's manifest
  */
 export interface ManifestItem {

@@ -9,7 +9,7 @@ import { ArtifactDetail } from '../../models/artifact-detail.model';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
-import { CreateArtifactDTO, ManifestItem } from '../models/artifact';
+import { UpdateArtifactDTO, ManifestItem } from '../models/artifact';
 
 @Component({
   selector: 'app-update-artifact',
@@ -102,9 +102,7 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
       footprint = CryptoJS.SHA256(canonical).toString();
     }
 
-    const dto: CreateArtifactDTO = {
-      title: formValues.title,
-      description: formValues.description,
+    const dto: UpdateArtifactDTO = {
       keywords,
       links,
       dois,

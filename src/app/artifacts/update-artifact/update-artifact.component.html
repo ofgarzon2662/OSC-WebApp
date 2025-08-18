@@ -136,7 +136,14 @@
         </tbody>
       </table>
     </div>
+    <!-- Footprint below Manifest -->
+  <div *ngIf="artifact?.footprint" class="mt-2">
+    <div class="section-heading mb-2">Footprint (SHA-256)</div>
+    <code class="text-break">{{ artifact?.footprint }}</code>
   </div>
+  </div>
+
+  
 
   <!-- File upload section (same as create-artifact) -->
   <div class="file-upload-divider"></div>

@@ -7,6 +7,7 @@ export interface ArtifactDetail {
   dois: string[];
   fundingAgencies: string[];
   acknowledgements: string;
+  footprint: string;
   manifest: Array<{
     hash: string;
     filename: string;

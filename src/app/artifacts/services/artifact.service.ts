@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
-import { CreateArtifactDTO } from '../models/artifact';
+import { CreateArtifactDTO, UpdateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
 import { Artifact } from '../../models/artifact.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
@@ -66,7 +66,7 @@ export class ArtifactService {
     /**
      * Updates an existing artifact by sending only metadata (no file upload)
      */
-    updateArtifactMetadataOnly(id: string, dto: CreateArtifactDTO): Observable<void> {
+    updateArtifactMetadataOnly(id: string, dto: UpdateArtifactDTO): Observable<void> {
         console.log('=== DEBUG: Updating metadata only ===');
         console.log('ID:', id);
         console.log('Manifest length:', dto.manifest?.length);
