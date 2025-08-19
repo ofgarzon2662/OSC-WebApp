@@ -70,14 +70,18 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
     this.createHiddenInputs();
 
     // If user clicks "Contribute" while already on this page, reset the form/UI
-    this.navSub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: any) => {
-        if (e.urlAfterRedirects?.includes('/create-artifact')) {
-          this.lastCreatedId = null;
-          this.resetForm();
-        }
-      });
+    // In unit tests, Router may be a simple spy without an events stream
+    const routerEvents: any = (this.router as any)?.events;
+    if (routerEvents && typeof routerEvents.pipe === 'function') {
+      this.navSub = routerEvents
+        .pipe(filter((e: any) => e instanceof NavigationEnd))
+        .subscribe((e: any) => {
+          if (e.urlAfterRedirects?.includes('/create-artifact') || e.urlAfterRedirects?.includes('/contribute')) {
+            this.lastCreatedId = null;
+            this.resetForm();
+          }
+        });
+    }
   }
 
   ngOnDestroy(): void {
