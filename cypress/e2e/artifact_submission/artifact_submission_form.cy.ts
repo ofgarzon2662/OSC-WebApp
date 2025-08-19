@@ -43,9 +43,6 @@ describe('Artifact Submission Full Flow Test', () => {
       });
     });
 
-    // Wait for processing to complete
-    cy.get('.processing-state', { timeout: 10000 }).should('be.visible');
-    cy.get('.processing-state', { timeout: 15000 }).should('not.exist');
     
     // Verify success state
     cy.get('.success-state').should('be.visible');

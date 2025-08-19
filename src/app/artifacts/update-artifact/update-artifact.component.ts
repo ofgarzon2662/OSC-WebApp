@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CreateArtifactComponent } from '../create-artifact/create-artifact.component';
 import { ArtifactService } from '../services/artifact.service';
 import { ToastrService } from 'ngx-toastr';
@@ -26,9 +26,10 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     location: Location,
     private readonly artService: ArtifactService,
     private readonly toastrSvc: ToastrService,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    router: Router
   ) {
-    super(fb, location, artService, toastrSvc);
+    super(fb, location, artService, toastrSvc, router);
   }
 
   override ngOnInit(): void {

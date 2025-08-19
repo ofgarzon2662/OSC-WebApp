@@ -223,7 +223,7 @@
           <p>... and {{ selectedFilesData.length - 10 }} more files.</p>
         </div>
         
-        <button type="button" class="btn btn-outline-primary" (click)="resetUpload()">
+        <button type="button" class="btn btn-outline-primary" (click)="resetUpload(); lastCreatedId = null; isSubmitted = false;">
           Choose Different File/Folder
         </button>
       </div>
@@ -239,7 +239,7 @@
       data-cy="submit-btn"
       type="button"
       class="btn btn-primary" 
-      [disabled]="!isFormAndFileValid() || lastCreatedId"
+      [disabled]="!isFormAndFileValid() || isProcessing || isSubmitting || lastCreatedId"
       (click)="onSubmit()"
     >
       Submit
