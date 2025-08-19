@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CreateArtifactComponent } from '../create-artifact/create-artifact.component';
 import { ArtifactService } from '../services/artifact.service';
 import { ToastrService } from 'ngx-toastr';
@@ -14,7 +14,7 @@ import { UpdateArtifactDTO, ManifestItem } from '../models/artifact';
 @Component({
   selector: 'app-update-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './update-artifact.component.html',
   styleUrls: ['./update-artifact.component.css']
 })
@@ -115,7 +115,14 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     this.artService.updateArtifactMetadataOnly(this.artifact.id, dto)
       .subscribe({
         next: () => {
-          this.toastrSvc.success('Artifact updated successfully');
+          const id = this.artifact!.id;
+          this.lastCreatedId ??= id;
+          const link = `/artifacts/${id}`;
+          this.toastrSvc.success(
+            `Artifact updated successfully! <a href='${link}'>Check your modified artifact</a>`,
+            'Success!',
+            { enableHtml: true, timeOut: 5000 }
+          );
           this.isSubmitting = false;
         },
         error: (err) => {

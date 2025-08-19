@@ -240,11 +240,12 @@
     <button 
       type="button"
       class="btn btn-primary" 
-      [disabled]="!isFormAndFileValid() || isSubmitting"
+      [disabled]="!isFormAndFileValid() || isSubmitting || lastCreatedId"
       (click)="onSubmit()"
     >
       Update
     </button>
+    <a *ngIf="lastCreatedId" class="btn btn-success" [routerLink]="['/artifacts', lastCreatedId]">Check your modified artifact</a>
   </div>
 
   <!-- Hidden file inputs -->
