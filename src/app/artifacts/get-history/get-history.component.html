@@ -1,6 +1,6 @@
 <div class="container py-4">
-  <h2 class="page-headline mb-3">📜 Dive into your Artifact's Detail</h2>
-  <div class="mb-3">
+  <h2 class="page-headline mb-3">Dive into your Artifact's Full History 📜</h2>
+  <div class="mb-3 content-block">
     <p class="mb-1"><strong>Title:</strong> {{ artifactTitle }}</p>
     <p class="mb-1"><strong>Description:</strong> {{ artifactDescription }}</p>
     <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ artifactId }}</p>
@@ -16,8 +16,16 @@
     <div class="history-card card shadow-sm mb-3" *ngFor="let item of items; let i = index">
       <div class="card-header d-flex justify-content-between align-items-center">
         <div>
-          <span class="badge bg-secondary me-2">{{ i === 0 ? 'Current State' : (item.isDelete ? 'Delete' : 'Update') }}</span>
           <strong>{{ item.timestamp | date:'medium' }}</strong>
+        </div>
+        <div>
+          <span [ngClass]="{
+                   'tag tag-current': i === 0,
+                   'tag tag-delete': i !== 0 && item.isDelete,
+                   'tag tag-update': i !== 0 && !item.isDelete
+                 }">
+            {{ i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
+          </span>
         </div>
       </div>
       <div class="card-body">
