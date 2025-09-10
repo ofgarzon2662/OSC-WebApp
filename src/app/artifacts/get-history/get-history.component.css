@@ -25,6 +25,66 @@
   margin-right: auto;
 }
 
+.history-toolbar {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pager-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.pager-nav .page-link {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Match artifact list pagination styles */
+.custom-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.custom-pager .page-arrow,
+.custom-pager .page-number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.custom-pager .page-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.custom-pager .page-number:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+.custom-pager .page-number.active {
+  background-color: #343a40;
+  color: white;
+  border-color: #343a40;
+}
+
+.custom-pager .page-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
 .history-card .card-header {
   background-color: #7DD3D8;
   color: white;

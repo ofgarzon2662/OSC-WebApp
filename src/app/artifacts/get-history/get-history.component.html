@@ -10,10 +10,21 @@
 
   <div *ngIf="!isLoading && errorMessage" class="text-danger">{{ errorMessage }}</div>
 
-  <div *ngIf="!isLoading && items.length === 0" class="text-muted">No history found.</div>
+  <div *ngIf="!isLoading && totalItems === 0" class="text-muted">No history found.</div>
 
-  <div class="history-list" *ngIf="!isLoading && items.length > 0">
-    <div class="history-card card shadow-sm mb-3" *ngFor="let item of items; let i = index">
+  <div class="history-list" *ngIf="!isLoading && totalItems > 0">
+    <div class="history-toolbar d-flex justify-content-between align-items-center mb-2">
+      <div class="pager-info">Showing 10 items per page (of {{ totalItems }} total)</div>
+      <div class="custom-pager" *ngIf="totalUiPages > 1">
+        <button class="page-arrow" (click)="onPrev()" [disabled]="uiPage === 1">&laquo;</button>
+        <ng-container *ngFor="let page of getUiPages()">
+          <span class="page-ellipsis" *ngIf="page === '...'">...</span>
+          <button *ngIf="page !== '...'" class="page-number" [class.active]="uiPage === page" (click)="onGoToPage(+page)">{{ page }}</button>
+        </ng-container>
+        <button class="page-arrow" (click)="onNext()" [disabled]="uiPage === totalUiPages">&raquo;</button>
+      </div>
+    </div>
+    <div class="history-card card shadow-sm mb-3" *ngFor="let item of displayedItems; let i = index">
       <div class="card-header d-flex justify-content-between align-items-center">
         <div>
           <strong>{{ item.timestamp | date:'medium' }}</strong>
@@ -21,11 +32,11 @@
         <div>
           <span [ngClass]="{
                    'tag': true,
-                   'tag-current': i === 0,
-                   'tag-delete': i !== 0 && item.isDelete,
-                   'tag-update': i !== 0 && !item.isDelete
+                   'tag-current': isFirstPage && i === 0,
+                   'tag-delete': (!isFirstPage || i !== 0) && item.isDelete,
+                   'tag-update': (!isFirstPage || i !== 0) && !item.isDelete
                  }">
-            {{ i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
+            {{ isFirstPage && i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
           </span>
         </div>
       </div>
@@ -68,6 +79,18 @@
         <ng-template #noValue>
           <div class="text-muted">No value included for this event.</div>
         </ng-template>
+      </div>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="mt-3 d-flex justify-content-center" *ngIf="totalUiPages > 1">
+      <div class="custom-pager">
+        <button class="page-arrow" (click)="onPrev()" [disabled]="uiPage === 1">&laquo;</button>
+        <ng-container *ngFor="let page of getUiPages()">
+          <span class="page-ellipsis" *ngIf="page === '...'">...</span>
+          <button *ngIf="page !== '...'" class="page-number" [class.active]="uiPage === page" (click)="onGoToPage(+page)">{{ page }}</button>
+        </ng-container>
+        <button class="page-arrow" (click)="onNext()" [disabled]="uiPage === totalUiPages">&raquo;</button>
       </div>
     </div>
   </div>
