@@ -20,9 +20,10 @@
         </div>
         <div>
           <span [ngClass]="{
-                   'tag tag-current': i === 0,
-                   'tag tag-delete': i !== 0 && item.isDelete,
-                   'tag tag-update': i !== 0 && !item.isDelete
+                   'tag': true,
+                   'tag-current': i === 0,
+                   'tag-delete': i !== 0 && item.isDelete,
+                   'tag-update': i !== 0 && !item.isDelete
                  }">
             {{ i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
           </span>
