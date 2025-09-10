@@ -1,0 +1,30 @@
+.container {
+  max-width: 900px;
+}
+
+.page-headline {
+  font-size: clamp(1.75rem, 2.2vw + 1rem, 2.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-left: -0.25rem; /* match artifact detail left alignment */
+}
+
+.history-card {
+  border-radius: 16px;
+}
+
+.history-card .card-header {
+  background-color: #7DD3D8;
+  color: white;
+  min-height: 56px; /* Taller header */
+  display: flex;
+  align-items: center;
+}
+
+.section-title {
+  font-weight: 700;
+}
+
+.txid { display: none; }
+
+

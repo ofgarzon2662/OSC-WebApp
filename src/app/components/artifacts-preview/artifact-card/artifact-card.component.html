@@ -7,10 +7,14 @@
     <p class="card-text">{{ artifact.description.length > 100 ? (artifact.description | slice:0:100) + '...' : artifact.description }}</p>
 
     <h6 class="card-subtitle mb-2 text-muted">Updates:</h6>
-    <p class="card-text">Submitted at {{ artifact.submittedAt | date:'medium' }}</p>
+    <p class="card-text" *ngIf="!(artifact.updatedAt || artifact.lastTimeUpdated); else lastUpdatedTpl">Submitted at {{ artifact.submittedAt | date:'medium' }}</p>
+    <ng-template #lastUpdatedTpl>
+      <p class="card-text">Last Updated at {{ (artifact.updatedAt || artifact.lastTimeUpdated) | date:'medium' }}</p>
+    </ng-template>
 
-    <div class="mt-auto button-container">
-      <button class="btn btn-primary view-button" [routerLink]="['/artifacts', artifact.id]">View</button>
+    <div class="mt-auto button-container d-flex gap-2">
+      <a class="btn btn-primary view-button" [routerLink]="['/artifacts', artifact.id]">View</a>
+      <a class="btn btn-primary view-button" [routerLink]="['/artifacts', artifact.id, 'history']">History</a>
     </div>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ArtifactService } from '../services/artifact.service';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
 import { switchMap } from 'rxjs/operators';
@@ -9,7 +10,7 @@ import { of } from 'rxjs';
 @Component({
   selector: 'app-detail-artifact',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './detail-artifact.component.html',
   styleUrls: ['./detail-artifact.component.css']
 })
