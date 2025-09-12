@@ -27,5 +27,5 @@
 .badge.tag-current { background: linear-gradient(135deg, #fff4bf 0%, #ffd54f 50%, #ff9f00 100%); color: #2b2b2b; }
 .badge.tag-update { background: linear-gradient(135deg, #5b7cfa 0%, #3d5afe 100%); }
 .badge.tag-delete { background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); }
-.badge.tag-initial { background: linear-gradient(135deg, #34d399 0%, #059669 100%); }
+.badge.tag-initial { background: none; background-color: #10b981 ; }
 

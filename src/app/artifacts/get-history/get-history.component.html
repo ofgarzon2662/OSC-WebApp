@@ -4,8 +4,10 @@
     <p class="mb-1"><strong>Title:</strong> {{ artifactTitle }}</p>
     <p class="mb-1"><strong>Description:</strong> {{ artifactDescription }}</p>
     <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ artifactId }}</p>
-    <div class="mt-2">
-      <button class="refresh-button" (click)="onRefresh()">Refresh History</button>
+    <div class="mt-2 d-flex gap-2">
+      <button class="btn btn-outline-primary" (click)="onRefresh()">Refresh History</button>
+      <a class="btn btn-primary" [routerLink]="['/update-artifact', artifactId]">Update this Artifact</a>
+      <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId]">See Artifact's Detail</a>
     </div>
   </div>
 

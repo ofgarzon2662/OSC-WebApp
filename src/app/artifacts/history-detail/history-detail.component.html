@@ -1,15 +1,17 @@
 <div class="container py-4" *ngIf="!isLoading; else loadingTpl">
   <div class="mb-3 intro">
     <p class="mb-1"><strong>Artifact ID:</strong> {{ artifactId }}</p>
-    <p class="mb-1"><strong>Tx ID:</strong> <span class="monospace">{{ txId }}</span></p>
-    <p class="mb-1" *ngIf="item">
-      <strong>Timestamp:</strong> {{ item.timestamp | date:'medium' }}
-      <span class="ms-2 badge" [ngClass]="isCurrent ? 'tag-current' : (isInitial ? 'tag-initial' : 'tag-update')">
+    <p class="mb-1">
+      <strong>Tx ID:</strong> <span class="monospace">{{ txId }}</span>
+      <span class="ms-2 badge" *ngIf="item" [ngClass]="isCurrent ? 'tag-current' : (isInitial ? 'tag-initial' : 'tag-update')">
         {{ isCurrent ? 'Current State' : (isInitial ? 'Initial State' : 'Snapshot') }}
       </span>
     </p>
-    <div class="mt-2">
+    <p class="mb-1" *ngIf="item"><strong>Timestamp:</strong> {{ item.timestamp | date:'medium' }}</p>
+    <div class="mt-2 d-flex gap-2">
       <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId, 'history']">Go back to History</a>
+      <a class="btn btn-primary" [routerLink]="['/update-artifact', artifactId]">Update this Artifact</a>
+      <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId]">See Artifact's Detail</a>
     </div>
   </div>
 </div>
@@ -97,7 +99,10 @@
         </div>
 
         <div class="manifest-section mt-3" *ngIf="(it.value?.manifest || []).length">
-          <h4 class="section-heading mb-3">Manifest</h4>
+          <h4 class="section-heading mb-2 d-inline-flex align-items-center">
+            Manifest
+            <button class="btn btn-primary btn-sm ms-2" (click)="printManifest()">Print full Manifest</button>
+          </h4>
           <p class="small text-muted">{{ it.value?.manifest?.length }} files total, showing only 10</p>
           <div class="table-responsive">
             <table class="table table-sm manifest-table align-middle">
@@ -124,8 +129,10 @@
           <code class="text-break">{{ it.value?.footprint }}</code>
         </div>
       </div>
-      <div class="mt-2 d-flex justify-content-center">
+      <div class="mt-2 d-flex justify-content-center gap-2">
         <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId, 'history']">Go back to History</a>
+        <a class="btn btn-primary" [routerLink]="['/update-artifact', artifactId]">Update this Artifact</a>
+        <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId]">See Artifact's Detail</a>
       </div>
     </div>
 

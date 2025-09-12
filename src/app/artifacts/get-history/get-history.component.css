@@ -85,26 +85,7 @@
   color: #6c757d;
 }
 
-.refresh-button {
-  border: none;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #ffffff;
-  background: linear-gradient(135deg, #8a5cff 0%, #6a00ff 100%);
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-}
-
-.refresh-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.refresh-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* refresh button now uses bootstrap btn btn-outline-primary */
 
 .history-card .card-header {
   background-color: #7DD3D8;
@@ -149,7 +130,8 @@
 }
 
 .badge.tag-initial {
-  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  background: none;
+  background-color: #10b981  ; /* flat light green */
 }
 
 .permalink {

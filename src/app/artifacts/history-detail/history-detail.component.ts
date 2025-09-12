@@ -60,6 +60,41 @@ export class HistoryDetailComponent implements OnInit {
     });
   }
 
+  printManifest(): void {
+    const manifest = this.item?.value?.manifest;
+    if (!manifest || manifest.length === 0) return;
+
+    const manifestText = manifest
+      .map(item => `${item.filename}\t${item.hash}\t${item.algorithm}`)
+      .join('\n');
+
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('Please allow pop-ups to print the manifest.');
+      return;
+    }
+
+    const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <title>Artifact Snapshot Manifest</title>
+        <style>
+          body { font-family: monospace; white-space: pre; margin: 16px; }
+        </style>
+      </head>
+      <body>${manifestText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')}</body>
+    </html>`;
+
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+
+    setTimeout(() => { win.focus(); }, 10);
+  }
+
   private async fetchUntilFound(): Promise<boolean> {
     const limit = 25;
     let offset = 0;
