@@ -24,12 +24,13 @@ export class GetHistoryComponent implements OnInit {
 
   // Pagination (server = 25, UI = 10)
   readonly serverPageSize = 25;
-  readonly uiPageSize = 10;
+  readonly uiPageSize = 5;
   uiPage = 1;
   totalItems = 0;
   totalUiPages = 0;
   globalStartIndex = 0; // start index for current UI page
   isFirstPage = true;
+  isLastPage = false;
 
   // Header index (sorted globally by timestamp desc)
   private headers: Array<{ txId: string; timestamp: string; isDelete: boolean }> = [];
@@ -121,6 +122,7 @@ export class GetHistoryComponent implements OnInit {
         this.displayedItems = neededHeaders
           .map(h => this.txIdToItem.get(h.txId))
           .filter((it): it is ArtifactHistoryItem => !!it);
+        this.isLastPage = (this.uiPage === this.totalUiPages);
         this.isLoading = false;
       })
       .catch(() => {

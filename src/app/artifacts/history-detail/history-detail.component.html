@@ -2,14 +2,19 @@
   <div class="mb-3 intro">
     <p class="mb-1"><strong>Artifact ID:</strong> {{ artifactId }}</p>
     <p class="mb-1"><strong>Tx ID:</strong> <span class="monospace">{{ txId }}</span></p>
-    <p class="mb-1" *ngIf="item"><strong>Timestamp:</strong> {{ item.timestamp | date:'medium' }}</p>
+    <p class="mb-1" *ngIf="item">
+      <strong>Timestamp:</strong> {{ item.timestamp | date:'medium' }}
+      <span class="ms-2 badge" [ngClass]="isCurrent ? 'tag-current' : (isInitial ? 'tag-initial' : 'tag-update')">
+        {{ isCurrent ? 'Current State' : (isInitial ? 'Initial State' : 'Snapshot') }}
+      </span>
+    </p>
     <div class="mt-2">
       <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId, 'history']">Go back to History</a>
     </div>
   </div>
 </div>
 
-  <div *ngIf="item as it; else notFoundTpl">
+<div *ngIf="item as it; else notFoundTpl">
     <div class="artifact-wrapper container">
       <div class="artifact-header">
         <h1 class="artifact-title">{{ it.value?.title }}</h1>
@@ -29,10 +34,6 @@
                 <tr>
                   <th>ID</th>
                   <td>{{ it.value?.id || artifactId }}</td>
-                </tr>
-                <tr>
-                  <th>Submitted</th>
-                  <td>{{ it.value?.submittedAt ? (it.value?.submittedAt | date:'medium') : '—' }}</td>
                 </tr>
                 <tr>
                   <th>Timestamp</th>
@@ -123,8 +124,13 @@
           <code class="text-break">{{ it.value?.footprint }}</code>
         </div>
       </div>
+      <div class="mt-2 d-flex justify-content-center">
+        <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId, 'history']">Go back to History</a>
+      </div>
     </div>
-  </div>
+
+   
+</div>
 
   <ng-template #notFoundTpl>
     <div class="text-danger">Snapshot not found.</div>

@@ -18,6 +18,8 @@ export class HistoryDetailComponent implements OnInit {
   isLoading = true;
   item?: ArtifactHistoryItem;
   errorMessage = '';
+  isCurrent = false;
+  isInitial = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -30,10 +32,12 @@ export class HistoryDetailComponent implements OnInit {
     this.txId = this.route.snapshot.paramMap.get('txId') ?? '';
 
     // Try router state first
-    const nav = history.state as { snapshot?: ArtifactHistoryItem };
+    const nav = history.state as { snapshot?: ArtifactHistoryItem, isCurrent?: boolean, isInitial?: boolean };
     if (nav?.snapshot) {
       this.item = nav.snapshot;
       if (this.item?.txId) this.cache.set(this.item.txId, this.item);
+      this.isCurrent = !!nav.isCurrent;
+      this.isInitial = !!nav.isInitial;
       this.isLoading = false;
       return;
     }
@@ -70,6 +74,10 @@ export class HistoryDetailComponent implements OnInit {
         if (it?.txId) this.cache.set(it.txId, it);
         if (it.txId === this.txId) {
           this.item = it;
+          // current state is the first item by timestamp desc
+          this.isCurrent = offset === 0 && items.length > 0 && items[0].txId === it.txId;
+          // initial state is the last item overall; detect when we are in final page and last index
+          this.isInitial = (offset + items.length) >= total && items.length > 0 && items[items.length - 1].txId === it.txId;
           return true;
         }
       }

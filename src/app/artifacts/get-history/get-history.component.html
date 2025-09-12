@@ -33,15 +33,15 @@
           <strong>{{ item.timestamp | date:'medium' }}</strong>
         </div>
         <div>
-          <span [ngClass]="{
-                   'tag': true,
+          <span class="badge" [ngClass]="{
                    'tag-current': isFirstPage && i === 0,
+                   'tag-initial': isLastPage && i === (displayedItems.length - 1) && !item.isDelete,
                    'tag-delete': (!isFirstPage || i !== 0) && item.isDelete,
-                   'tag-update': (!isFirstPage || i !== 0) && !item.isDelete
+                   'tag-update': (!isFirstPage || i !== 0) && !item.isDelete && !(isLastPage && i === (displayedItems.length - 1))
                  }">
-            {{ isFirstPage && i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
+            {{ isFirstPage && i === 0 ? 'Current State' : (isLastPage && i === (displayedItems.length - 1) && !item.isDelete ? 'Initial State' : (item.isDelete ? 'Deleted' : 'Snapshot')) }}
           </span>
-          <a class="permalink" [routerLink]="['/artifacts', artifactId, 'history', item.txId]" [state]="{ snapshot: item }" title="Open snapshot detail">🔗</a>
+          <a class="permalink" [routerLink]="['/artifacts', artifactId, 'history', item.txId]" [state]="{ snapshot: item, isCurrent: (isFirstPage && i === 0), isInitial: (isLastPage && i === (displayedItems.length - 1) && !item.isDelete) }" title="Open snapshot detail">🔗</a>
         </div>
       </div>
       <div class="card-body">
