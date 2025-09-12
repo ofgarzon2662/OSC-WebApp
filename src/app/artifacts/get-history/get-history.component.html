@@ -4,6 +4,9 @@
     <p class="mb-1"><strong>Title:</strong> {{ artifactTitle }}</p>
     <p class="mb-1"><strong>Description:</strong> {{ artifactDescription }}</p>
     <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ artifactId }}</p>
+    <div class="mt-2">
+      <button class="refresh-button" (click)="onRefresh()">Refresh History</button>
+    </div>
   </div>
 
   <div *ngIf="isLoading">Loading history…</div>
@@ -38,6 +41,7 @@
                  }">
             {{ isFirstPage && i === 0 ? 'Current State' : (item.isDelete ? 'Deleted' : 'Update') }}
           </span>
+          <a class="permalink" [routerLink]="['/artifacts', artifactId, 'history', item.txId]" [state]="{ snapshot: item }" title="Open snapshot detail">🔗</a>
         </div>
       </div>
       <div class="card-body">

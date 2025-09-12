@@ -53,6 +53,22 @@ export class ArtifactService {
     }
 
     /**
+     * Triggers a backend refresh of artifact history
+     */
+    refreshArtifactHistory(id: string, options?: {
+        offset?: number;
+        limit?: number;
+        order?: 'asc' | 'desc';
+        includeValue?: boolean;
+    }): Observable<any> {
+        const { offset = 0, limit = 500, order = 'desc', includeValue = true } = options ?? {};
+        const url = `${this.apiUrl}/${id}/history/refresh?offset=${offset}&limit=${limit}&order=${order}&includeValue=${includeValue}`;
+        return this.http.post(url, {}).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
      * Creates a new artifact by sending only metadata (no file upload)
      * @param dto The artifact data including the manifest of files
      * @returns Observable of the creation status

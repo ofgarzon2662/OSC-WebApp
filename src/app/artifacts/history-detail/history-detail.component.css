@@ -1,0 +1,25 @@
+.page-headline {
+  font-size: clamp(1.75rem, 2.2vw + 1rem, 2.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-left: -0.25rem;
+}
+
+.section-title { font-weight: 700; }
+.monospace { font-family: monospace; word-break: break-all; }
+
+/* Reuse artifact detail layout styles */
+.artifact-wrapper {
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+.artifact-title { font-size: clamp(1.75rem, 2.2vw + 1rem, 2.5rem); font-weight: 700; line-height: 1.25; margin-left: -0.25rem; }
+.artifact-body { max-width: 85%; margin: 1.5rem auto 0 auto; }
+.details-col { border-left: 1px solid #dee2e6; padding-left: 1.5rem; }
+.artifact-meta td, .artifact-meta th { vertical-align: top; padding: 0.25rem 0.5rem; }
+.manifest-table td { font-family: monospace; font-size: 0.85rem; white-space: nowrap; }
+.manifest-table .hash { max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+.keyword-badge { background-color: #d0e7ff; color: #004e92; border: 1px solid #b3d6ff; }
+.pre-wrap { white-space: pre-wrap; }
+

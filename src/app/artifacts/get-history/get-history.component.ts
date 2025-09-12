@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ArtifactService } from '../services/artifact.service';
 import { ArtifactHistoryItem } from '../../models/artifact-history.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
@@ -10,7 +10,7 @@ import { switchMap } from 'rxjs/operators';
 @Component({
   selector: 'app-get-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './get-history.component.html',
   styleUrls: ['./get-history.component.css']
 })
@@ -82,6 +82,26 @@ export class GetHistoryComponent implements OnInit {
 
   onPrev(): void { this.onGoToPage(this.uiPage - 1); }
   onNext(): void { this.onGoToPage(this.uiPage + 1); }
+
+  async onRefresh(): Promise<void> {
+    if (!this.artifactId) return;
+    this.isLoading = true;
+    this.errorMessage = '';
+    try {
+      await this.artifactService.refreshArtifactHistory(this.artifactId, { offset: 0, limit: 500, order: 'desc', includeValue: true }).toPromise();
+      // Clear caches
+      this.serverPageCache.clear();
+      this.serverPageRecency = [];
+      this.txIdToItem.clear();
+      this.txIdToServerPage.clear();
+      // Reload headers and page 1
+      await this.loadAllHeaders();
+      this.loadUiPage(1);
+    } catch {
+      this.errorMessage = 'Unable to refresh history.';
+      this.isLoading = false;
+    }
+  }
 
   // Core paging logic
   private loadUiPage(page: number): void {

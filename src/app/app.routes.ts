@@ -55,6 +55,12 @@ export const routes: Routes = [
     loadComponent: () => import('./artifacts/get-history/get-history.component').then(m => m.GetHistoryComponent),
     canActivate: [authGuard]
   },
+  // History detail snapshot
+  {
+    path: 'artifacts/:id/history/:txId',
+    loadComponent: () => import('./artifacts/history-detail/history-detail.component').then(m => m.HistoryDetailComponent),
+    canActivate: [authGuard]
+  },
   // Update artifact
   {
     path: 'update-artifact/:id',
