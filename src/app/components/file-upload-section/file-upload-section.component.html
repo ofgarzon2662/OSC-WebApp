@@ -1,0 +1,82 @@
+<div class="file-upload-section">
+  <h2 class="section-title">Select folders or files</h2>
+  <p *ngIf="hintText" class="manifest-hint text-muted">{{ hintText }}</p>
+
+  <div
+    class="drop-zone"
+    (dragover)="fileDragOver.emit($event)"
+    (dragleave)="fileDragLeave.emit($event)"
+    (drop)="fileDrop.emit($event)"
+    [class.drag-over]="isDragging"
+  >
+    <div class="drop-zone-content" *ngIf="selectedFilesData.length === 0 && !isProcessing">
+      <div class="icon-container">
+        <i class="bi bi-cloud-upload"></i>
+      </div>
+      <h3>Drop Folders or Files here</h3>
+      <p>Or</p>
+      <div class="button-group">
+        <button type="button" class="btn btn-primary" (click)="selectFolder.emit()">
+          <i class="bi bi-folder-plus"></i> Select a Folder
+        </button>
+        <button type="button" class="btn btn-primary" (click)="selectFile.emit()">
+          <i class="bi bi-file-earmark-plus"></i> Select a File
+        </button>
+      </div>
+      <p class="max-size-info">Files up to 20MB, Folders up to 20MB and max 50 files</p>
+    </div>
+
+    <div class="processing-state" *ngIf="isProcessing">
+      <div class="processing-animation">
+        <i class="bi bi-gear-fill rotating"></i>
+      </div>
+      <h3>🧠 We're hashing this out for you!</h3>
+      <p>{{ processingMessage || 'Sit tight, we are turning your file into a beautiful, immutable truth nugget 🔐✨' }}</p>
+      <div class="loading-animation">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <div class="error-state" *ngIf="uploadError">
+      <div class="error-icon">
+        <i class="bi bi-exclamation-circle"></i>
+      </div>
+      <h3>😬 Well, that didn't go as planned...</h3>
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="btn btn-primary" (click)="resetUpload.emit()">
+        Try Again
+      </button>
+    </div>
+
+    <div class="success-state" *ngIf="selectedFilesData.length > 0 && !isProcessing">
+      <div class="success-icon">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <h3>Successfully Processed!</h3>
+      <div *ngIf="footprintPreview" class="alert alert-info mt-2">
+        <div class="fw-semibold mb-1">Footprint (SHA-256)</div>
+        <code class="text-break">{{ footprintPreview }}</code>
+      </div>
+
+      <div class="file-list-container">
+        <div *ngFor="let file of selectedFilesData.slice(0, 10)" class="file-item">
+          <span class="file-name" [title]="file.name">{{ formatFileName(file.name) }}</span>
+          <span class="file-hash" [title]="file.hash">sha256:{{ file.hash }}</span>
+          <span class="file-size">({{ formatFileSize(file.size) }})</span>
+        </div>
+      </div>
+
+      <div *ngIf="selectedFilesData.length > 10" class="more-files-notice">
+        <p>... and {{ selectedFilesData.length - 10 }} more files.</p>
+      </div>
+
+      <button type="button" class="btn btn-outline-primary" (click)="resetUpload.emit()">
+        Choose Different File/Folder
+      </button>
+    </div>
+  </div>
+</div>
+
+

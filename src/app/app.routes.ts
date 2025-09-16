@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Component } from '@angular/core';
 import { canCreateArtifactGuard } from './guards/role.guard';
+import { authGuard } from './guards/auth.guard';
 
 // Componente vacío para la ruta raíz
 @Component({
@@ -47,6 +48,24 @@ export const routes: Routes = [
   {
     path: 'artifacts/:id',
     loadComponent: () => import('./artifacts/detail-artifact/detail-artifact.component').then(m => m.DetailArtifactComponent)
+  },
+  // Artifact history (standalone component)
+  {
+    path: 'artifacts/:id/history',
+    loadComponent: () => import('./artifacts/get-history/get-history.component').then(m => m.GetHistoryComponent),
+    canActivate: [authGuard]
+  },
+  // History detail snapshot
+  {
+    path: 'artifacts/:id/history/:txId',
+    loadComponent: () => import('./artifacts/history-detail/history-detail.component').then(m => m.HistoryDetailComponent),
+    canActivate: [authGuard]
+  },
+  // Update artifact
+  {
+    path: 'update-artifact/:id',
+    loadComponent: () => import('./artifacts/update-artifact/update-artifact.component').then(m => m.UpdateArtifactComponent),
+    canActivate: [canCreateArtifactGuard]
   },
 
   // Ruta de fallback para cualquier ruta no definida

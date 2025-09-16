@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
-import { CreateArtifactDTO } from '../models/artifact';
+import { CreateArtifactDTO, UpdateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
 import { Artifact } from '../../models/artifact.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
+import { ArtifactHistoryResponse } from '../../models/artifact-history.model';
 
 @Injectable({
     providedIn: 'root'
@@ -36,11 +37,43 @@ export class ArtifactService {
     }
 
     /**
+     * Gets blockchain-backed history for an artifact
+     */
+    getArtifactHistory(id: string, options?: {
+        offset?: number;
+        limit?: number;
+        order?: 'asc' | 'desc';
+        includeValue?: boolean;
+    }): Observable<ArtifactHistoryResponse> {
+        const { offset = 0, limit = 50, order = 'desc', includeValue = true } = options ?? {};
+        const url = `${this.apiUrl}/${id}/history?offset=${offset}&limit=${limit}&order=${order}&includeValue=${includeValue}`;
+        return this.http.get<ArtifactHistoryResponse>(url).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
+     * Triggers a backend refresh of artifact history
+     */
+    refreshArtifactHistory(id: string, options?: {
+        offset?: number;
+        limit?: number;
+        order?: 'asc' | 'desc';
+        includeValue?: boolean;
+    }): Observable<any> {
+        const { offset = 0, limit = 500, order = 'desc', includeValue = true } = options ?? {};
+        const url = `${this.apiUrl}/${id}/history/refresh?offset=${offset}&limit=${limit}&order=${order}&includeValue=${includeValue}`;
+        return this.http.post(url, {}).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
      * Creates a new artifact by sending only metadata (no file upload)
      * @param dto The artifact data including the manifest of files
      * @returns Observable of the creation status
      */
-    createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<void> {
+    createArtifactMetadataOnly(dto: CreateArtifactDTO): Observable<{id: string}> {
         // Debug logs
         console.log('=== DEBUG: Sending metadata only ===');
         
@@ -57,10 +90,24 @@ export class ArtifactService {
         console.log('=== END DEBUG ===');
         
         // Simplemente enviamos el DTO como JSON, sin FormData ni archivos
-        return this.http.post<void>(this.apiUrl, dto)
+        return this.http.post<{id: string}>(this.apiUrl, dto)
             .pipe(
                 catchError(this.handleError)
             );
+    }
+
+    /**
+     * Updates an existing artifact by sending only metadata (no file upload)
+     */
+    updateArtifactMetadataOnly(id: string, dto: UpdateArtifactDTO): Observable<void> {
+        console.log('=== DEBUG: Updating metadata only ===');
+        console.log('ID:', id);
+        console.log('Manifest length:', dto.manifest?.length);
+        console.log('Footprint:', dto.footprint);
+        console.log('=== END DEBUG ===');
+
+        return this.http.put<void>(`${this.apiUrl}/${id}`, dto)
+            .pipe(catchError(this.handleError));
     }
 
     /**

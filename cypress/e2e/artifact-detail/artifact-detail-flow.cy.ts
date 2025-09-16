@@ -51,9 +51,16 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
     // upload sample file
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/sample.txt', { force: true });
 
-    cy.get('[data-cy="submit-btn"]').should('not.be.disabled').click();
+    cy.wait(2000);
+
+    cy.get('[data-cy="submit-btn"]').should('not.be.disabled');
+
+    cy.get('[data-cy="submit-btn"]').click();
 
     cy.contains('Your artifact has been successfully submitted!').should('be.visible');
+
+    cy.get('[data-cy="submit-btn"]').should('be.disabled');
+
   };
 
   before(() => {

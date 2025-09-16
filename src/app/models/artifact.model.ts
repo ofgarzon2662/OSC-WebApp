@@ -7,4 +7,5 @@ export interface Artifact {
     verified: boolean;
     lastTimeVerified: string | null;
     lastTimeUpdated: string | null;
+    updatedAt?: string | null;
 }

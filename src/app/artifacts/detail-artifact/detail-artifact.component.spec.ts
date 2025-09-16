@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { DetailArtifactComponent } from './detail-artifact.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
@@ -73,24 +73,30 @@ describe('DetailArtifactComponent', () => {
       expect(component.truncated('abcdefghijkl', 6)).toBe('abcdef…');
     });
 
-    it('printManifest should open new window and write manifest', () => {
+    it('printManifest should open new window and write manifest', fakeAsync(() => {
       component.artifact = mockArtifact;
       const mockWin = {
         document: {
           createElement: () => ({ textContent: '' }),
           body: { appendChild: jasmine.createSpy('appendChild') },
           title: '',
+          open: jasmine.createSpy('open'),
+          write: jasmine.createSpy('write'),
+          close: jasmine.createSpy('close')
         },
-        print: jasmine.createSpy('print')
+        focus: jasmine.createSpy('focus')
       } as unknown as Window;
 
       spyOn(window, 'open').and.returnValue(mockWin);
 
       component.printManifest();
+      tick(20);
 
       expect(window.open).toHaveBeenCalled();
-      expect(mockWin.document.body.appendChild).toHaveBeenCalled();
-      expect(mockWin.print).toHaveBeenCalled();
-    });
+      expect(mockWin.document.open).toHaveBeenCalled();
+      expect(mockWin.document.write).toHaveBeenCalled();
+      expect(mockWin.document.close).toHaveBeenCalled();
+      expect(mockWin.focus).toHaveBeenCalled();
+    }));
   });
 }); 
