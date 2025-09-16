@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+declare const expect: any;
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ArtifactService } from './artifact.service';
-import { CreateArtifactDTO } from '../models/artifact';
+import { CreateArtifactDTO, UpdateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -84,6 +85,71 @@ describe('ArtifactService', () => {
     });
   });
 
+  describe('getArtifacts caching', () => {
+    it('caches the list response (shareReplay)', () => {
+      const firstSub = service.getArtifacts().subscribe();
+      const secondSub = service.getArtifacts().subscribe();
+      const req = httpMock.expectOne(apiUrl);
+      req.flush([{ id: '1' }]);
+      firstSub.unsubscribe();
+      secondSub.unsubscribe();
+      // No additional requests should be pending
+      httpMock.verify();
+    });
+  });
+
+  describe('getArtifactById', () => {
+    it('builds the correct URL', () => {
+      service.getArtifactById('abc').subscribe();
+      const req = httpMock.expectOne(`${apiUrl}/abc`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ id: 'abc' });
+    });
+  });
+
+  describe('getArtifactHistory', () => {
+    it('uses defaults and constructs query string', () => {
+      service.getArtifactHistory('abc').subscribe();
+      const req = httpMock.expectOne(`${apiUrl}/abc/history?offset=0&limit=50&order=desc&includeValue=true`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ items: [], total: 0 });
+    });
+
+    it('supports custom options', () => {
+      service.getArtifactHistory('abc', { offset: 10, limit: 5, order: 'asc', includeValue: false }).subscribe();
+      const req = httpMock.expectOne(`${apiUrl}/abc/history?offset=10&limit=5&order=asc&includeValue=false`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ items: [], total: 0 });
+    });
+  });
+
+  describe('refreshArtifactHistory', () => {
+    it('posts to refresh endpoint with defaults', () => {
+      service.refreshArtifactHistory('abc').subscribe();
+      const req = httpMock.expectOne(`${apiUrl}/abc/history/refresh?offset=0&limit=500&order=desc&includeValue=true`);
+      expect(req.request.method).toBe('POST');
+      req.flush({});
+    });
+  });
+
+  describe('updateArtifactMetadataOnly', () => {
+    it('sends PUT with dto', () => {
+      const dto: UpdateArtifactDTO = {
+        keywords: ['k'],
+        links: ['l'],
+        dois: ['d'],
+        fundingAgencies: ['NSF'],
+        acknowledgements: 'a',
+        manifest: [],
+        footprint: 'f'
+      };
+      service.updateArtifactMetadataOnly('id1', dto).subscribe();
+      const req = httpMock.expectOne(`${apiUrl}/id1`);
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual(dto);
+      req.flush({});
+    });
+  });
   describe('error handling', () => {
     it('should handle client-side errors', () => {
       const mockDto: CreateArtifactDTO = {

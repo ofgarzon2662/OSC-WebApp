@@ -52,24 +52,33 @@ export class DetailArtifactComponent implements OnInit {
       return;
     }
 
-    const doc = win.document;
+    const doc: any = win.document;
     doc.title = 'Artifact Manifest';
 
-    // Inject basic styles
-    const styleEl = doc.createElement('style');
-    styleEl.textContent = 'body { font-family: monospace; margin: 16px; }';
-    doc.head.appendChild(styleEl);
+    // Prefer modern DOM APIs; fall back to open/write for test stubs without head/body
+    if (doc?.head && doc?.body && typeof doc.createElement === 'function') {
+      const styleEl = doc.createElement('style');
+      styleEl.textContent = 'body { font-family: monospace; margin: 16px; }';
+      doc.head.appendChild(styleEl);
 
-    // Put manifest into a <pre> to preserve whitespace without manual escaping
-    const pre = doc.createElement('pre');
-    pre.textContent = manifestText;
-    doc.body.innerHTML = '';
-    doc.body.appendChild(pre);
+      const pre = doc.createElement('pre');
+      pre.textContent = manifestText;
+      doc.body.innerHTML = '';
+      doc.body.appendChild(pre);
+    } else {
+      const escaped = manifestText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;');
+      const html = `<!doctype html><html><head><title>Artifact Manifest</title><style>body { font-family: monospace; white-space: pre; margin: 16px; }</style></head><body>${escaped}</body></html>`;
+      if (typeof doc.open === 'function') doc.open();
+      if (typeof doc.write === 'function') doc.write(html);
+      if (typeof doc.close === 'function') doc.close();
+    }
 
     // Give the browser a paint cycle, then print
     setTimeout(() => {
-      win.focus();
-      win.print();
+      if (typeof (win as any).focus === 'function') (win as any).focus();
+      if (typeof (win as any).print === 'function') (win as any).print();
     }, 10);
   }
 
