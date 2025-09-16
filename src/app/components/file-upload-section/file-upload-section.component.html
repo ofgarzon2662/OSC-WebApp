@@ -4,9 +4,9 @@
 
   <div
     class="drop-zone"
-    (dragover)="dragOver.emit($event)"
-    (dragleave)="dragLeave.emit($event)"
-    (drop)="drop.emit($event)"
+    (dragover)="fileDragOver.emit($event)"
+    (dragleave)="fileDragLeave.emit($event)"
+    (drop)="fileDrop.emit($event)"
     [class.drag-over]="isDragging"
   >
     <div class="drop-zone-content" *ngIf="selectedFilesData.length === 0 && !isProcessing">

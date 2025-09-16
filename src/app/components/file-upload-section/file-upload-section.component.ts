@@ -23,9 +23,9 @@ export class FileUploadSectionComponent {
   @Output() selectFolder = new EventEmitter<void>();
   @Output() selectFile = new EventEmitter<void>();
   @Output() resetUpload = new EventEmitter<void>();
-  @Output() dragOver = new EventEmitter<DragEvent>();
-  @Output() dragLeave = new EventEmitter<DragEvent>();
-  @Output() drop = new EventEmitter<DragEvent>();
+  @Output() fileDragOver = new EventEmitter<DragEvent>();
+  @Output() fileDragLeave = new EventEmitter<DragEvent>();
+  @Output() fileDrop = new EventEmitter<DragEvent>();
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
