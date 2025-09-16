@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ArtifactHistoryItem } from '../../models/artifact-history.model';
 import { ArtifactService } from '../services/artifact.service';
 import { HistoryCacheService } from '../services/history-cache.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-history-detail',
@@ -74,25 +75,19 @@ export class HistoryDetailComponent implements OnInit {
       return;
     }
 
-    const html = `
-    <!doctype html>
-    <html>
-      <head>
-        <title>Artifact Snapshot Manifest</title>
-        <style>
-          body { font-family: monospace; white-space: pre; margin: 16px; }
-        </style>
-      </head>
-      <body>${manifestText
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')}</body>
-    </html>`;
+    const doc = win.document;
+    doc.title = 'Artifact Snapshot Manifest';
 
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
+    const styleEl = doc.createElement('style');
+    styleEl.textContent = 'body { font-family: monospace; margin: 16px; }';
+    doc.head.appendChild(styleEl);
 
-    setTimeout(() => { win.focus(); }, 10);
+    const pre = doc.createElement('pre');
+    pre.textContent = manifestText;
+    doc.body.innerHTML = '';
+    doc.body.appendChild(pre);
+
+    setTimeout(() => { win.focus(); win.print(); }, 10);
   }
 
   private async fetchUntilFound(): Promise<boolean> {
@@ -102,7 +97,12 @@ export class HistoryDetailComponent implements OnInit {
     let scanned = 0;
     const maxScan = 1000; // safety cap
     do {
-      const res = await this.artifactService.getArtifactHistory(this.artifactId, { offset, limit, order: 'desc', includeValue: true }).toPromise();
+      const res = await firstValueFrom(
+        this.artifactService.getArtifactHistory(
+          this.artifactId,
+          { offset, limit, order: 'desc', includeValue: true }
+        )
+      );
       const items = res?.items ?? [];
       total = res?.total ?? total;
       for (const it of items) {

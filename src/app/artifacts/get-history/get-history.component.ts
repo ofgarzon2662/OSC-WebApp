@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ArtifactService } from '../services/artifact.service';
 import { ArtifactHistoryItem } from '../../models/artifact-history.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
-import { of } from 'rxjs';
+import { of, firstValueFrom } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Component({
@@ -36,12 +36,12 @@ export class GetHistoryComponent implements OnInit {
   private headers: Array<{ txId: string; timestamp: string; isDelete: boolean }> = [];
 
   // Cache by txId for full items
-  private txIdToItem = new Map<string, ArtifactHistoryItem>();
-  private txIdToServerPage = new Map<string, number>();
+  private readonly txIdToItem = new Map<string, ArtifactHistoryItem>();
+  private readonly txIdToServerPage = new Map<string, number>();
 
   // Small LRU cache for server pages
-  private maxCachedServerPages = 3;
-  private serverPageCache = new Map<number, ArtifactHistoryItem[]>();
+  private readonly maxCachedServerPages = 3;
+  private readonly serverPageCache = new Map<number, ArtifactHistoryItem[]>();
   private serverPageRecency: number[] = []; // most recent at end
 
   constructor(
@@ -64,13 +64,13 @@ export class GetHistoryComponent implements OnInit {
         return of(true);
       })
     ).subscribe({
-      next: async () => {
-        await this.loadAllHeaders();
-        this.loadUiPage(1);
+      next: () => {
+        this.loadAllHeaders()
+          .then(() => this.loadUiPage(1));
       },
-      error: async () => {
-        await this.loadAllHeaders();
-        this.loadUiPage(1);
+      error: () => {
+        this.loadAllHeaders()
+          .then(() => this.loadUiPage(1));
       }
     });
   }
@@ -89,7 +89,12 @@ export class GetHistoryComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     try {
-      await this.artifactService.refreshArtifactHistory(this.artifactId, { offset: 0, limit: 500, order: 'desc', includeValue: true }).toPromise();
+      await firstValueFrom(
+        this.artifactService.refreshArtifactHistory(
+          this.artifactId,
+          { offset: 0, limit: 500, order: 'desc', includeValue: true }
+        )
+      );
       // Clear caches
       this.serverPageCache.clear();
       this.serverPageRecency = [];
@@ -140,9 +145,12 @@ export class GetHistoryComponent implements OnInit {
 
     const offset = serverPageIndex * this.serverPageSize;
 
-    const res = await this.artifactService
-      .getArtifactHistory(this.artifactId!, { offset, limit: this.serverPageSize, order: 'desc', includeValue: true })
-      .toPromise();
+    const res = await firstValueFrom(
+      this.artifactService.getArtifactHistory(
+        this.artifactId!,
+        { offset, limit: this.serverPageSize, order: 'desc', includeValue: true }
+      )
+    );
 
     const items = (res?.items ?? []).slice().sort((a, b) => {
       const at = new Date(a.timestamp).getTime();
@@ -191,9 +199,12 @@ export class GetHistoryComponent implements OnInit {
     let total = 0;
     let absoluteIndex = 0;
     do {
-      const res = await this.artifactService
-        .getArtifactHistory(this.artifactId, { offset, limit: this.serverPageSize, order: 'desc', includeValue: false })
-        .toPromise();
+      const res = await firstValueFrom(
+        this.artifactService.getArtifactHistory(
+          this.artifactId,
+          { offset, limit: this.serverPageSize, order: 'desc', includeValue: false }
+        )
+      );
       const items = res?.items ?? [];
       total = res?.total ?? total;
       for (let i = 0; i < items.length; i++) {

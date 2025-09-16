@@ -4,7 +4,7 @@ import { ArtifactHistoryItem } from '../../models/artifact-history.model';
 @Injectable({ providedIn: 'root' })
 export class HistoryCacheService {
   private readonly maxEntries = 200;
-  private cache = new Map<string, ArtifactHistoryItem>();
+  private readonly cache = new Map<string, ArtifactHistoryItem>();
 
   get(txId: string): ArtifactHistoryItem | undefined {
     const value = this.cache.get(txId);
@@ -28,9 +28,11 @@ export class HistoryCacheService {
 
   private evictIfNeeded(): void {
     while (this.cache.size > this.maxEntries) {
-      const oldestKey = this.cache.keys().next().value as string | undefined;
-      if (oldestKey) this.cache.delete(oldestKey);
-      else break;
+      const iterator = this.cache.keys();
+      const first = iterator.next();
+      if (first.done) break;
+      const oldestKey = first.value;
+      this.cache.delete(oldestKey);
     }
   }
 }

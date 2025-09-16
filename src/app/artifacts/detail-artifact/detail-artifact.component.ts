@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ArtifactService } from '../services/artifact.service';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
 import { switchMap } from 'rxjs/operators';
@@ -47,34 +46,30 @@ export class DetailArtifactComponent implements OnInit {
       .map(item => `${item.filename}\t${item.hash}\t${item.algorithm}`)
       .join('\n');
 
-    const win = window.open('', '_blank');      // keep it simple, no “noopener,noreferrer”
+    const win = window.open('', '_blank'); // keep it simple, no “noopener,noreferrer”
     if (!win) {
       alert('Please allow pop-ups to print the manifest.');
       return;
     }
 
-    // Assemble the page in one go
-    const html = `
-    <!doctype html>
-    <html>
-      <head>
-        <title>Artifact Manifest</title>
-        <style>
-          body { font-family: monospace; white-space: pre; margin: 16px; }
-        </style>
-      </head>
-      <body>${manifestText
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')}</body>
-    </html>`;
+    const doc = win.document;
+    doc.title = 'Artifact Manifest';
 
-    win.document.open();
-    win.document.write(html);
-    win.document.close();           // ensures the body is fully built
+    // Inject basic styles
+    const styleEl = doc.createElement('style');
+    styleEl.textContent = 'body { font-family: monospace; margin: 16px; }';
+    doc.head.appendChild(styleEl);
 
-    // give the browser one paint cycle, then print
+    // Put manifest into a <pre> to preserve whitespace without manual escaping
+    const pre = doc.createElement('pre');
+    pre.textContent = manifestText;
+    doc.body.innerHTML = '';
+    doc.body.appendChild(pre);
+
+    // Give the browser a paint cycle, then print
     setTimeout(() => {
       win.focus();
+      win.print();
     }, 10);
   }
 
