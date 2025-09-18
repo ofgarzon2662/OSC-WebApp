@@ -19,6 +19,8 @@ export class FileUploadSectionComponent {
   @Input() errorMessage = '';
   @Input() isDragging = false;
   @Input() hintText?: string;
+  @Input() keepManifestUnchanged = false; // controls disabling of select buttons
+  @Input() showKeepManifestToggle = false; // whether to render the toggle UI
 
   @Output() selectFolder = new EventEmitter<void>();
   @Output() selectFile = new EventEmitter<void>();
@@ -26,6 +28,7 @@ export class FileUploadSectionComponent {
   @Output() fileDragOver = new EventEmitter<DragEvent>();
   @Output() fileDragLeave = new EventEmitter<DragEvent>();
   @Output() fileDrop = new EventEmitter<DragEvent>();
+  @Output() keepManifestToggle = new EventEmitter<boolean>();
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
@@ -39,6 +42,11 @@ export class FileUploadSectionComponent {
     if (!name) return '';
     const lastSlash = name.lastIndexOf('/');
     return lastSlash === -1 ? name : name.substring(lastSlash + 1);
+  }
+
+  onToggleKeepManifest(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.keepManifestToggle.emit(!!input.checked);
   }
 }
 

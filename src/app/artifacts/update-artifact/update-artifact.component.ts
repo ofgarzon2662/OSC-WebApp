@@ -21,6 +21,7 @@ import { FileUploadSectionComponent } from '../../components/file-upload-section
 })
 export class UpdateArtifactComponent extends CreateArtifactComponent implements OnInit {
   artifact?: ArtifactDetail;
+  keepManifestUnchanged = false;
 
   constructor(
     fb: FormBuilder,
@@ -89,19 +90,26 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     const dois = this.processCommaSeparatedField(formValues.doi);
     const fundingAgencies = this.processFundingAgencies(formValues);
 
-    const manifest: ManifestItem[] = this.selectedFilesData.map(f => ({
-      hash: f.hash,
-      filename: f.name,
-      algorithm: 'sha256'
-    }));
-
-    // Single-file rule; otherwise hash canonical manifest
+    // Choose manifest/footprint based on the toggle
+    let manifest: ManifestItem[];
     let footprint: string;
-    if (this.selectedFilesData.length === 1) {
-      footprint = this.selectedFilesData[0].hash;
+    if (this.keepManifestUnchanged) {
+      manifest = (this.artifact?.manifest || []).map(m => ({ hash: m.hash, filename: m.filename, algorithm: m.algorithm }));
+      footprint = this.artifact?.footprint || '';
     } else {
-      const canonical = this.buildCanonicalManifestForUpdate(manifest);
-      footprint = CryptoJS.SHA256(canonical).toString();
+      manifest = this.selectedFilesData.map(f => ({
+        hash: f.hash,
+        filename: f.name,
+        algorithm: 'sha256'
+      }));
+
+      // Single-file rule; otherwise hash canonical manifest
+      if (this.selectedFilesData.length === 1) {
+        footprint = this.selectedFilesData[0].hash;
+      } else {
+        const canonical = this.buildCanonicalManifestForUpdate(manifest);
+        footprint = CryptoJS.SHA256(canonical).toString();
+      }
     }
 
     const dto: UpdateArtifactDTO = {
@@ -139,5 +147,64 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
       .sort((a, b) => a.filename.localeCompare(b.filename, undefined, { sensitivity: 'base' }))
       .map(m => `${m.filename}\t${m.hash}\t${m.algorithm}`)
       .join('\n');
+  }
+
+  // Toggle handler for keeping the existing manifest/footprint
+  onToggleKeepManifest(eventOrValue: Event | boolean): void {
+    const checked = typeof eventOrValue === 'boolean' ? eventOrValue : !!(eventOrValue.target as HTMLInputElement).checked;
+    this.keepManifestUnchanged = checked;
+    if (this.keepManifestUnchanged) {
+      // Clear any selected files if user opts to keep the manifest
+      this.resetUpload();
+    }
+  }
+
+  // Determine if metadata fields (excluding manifest/footprint) changed vs the original artifact
+  private hasMetadataChanges(): boolean {
+    if (!this.artifact) return false;
+    const formValues = this.artifactForm.getRawValue();
+
+    const toNormalizedArray = (arr?: string[]) => (arr || [])
+      .map(x => (x ?? '').toString().trim().toLowerCase())
+      .filter(x => x.length > 0)
+      .sort();
+
+    const arraysEqualUnordered = (a: string[], b: string[]) => {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+      return true;
+    };
+
+    const currentKeywords = toNormalizedArray(this.processCommaSeparatedField(formValues.keywords));
+    const originalKeywords = toNormalizedArray(this.artifact.keywords);
+
+    const currentLinks = toNormalizedArray(this.processCommaSeparatedField(formValues.links, 'links'));
+    const originalLinks = toNormalizedArray(this.artifact.links);
+
+    const currentDois = toNormalizedArray(this.processCommaSeparatedField(formValues.doi));
+    const originalDois = toNormalizedArray(this.artifact.dois);
+
+    const currentAgencies = toNormalizedArray(this.processFundingAgencies(formValues));
+    const originalAgencies = toNormalizedArray(this.artifact.fundingAgencies);
+
+    const currentAck = (formValues.acknowledgment ?? '').toString().trim();
+    const originalAck = (this.artifact.acknowledgements ?? '').toString().trim();
+
+    const keywordsChanged = !arraysEqualUnordered(currentKeywords, originalKeywords);
+    const linksChanged = !arraysEqualUnordered(currentLinks, originalLinks);
+    const doisChanged = !arraysEqualUnordered(currentDois, originalDois);
+    const agenciesChanged = !arraysEqualUnordered(currentAgencies, originalAgencies);
+    const ackChanged = currentAck !== originalAck;
+
+    return keywordsChanged || linksChanged || doisChanged || agenciesChanged || ackChanged;
+  }
+
+  // Allow submit when either a new file/folder is provided or user opts to keep the manifest with other metadata changes
+  override isFormAndFileValid(): boolean {
+    if (!this.artifactForm.valid || this.isProcessing) return false;
+    if (this.keepManifestUnchanged) {
+      return this.hasMetadataChanges();
+    }
+    return this.selectedFilesData.length > 0;
   }
 }

@@ -93,8 +93,9 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
     cy.contains('button', 'Search').click();
 
     // one card expected
-    cy.get('app-artifact-card').should('have.length', 1);
-    cy.get('app-artifact-card .view-button').click();
+    cy.get('app-artifact-card').should('have.length', 1).within(() => {
+      cy.contains('a.view-button', 'View').click();
+    });
   };
 
   const assertDetailPage = (artifact: ArtifactInput) => {

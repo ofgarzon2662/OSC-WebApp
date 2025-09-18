@@ -39,7 +39,12 @@
             formControlName="keywords"
             class="form-control"
             placeholder="Enter keywords, separated by commas"
+            [ngClass]="{'is-invalid': artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched}"
           >
+          <div *ngIf="artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('keywords')?.errors?.['maxlength']">Keywords cannot exceed 1000 characters</small>
+            <small *ngIf="artifactForm.get('keywords')?.errors?.['invalidFormat']">Please enter valid keywords separated by commas</small>
+          </div>
         </div>
 
         <div class="form-group">
@@ -50,7 +55,12 @@
             formControlName="links"
             class="form-control"
             placeholder="Enter URLs, separated by commas"
+            [ngClass]="{'is-invalid': artifactForm.get('links')?.invalid && artifactForm.get('links')?.touched}"
           >
+          <div *ngIf="artifactForm.get('links')?.invalid && artifactForm.get('links')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('links')?.errors?.['maxlength']">Links cannot exceed 2000 characters</small>
+            <small *ngIf="artifactForm.get('links')?.errors?.['invalidLinks']">Please enter valid URLs separated by commas</small>
+          </div>
         </div>
 
         <div class="form-group last-field">
@@ -61,7 +71,11 @@
             formControlName="doi"
             class="form-control"
             placeholder="ex. DOI: 10.1234/abc123"
+            [ngClass]="{'is-invalid': artifactForm.get('doi')?.invalid && artifactForm.get('doi')?.touched}"
           >
+          <div *ngIf="artifactForm.get('doi')?.invalid && artifactForm.get('doi')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('doi')?.errors?.['invalidDoi']">Please enter valid DOIs separated by commas</small>
+          </div>
         </div>
       </div>
 
@@ -95,7 +109,12 @@
               formControlName="otherAgency"
               class="form-control"
               placeholder="Enter agencies, separated by commas"
+              [ngClass]="{'is-invalid': artifactForm.get('otherAgency')?.invalid && artifactForm.get('otherAgency')?.touched}"
             >
+            <div *ngIf="artifactForm.get('otherAgency')?.invalid && artifactForm.get('otherAgency')?.touched" class="error-message">
+              <small *ngIf="artifactForm.get('otherAgency')?.errors?.['maxlength']">Other agencies cannot exceed 100 characters</small>
+              <small *ngIf="artifactForm.get('otherAgency')?.errors?.['invalidFormat']">Please enter valid agencies separated by commas</small>
+            </div>
           </div>
         </div>
 
@@ -106,7 +125,11 @@
             formControlName="acknowledgment"
             class="form-control"
             rows="4"
+            [ngClass]="{'is-invalid': artifactForm.get('acknowledgment')?.invalid && artifactForm.get('acknowledgment')?.touched}"
           ></textarea>
+          <div *ngIf="artifactForm.get('acknowledgment')?.invalid && artifactForm.get('acknowledgment')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('acknowledgment')?.errors?.['maxlength']">Acknowledgment cannot exceed 3000 characters</small>
+          </div>
         </div>
       </div>
     </div>
@@ -157,6 +180,9 @@
     [errorMessage]="errorMessage"
     [isDragging]="isDragging"
     [hintText]="'Have updates for your artifact? Drag a new file or folder here to regenerate the manifest.'"
+    [keepManifestUnchanged]="keepManifestUnchanged"
+    [showKeepManifestToggle]="true"
+    (keepManifestToggle)="onToggleKeepManifest($event)"
     (fileDragOver)="onDragOver($event)"
     (fileDragLeave)="onDragLeave($event)"
     (fileDrop)="onDrop($event)"
