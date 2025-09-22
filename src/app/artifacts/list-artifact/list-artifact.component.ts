@@ -39,7 +39,10 @@ export class ListArtifactComponent implements OnInit {
 
   onSearch(): void {
     const titleTerm = this.titleSearchTerm.toLowerCase().trim();
-    const searchKeywords = this.keywordSearchTerm.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+    const searchKeywords = this.keywordSearchTerm
+      .split(',')
+      .map(k => k.trim().toLowerCase())
+      .filter(Boolean);
 
     const keywordTermIsPresent = searchKeywords.length > 0;
 

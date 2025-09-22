@@ -130,13 +130,14 @@ export class ArtifactService {
             // Mostrar mensajes específicos si existen
             if (error.error.message && Array.isArray(error.error.message)) {
                 console.error('Validation errors:');
-                error.error.message.forEach((msg: string, index: number) => {
+                const msgs: string[] = error.error.message;
+                for (const [index, msg] of msgs.entries()) {
                     console.error(`[${index + 1}] ${msg}`);
-                });
+                }
                 
                 // Usar el primer mensaje de validación como mensaje de error
-                if (error.error.message.length > 0) {
-                    errorMessage = error.error.message[0];
+                if (msgs.length > 0) {
+                    errorMessage = msgs[0];
                 }
             }
         }
