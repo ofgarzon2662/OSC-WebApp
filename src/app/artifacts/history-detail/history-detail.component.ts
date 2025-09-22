@@ -75,7 +75,7 @@ export class HistoryDetailComponent implements OnInit {
       return;
     }
 
-    const doc = win.document;
+    const doc = win.document as Document;
     doc.title = 'Artifact Snapshot Manifest';
 
     const styleEl = doc.createElement('style');

@@ -67,8 +67,8 @@ export class DetailArtifactComponent implements OnInit {
       doc.body.appendChild(pre);
     } else {
       const escaped = manifestText
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;');
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;');
       const html = `<!doctype html><html><head><title>Artifact Manifest</title><style>body { font-family: monospace; white-space: pre; margin: 16px; }</style></head><body>${escaped}</body></html>`;
       if (typeof doc.open === 'function') doc.open();
       if (typeof doc.write === 'function') doc.write(html);
