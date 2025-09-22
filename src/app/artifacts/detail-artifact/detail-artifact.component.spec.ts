@@ -98,5 +98,21 @@ describe('DetailArtifactComponent', () => {
       expect(mockWin.document.close).toHaveBeenCalled();
       expect(mockWin.focus).toHaveBeenCalled();
     }));
+
+    it('printManifest should alert when popup blocked', () => {
+      component.artifact = mockArtifact;
+      spyOn(window, 'open').and.returnValue(null as any);
+      spyOn(window, 'alert');
+      component.printManifest();
+      expect(window.alert).toHaveBeenCalled();
+    });
+
+    it('onUpdateArtifact navigates to update route', () => {
+      const navigate = jasmine.createSpy('navigate');
+      (component as any).router = { navigate };
+      component.artifact = mockArtifact;
+      component.onUpdateArtifact();
+      expect(navigate).toHaveBeenCalled();
+    });
   });
 }); 

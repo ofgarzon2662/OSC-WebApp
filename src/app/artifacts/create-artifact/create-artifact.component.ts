@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Router, NavigationEnd, RouterModule} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FileUploadSectionComponent } from '../../components/file-upload-section/file-upload-section.component';
+import { ArtifactMetadataFormComponent } from '../../components/artifact-metadata-form/artifact-metadata-form.component';
 import { filter } from 'rxjs/operators';
 
 // Size limits
@@ -22,7 +23,7 @@ export const MAX_FILES_IN_FOLDER  = 50;                 // max files in a folder
 @Component({
   selector: 'app-create-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent, ArtifactMetadataFormComponent],
   templateUrl: './create-artifact.component.html',
   styleUrls: ['./create-artifact.component.css']
 })

@@ -11,11 +11,12 @@ import { of } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 import { UpdateArtifactDTO, ManifestItem } from '../models/artifact';
 import { FileUploadSectionComponent } from '../../components/file-upload-section/file-upload-section.component';
+import { ArtifactMetadataFormComponent } from '../../components/artifact-metadata-form/artifact-metadata-form.component';
 
 @Component({
   selector: 'app-update-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent, ArtifactMetadataFormComponent],
   templateUrl: './update-artifact.component.html',
   styleUrls: ['./update-artifact.component.css']
 })

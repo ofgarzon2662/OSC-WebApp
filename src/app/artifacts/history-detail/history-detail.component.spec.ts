@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush, flushMicrotasks } from '@angular/core/testing';
 declare const expect: any;
 import { HistoryDetailComponent } from './history-detail.component';
 import { ActivatedRoute } from '@angular/router';
@@ -59,6 +59,17 @@ describe('HistoryDetailComponent', () => {
     expect(comp.item?.txId).toBe('tx-1');
     expect([true, false]).toContain(comp.isCurrent);
     expect([true, false]).toContain(comp.isInitial);
+    expect(comp.isLoading).toBeFalse();
+  }));
+
+  it('shows error when not found', fakeAsync(() => {
+    const svc = TestBed.inject(ArtifactService) as any;
+    spyOn(svc, 'getArtifactHistory').and.returnValue(of({ items: [], total: 0 }));
+    const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
+    comp.ngOnInit();
+    flush();
+    tick();
+    expect(comp.errorMessage).toContain('not found');
     expect(comp.isLoading).toBeFalse();
   }));
 
