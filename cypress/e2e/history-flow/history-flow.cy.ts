@@ -118,9 +118,39 @@ describe('History flow - single artifact', () => {
     // Ensure Update button is enabled and submit
     cy.contains('button', 'Update').should('not.be.disabled').click();
 
-    // Expect success toast and CTA without clicking it
+    // Expect success toast and CTA
     cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
-    cy.contains('Check your modified artifact').should('be.visible');
+    cy.contains('Check your modified artifact')
+      .scrollIntoView()
+      .should('exist')
+      .click({ force: true });
+
+    // On updated detail, verify new values
+    cy.contains(NEW_KEYWORDS.split(',')[0].trim()).should('exist');
+    NEW_LINKS.split(',').forEach(l => cy.get(`a[href="${l.trim()}"]`).should('exist'));
+    cy.contains('Funding Agencies').parent().should('contain.text', 'NSF').and('not.contain.text', 'NIH').and('contain.text', 'NASA').and('contain.text', 'Agency-Z');
+    cy.contains('DOIs').parent().should('contain.text', '10.9999/xyz1').and('contain.text', '10.8888/xyz2');
+    cy.contains(NEW_ACK).should('exist');
+
+    // Go to history, refresh, and assert two cards: Current and Initial
+    cy.contains('History').click();
+    cy.url().should('match', /\/artifacts\/.+\/history$/);
+    cy.wait(2000);
+    cy.contains('button', 'Refresh History').click();
+    cy.contains('Loading history…', { timeout: 10000 }).should('exist');
+    cy.contains('Loading history…', { timeout: 10000 }).should('not.exist');
+    cy.get('.history-list a').should('have.length', 2);
+
+    // Open the Current State snapshot via its permalink (🔗)
+    cy.contains('.history-card', 'Current State')
+      .find('a.permalink')
+      .first()
+      .click();
+    cy.contains('Current State').should('be.visible');
+    // Validate updated fields in snapshot detail
+    cy.contains(NEW_KEYWORDS.split(',')[0].trim()).should('exist');
+    NEW_LINKS.split(',').forEach(l => cy.contains(l.trim()).should('exist'));
+    cy.contains('Description').should('exist');
   });
 });
 
