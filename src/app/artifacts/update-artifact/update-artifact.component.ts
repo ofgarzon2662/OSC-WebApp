@@ -168,7 +168,7 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
     const toNormalizedArray = (arr?: string[]) => (arr || [])
       .map(x => (x ?? '').toString().trim().toLowerCase())
       .filter(x => x.length > 0)
-      .sort();
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
     const arraysEqualUnordered = (a: string[], b: string[]) => {
       if (a.length !== b.length) return false;

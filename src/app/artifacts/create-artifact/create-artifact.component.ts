@@ -121,7 +121,7 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
       }
 
       const values = control.value.split(',').map((item: string) => item.trim());
-      const hasEmptyValues = values.some((item: string) => item === '');
+      const hasEmptyValues = values.includes('');
 
       return hasEmptyValues ? { invalidFormat: true } : null;
     };
@@ -137,7 +137,7 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
       const urls = control.value.split(',').map((url: string) => url.trim());
       
       // Validar que no haya valores vacíos
-      const hasEmptyValues = urls.some((url: string) => url === '');
+      const hasEmptyValues = urls.includes('');
       
       if (hasEmptyValues) {
         return { invalidLinks: true };
@@ -259,7 +259,7 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
     this.selectedFilesData = []; // Reset any previous selection
     
     // Fast path for Cypress E2E to avoid FileReader flakiness
-    if (typeof (window as any) !== 'undefined' && (window as any).Cypress) {
+    if ((globalThis as any).Cypress !== undefined) {
       const hash = CryptoJS.SHA256(file.name).toString();
       this.selectedFilesData.push({
         content: file,
@@ -365,25 +365,13 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
   }
 
   private async calculateFileHash(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = function(event) {
-        const binary = event.target?.result;
-        if (binary) {
-          const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(binary as any)).toString();
-          resolve(hash);
-        } else {
-          reject(new Error('Failed to read file'));
-        }
-      };
-
-      reader.onerror = function() {
-        reject(new Error('Failed to read file'));
-      };
-
-      reader.readAsArrayBuffer(file);
-    });
+    try {
+      const buffer = await file.arrayBuffer();
+      const wordArray = CryptoJS.lib.WordArray.create(buffer as any);
+      return CryptoJS.SHA256(wordArray).toString();
+    } catch {
+      throw new Error('Failed to read file');
+    }
   }
 
   private showError(message: string): void {
