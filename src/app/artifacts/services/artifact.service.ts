@@ -116,63 +116,55 @@ export class ArtifactService {
      * @returns An observable with a user-facing error message
      */
     private handleError(error: HttpErrorResponse) {
-        let errorMessage = 'An error occurred while processing your request.';
-        
-        // Debug log for errors
+        // 1) Debug always
+        this.logErrorDebug(error);
+
+        // 2) Prefer specific validation message when available
+        const validationMsg = this.extractValidationMessage(error);
+        if (validationMsg) {
+            return throwError(() => new Error(validationMsg));
+        }
+
+        // 3) Client-side vs server-side
+        if (error.error instanceof ErrorEvent) {
+            return throwError(() => new Error(error.error.message));
+        }
+
+        // 4) Map status to message with a small helper
+        const message = this.getServerErrorMessage(error.status);
+        return throwError(() => new Error(message));
+    }
+
+    private logErrorDebug(error: HttpErrorResponse): void {
         console.error('=== DEBUG: API Error ===');
         console.error('Status:', error.status);
         console.error('Error object:', error);
-        
-        // Mostrar el objeto de error completo
         if (error.error) {
             console.error('Error body:', error.error);
-            
-            // Mostrar mensajes específicos si existen
-            if (error.error.message && Array.isArray(error.error.message)) {
-                console.error('Validation errors:');
-                const msgs: string[] = error.error.message;
-                for (const [index, msg] of msgs.entries()) {
-                    console.error(`[${index + 1}] ${msg}`);
-                }
-                
-                // Usar el primer mensaje de validación como mensaje de error
-                if (msgs.length > 0) {
-                    errorMessage = msgs[0];
-                }
-            }
         }
-        
         console.error('=== END ERROR DEBUG ===');
-        
-        if (error.error instanceof ErrorEvent) {
-            // Client-side error
-            errorMessage = error.error.message;
-        } else {
-            // Server-side error
-            switch (error.status) {
-                case 400:
-                    if (!errorMessage.includes('Invalid')) {
-                        errorMessage = 'Invalid artifact data provided.';
-                    }
-                    break;
-                case 401:
-                    errorMessage = 'You must be authenticated to create artifacts.';
-                    break;
-                case 412:
-                    errorMessage = 'An artifact with this title already exists in the organization.';
-                    break;
-                case 413:
-                    errorMessage = 'The file size exceeds the maximum allowed limit.';
-                    break;
-                case 415:
-                    errorMessage = 'The file type is not supported.';
-                    break;
-                case 500:
-                    errorMessage = 'A server error occurred. Please try again later.';
-                    break;
-            }
-        }
+    }
 
-        return throwError(() => new Error(errorMessage));
+    private extractValidationMessage(error: HttpErrorResponse): string | null {
+        const body = (error && (error as any).error) as any;
+        const messages: unknown = body?.message;
+        if (Array.isArray(messages) && messages.length > 0) {
+            console.error('Validation errors:');
+            messages.forEach((m: string, i: number) => console.error(`[${i + 1}] ${m}`));
+            return messages[0];
+        }
+        return null;
+    }
+
+    private getServerErrorMessage(status: number): string {
+        const map: Record<number, string> = {
+            400: 'Invalid artifact data provided.',
+            401: 'You must be authenticated to create artifacts.',
+            412: 'An artifact with this title already exists in the organization.',
+            413: 'The file size exceeds the maximum allowed limit.',
+            415: 'The file type is not supported.',
+            500: 'A server error occurred. Please try again later.'
+        };
+        return map[status] ?? 'An error occurred while processing your request.';
     }
 } 

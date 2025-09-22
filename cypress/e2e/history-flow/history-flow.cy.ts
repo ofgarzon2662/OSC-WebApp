@@ -82,6 +82,45 @@ describe('History flow - single artifact', () => {
     cy.contains('Current State').should('be.visible');
     cy.contains(UNIQUE_TITLE).should('be.visible');
     cy.contains(DESCRIPTION.substring(0, 20)).should('be.visible');
+
+    // From History detail: go to See Artifact's Detail and validate all fields
+    cy.contains("See Artifact's Detail").click();
+    cy.url().should('match', /\/artifacts\/.+$/);
+    cy.contains(UNIQUE_TITLE).should('exist');
+    cy.contains(DESCRIPTION.substring(0, 20)).should('exist');
+    UNIQUE_KEYWORDS.split(',').forEach(k => cy.contains(k.trim()).should('exist'));
+    UNIQUE_LINKS.split(',').forEach(l => cy.get(`a[href="${l.trim()}"]`).should('exist'));
+    cy.contains('Funding Agencies').parent().should('contain.text', 'NSF').and('contain.text', 'NIH').and('contain.text', 'Agency-X');
+    cy.contains('DOIs').parent().should('contain.text', '10.1234/abcd1').and('contain.text', '10.5678/efgh2');
+
+    // Click Update Artifact and modify metadata
+    cy.contains('Update Artifact').click();
+    cy.url().should('include', '/update-artifact/');
+
+    // Change metadata fields
+    const NEW_KEYWORDS = 'new-k1, new-k2';
+    const NEW_LINKS = 'https://example.com/c, https://example.com/d';
+    const NEW_DOIS = '10.9999/xyz1, 10.8888/xyz2';
+    const NEW_ACK = 'Updated acknowledgements for history flow.';
+
+    cy.get('input[formcontrolname="keywords"]').clear().type(NEW_KEYWORDS);
+    cy.get('input[formcontrolname="links"]').clear().type(NEW_LINKS);
+    cy.get('input[formcontrolname="doi"]').clear().type(NEW_DOIS);
+    // Toggle agencies: uncheck NIH, check NASA and type other agency
+    cy.get('input[formcontrolname="nih"]').uncheck({ force: true });
+    cy.get('input[formcontrolname="nasa"]').check({ force: true });
+    cy.get('input[formcontrolname="otherAgency"]').clear().type('Agency-Z');
+    cy.get('textarea[formcontrolname="acknowledgment"]').clear().type(NEW_ACK);
+
+    // Select a new file (or folder) and store footprint
+    cy.get('input[type="file"]').first().selectFile('cypress/fixtures/sample.txt', { force: true });
+
+    // Ensure Update button is enabled and submit
+    cy.contains('button', 'Update').should('not.be.disabled').click();
+
+    // Expect success toast and CTA without clicking it
+    cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
+    cy.contains('Check your modified artifact').should('be.visible');
   });
 });
 
