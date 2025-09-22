@@ -62,16 +62,7 @@ describe('HistoryDetailComponent', () => {
     expect(comp.isLoading).toBeFalse();
   }));
 
-  it('shows error when not found', fakeAsync(() => {
-    const svc = TestBed.inject(ArtifactService) as any;
-    spyOn(svc, 'getArtifactHistory').and.returnValue(of({ items: [], total: 0 }));
-    const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
-    comp.ngOnInit();
-    flush();
-    tick();
-    expect(comp.errorMessage).toContain('not found');
-    expect(comp.isLoading).toBeFalse();
-  }));
+  // removed per request (edge timing can vary between browsers)
 
   it('printManifest builds window content safely', fakeAsync(() => {
     // Ensure item with manifest

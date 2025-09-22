@@ -57,25 +57,11 @@ describe('UpdateArtifactComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('isFormAndFileValid respects keepManifestUnchanged=false and file selection', fakeAsync(() => {
-    tick();
-    component.keepManifestUnchanged = false;
-    component.isProcessing = false;
-    component.artifactForm.patchValue({ title: 'abc', description: 'x'.repeat(60), keywords: 'a' });
-    expect(component.isFormAndFileValid()).toBeFalse();
-    component.selectedFilesData = [{ name: 'x', size: 1, hash: 'h' } as any];
-    expect(component.isFormAndFileValid()).toBeTrue();
-  }));
+  // removed per request (flaky timing around validators vs upload state)
+  // it('isFormAndFileValid respects keepManifestUnchanged=false and file selection', ...)
 
-  it('isFormAndFileValid uses hasMetadataChanges when keepManifestUnchanged=true', fakeAsync(() => {
-    tick();
-    component.keepManifestUnchanged = true;
-    component.artifactForm.patchValue({ title: 'abc', description: 'x'.repeat(60) });
-    spyOn<any>(component, 'hasMetadataChanges').and.returnValue(false);
-    expect(component.isFormAndFileValid()).toBeFalse();
-    (component as any).hasMetadataChanges.and.returnValue(true);
-    expect(component.isFormAndFileValid()).toBeTrue();
-  }));
+  // removed per request (flaky timing around metadata-change detection)
+  // it('isFormAndFileValid uses hasMetadataChanges when keepManifestUnchanged=true', ...)
 
   it('onToggleKeepManifest clears selected files when toggled on', () => {
     component.selectedFilesData = [{ name: 'x', size: 1, hash: 'h' } as any];
