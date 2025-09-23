@@ -167,14 +167,162 @@ describe('History flow - single artifact', () => {
     // Update button should be disabled until metadata changes
     cy.contains('button', 'Update').should('be.disabled');
 
+    // Capture current footprint shown in update form (will be reused)
+    cy.contains('.section-heading', 'Footprint', { timeout: 10000 })
+      .should('exist')
+      .parent()
+      .find('code')
+      .invoke('text')
+      .then(t => t.trim())
+      .as('savedFootprint');
+
     // Change keywords to enable submit
     const AGAIN_KEYWORDS = 'again-k1, again-k2';
     cy.get('input[formcontrolname="keywords"]').clear().type(AGAIN_KEYWORDS);
     cy.contains('button', 'Update').should('not.be.disabled').click();
     cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
 
+    // Go to the modified artifact and assert unchanged footprint and new keywords
+    cy.contains('Check your modified artifact').click({ force: true });
+    cy.get('@savedFootprint').then((fp: any) => {
+      cy.contains('Footprint (SHA-256)')
+        .parent()
+        .find('code')
+        .should(($c) => expect($c.text().trim()).to.eq(String(fp).trim()));
+    });
+    cy.contains(AGAIN_KEYWORDS.split(',')[0].trim()).should('exist');
+
+    // Open History and verify the footprint appears in a card
+    cy.contains('History').click();
+    cy.contains('Loading history…', { timeout: 10000 }).should('not.exist');
+    cy.get('@savedFootprint').then((fp: any) => {
+      const expected = String(fp).trim();
+      cy.get('.history-card').should('exist');
+      cy.get('.history-card .card-body').contains(expected, { matchCase: false });
+    });
+
     // Final single assertion so the Cypress reporter shows an overall pass
     cy.wrap('History flow complete').should('eq', 'History flow complete');
+
+    // -------- Extended scenario: create a new artifact and update it 15 times --------
+    const NEW_TITLE = `e2e-batch-artifact-${Date.now()}`;
+    const NEW_DESC = 'Batch update test description with sufficient length to pass validation rules.';
+    const NEW_KEYS_BASE = 'batch-k1, batch-k2';
+    const NEW_LINKS_BASE = 'https://example.com/x, https://example.com/y';
+    const NEW_DOIS_BASE = '10.1111/xyz1, 10.2222/xyz2';
+
+    cy.visit('/');
+    cy.contains('Contribute').click();
+    cy.get('input[formcontrolname="title"]').type(NEW_TITLE);
+    cy.get('textarea[formcontrolname="description"]').type(NEW_DESC);
+    cy.get('input[formcontrolname="keywords"]').type(NEW_KEYS_BASE);
+    cy.get('input[formcontrolname="links"]').type(NEW_LINKS_BASE);
+    cy.get('input[formcontrolname="doi"]').type(NEW_DOIS_BASE);
+    cy.get('input[formcontrolname="nsf"]').check({ force: true });
+    cy.get('input[formcontrolname="nih"]').check({ force: true });
+    cy.get('input[formcontrolname="otherAgency"]').type('Batch-Agency');
+    cy.get('input[type="file"]').first().selectFile('cypress/fixtures/sample.txt', { force: true });
+    cy.contains('button', 'Submit').should('exist');
+    cy.get('[data-cy="submit-btn"]').should('not.be.disabled').click();
+    cy.contains('Your artifact has been successfully submitted!').should('be.visible');
+
+    // Navigate to detail via CTA or list
+    cy.contains('View new artifact here').click({ force: true });
+
+    // Helper to perform a single randomized update cycle
+    const doOneUpdate = (idx: number) => {
+      cy.contains('Footprint (SHA-256)')
+        .parent()
+        .find('code')
+        .invoke('text')
+        .then((prevFp) => {
+          cy.contains('Update Artifact').click();
+          cy.url().should('include', '/update-artifact/');
+
+          const changeManifest = Cypress._.random(0, 1) === 1;
+          if (changeManifest) {
+            // Ensure toggle is off and pick a file to change manifest
+            cy.contains('span', 'Keep manifest unchanged')
+              .parent()
+              .find('input[type="checkbox"]').uncheck({ force: true });
+            cy.get('input[type="file"]').first().selectFile('cypress/fixtures/sample.txt', { force: true });
+          } else {
+            // Keep manifest and change metadata
+            cy.contains('span', 'Keep manifest unchanged')
+              .parent()
+              .find('input[type="checkbox"]').check({ force: true });
+            cy.get('input[formcontrolname="keywords"]').clear().type(`bupd-${idx}, ${Date.now()}`);
+          }
+
+          cy.contains('button', 'Update').should('not.be.disabled').click();
+          cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
+          cy.contains('Check your modified artifact').click({ force: true });
+
+          cy.contains('Footprint (SHA-256)')
+            .parent()
+            .find('code')
+            .invoke('text')
+            .then((newFp) => {
+              const trimmed = String(newFp).trim();
+              if (changeManifest) {
+                // When manifest changes, footprint may or may not change depending on selected content.
+                // Assert it is a valid SHA-256 hex string.
+                expect(trimmed).to.match(/^[a-f0-9]{64}$/);
+              } else {
+                expect(trimmed).to.equal(String(prevFp).trim());
+              }
+            });
+        });
+    };
+
+    // Perform 15 randomized updates
+    for (let i = 1; i <= 15; i++) {
+      doOneUpdate(i);
+    }
+
+    // From the artifact detail, open history and validate pagination and tags
+    cy.contains('History').click();
+    cy.contains('Loading history…', { timeout: 10000 }).should('not.exist');
+
+    // Page 1: expect 5 cards and first tagged Current State
+    cy.get('.history-list .history-card').should('have.length', 5);
+    cy.get('.history-list .history-card').first().find('.badge').should('contain.text', 'Current State');
+
+    // Pager has at least 3 pages
+    cy.get('.custom-pager .page-number').its('length').should('be.gte', 3);
+
+    // Go to page 2 and validate 5 Snapshot tags
+    cy.get('.custom-pager .page-number').contains('2').click();
+    cy.contains('Loading history…').should('not.exist');
+    cy.get('.history-list .history-card').should('have.length', 5);
+    cy.get('.history-list .history-card .badge').each($b => {
+      expect($b.text().trim()).to.eq('Snapshot');
+    });
+
+    // Go to LAST page (not hardcoded index) and validate at most 5 cards,
+    // first is Initial State, others Snapshot
+    cy.get('.custom-pager .page-number').then($pages => {
+      cy.wrap($pages).last().click();
+    });
+    cy.contains('Loading history…').should('not.exist');
+    cy.get('.history-list .history-card').its('length').should('be.lte', 5);
+    // Initial State badge is on the LAST card of the last page
+    cy.get('.history-list .history-card').last().find('.badge').should('contain.text', 'Initial State');
+    // All previous cards should be Snapshot
+    cy.get('.history-list .history-card').then($cards => {
+      Cypress.$($cards).slice(0, -1).each((_, el) => {
+        const text = Cypress.$(el).find('.badge').text().trim();
+        expect(text).to.eq('Snapshot');
+      });
+    });
+
+    // Back to page 1 and ensure first is Current State
+    cy.get('.custom-pager .page-number').contains('1').click();
+    cy.contains('Loading history…').should('not.exist');
+    cy.get('.history-list .history-card').first().find('.badge').should('contain.text', 'Current State');
+
+    // Additional final assertion
+    cy.wrap('History mega flow complete').should('eq', 'History mega flow complete');
   });
 });
 
