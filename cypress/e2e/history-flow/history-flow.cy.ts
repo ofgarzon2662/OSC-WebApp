@@ -151,6 +151,9 @@ describe('History flow - single artifact', () => {
     cy.contains(NEW_KEYWORDS.split(',')[0].trim()).should('exist');
     NEW_LINKS.split(',').forEach(l => cy.contains(l.trim()).should('exist'));
     cy.contains('Description').should('exist');
+
+    // Final single assertion so the Cypress reporter shows an overall pass
+    cy.wrap('History flow complete').should('eq', 'History flow complete');
   });
 });
 
