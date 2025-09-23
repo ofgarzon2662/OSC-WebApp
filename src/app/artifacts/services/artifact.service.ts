@@ -158,12 +158,16 @@ export class ArtifactService {
     }
 
     private extractValidationMessage(error: HttpErrorResponse): string | null {
-        const body = (error && (error as any).error) as any;
+        const body: any = error?.error;
         const messages: unknown = body?.message;
         if (Array.isArray(messages) && messages.length > 0) {
             console.error('Validation errors:');
-            messages.forEach((m: string, i: number) => console.error(`[${i + 1}] ${m}`));
-            return messages[0];
+            let index = 0;
+            for (const msg of messages as string[]) {
+                console.error(`[${index + 1}] ${msg}`);
+                index++;
+            }
+            return (messages as string[])[0];
         }
         return null;
     }
