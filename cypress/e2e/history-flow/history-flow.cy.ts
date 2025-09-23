@@ -152,6 +152,27 @@ describe('History flow - single artifact', () => {
     NEW_LINKS.split(',').forEach(l => cy.contains(l.trim()).should('exist'));
     cy.contains('Description').should('exist');
 
+    // Update again using the "Keep manifest unchanged" toggle
+    cy.contains('Update this Artifact').click();
+    cy.url().should('include', '/update-artifact/');
+
+    // Toggle: Keep manifest unchanged (disables Select buttons)
+    cy.contains('span', 'Keep manifest unchanged')
+      .parent()
+      .find('input[type="checkbox"]')
+      .check({ force: true });
+    cy.contains('button', 'Select a Folder').should('be.disabled');
+    cy.contains('button', 'Select a File').should('be.disabled');
+
+    // Update button should be disabled until metadata changes
+    cy.contains('button', 'Update').should('be.disabled');
+
+    // Change keywords to enable submit
+    const AGAIN_KEYWORDS = 'again-k1, again-k2';
+    cy.get('input[formcontrolname="keywords"]').clear().type(AGAIN_KEYWORDS);
+    cy.contains('button', 'Update').should('not.be.disabled').click();
+    cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
+
     // Final single assertion so the Cypress reporter shows an overall pass
     cy.wrap('History flow complete').should('eq', 'History flow complete');
   });
