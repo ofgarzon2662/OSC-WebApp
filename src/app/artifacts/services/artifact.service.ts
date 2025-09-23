@@ -115,22 +115,34 @@ export class ArtifactService {
      * @param error The error response
      * @returns An observable with a user-facing error message
      */
-    private handleError(error: HttpErrorResponse) {
+    private readonly handleError = (error: HttpErrorResponse) => {
         // 1) Debug always
         this.logErrorDebug(error);
 
-        // 2) Prefer specific validation message when available
+        // 2) Client-side errors
+        if (error.error instanceof ErrorEvent) {
+            return throwError(() => new Error(error.error.message));
+        }
+
+        // 3) Special handling for 400: only pass through when message is exactly 'Invalid data'
+        if (error.status === 400) {
+            const body: any = (error as any)?.error;
+            const messages: unknown = body?.message;
+            if (Array.isArray(messages) && messages.length > 0) {
+                const firstMessage = String(messages[0]);
+                if (firstMessage === 'Invalid data') {
+                    return throwError(() => new Error(firstMessage));
+                }
+            }
+            return throwError(() => new Error(this.getServerErrorMessage(400)));
+        }
+
+        // 4) Other statuses: prefer a specific validation message if available, else map by status
         const validationMsg = this.extractValidationMessage(error);
         if (validationMsg) {
             return throwError(() => new Error(validationMsg));
         }
 
-        // 3) Client-side vs server-side
-        if (error.error instanceof ErrorEvent) {
-            return throwError(() => new Error(error.error.message));
-        }
-
-        // 4) Map status to message with a small helper
         const message = this.getServerErrorMessage(error.status);
         return throwError(() => new Error(message));
     }
