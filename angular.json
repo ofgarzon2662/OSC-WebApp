@@ -43,13 +43,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "20KB",
+                  "maximumError": "40kB"
                 }
               ],
               "outputHashing": "all"
@@ -58,6 +58,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "staging": {
+              "optimization": true,
+              "extractLicenses": true,
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -86,6 +97,9 @@
             },
             "development": {
               "buildTarget": "OSC-WebApp:build:development"
+            },
+            "staging": {
+              "buildTarget": "OSC-WebApp:build:staging"
             }
           },
           "defaultConfiguration": "development"

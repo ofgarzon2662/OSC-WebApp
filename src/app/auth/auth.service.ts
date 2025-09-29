@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, throwError, of } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { getApiBaseUrl } from '../services/api-base-url';
 import { Router } from '@angular/router';
 
 interface TokenPayload {
@@ -30,7 +30,7 @@ interface StoredTokenData {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = `${environment.apiUrl}/users`;
+  private get apiUrl(): string { return `${getApiBaseUrl()}/users`; }
   private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   private tokenCheckInterval: any = null;
