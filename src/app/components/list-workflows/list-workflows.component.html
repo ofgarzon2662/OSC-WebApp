@@ -1,0 +1,20 @@
+<div class="workflows-container">
+  <h1 class="main-title">Workflows</h1>
+  <div class="title-divider"></div>
+
+  <div class="content-wrapper">
+    <p class="subtitle">Discover & Explore Workflows</p>
+
+    <main class="workflows-grid" *ngIf="!isLoading; else loading">
+      <div class="workflow-card-wrapper" *ngFor="let workflow of workflows">
+        <app-workflow-card [workflow]="workflow"></app-workflow-card>
+      </div>
+      <p *ngIf="workflows.length === 0">No workflows available.</p>
+    </main>
+  </div>
+
+  <ng-template #loading>
+    <p class="loading-message">Loading workflows...</p> 
+  </ng-template>
+</div>
+

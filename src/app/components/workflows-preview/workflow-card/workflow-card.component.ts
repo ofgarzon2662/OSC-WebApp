@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Workflow } from '../../../models/workflow.model';
 
 @Component({
@@ -7,7 +8,7 @@ import { Workflow } from '../../../models/workflow.model';
   templateUrl: './workflow-card.component.html',
   styleUrls: ['./workflow-card.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, RouterModule]
 })
 export class WorkflowCardComponent {
   @Input() workflow!: Workflow;

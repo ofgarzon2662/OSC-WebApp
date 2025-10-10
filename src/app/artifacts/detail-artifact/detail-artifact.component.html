@@ -1,6 +1,9 @@
 <ng-container *ngIf="!isLoading && artifact; else loadingTpl">
   <div class="artifact-wrapper container">
     <div class="artifact-header">
+      <div class="badge-container mb-2">
+        <span class="badge bg-info">Scientific Artifact</span>
+      </div>
       <h1 class="artifact-title">{{ artifact.title }}</h1>
     </div>
 

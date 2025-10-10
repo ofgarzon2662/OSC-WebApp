@@ -1,0 +1,128 @@
+<ng-container *ngIf="!isLoading && workflow; else loadingTpl">
+  <div class="workflow-wrapper container">
+    <!-- Header Section -->
+    <div class="workflow-header">
+      <div class="badge-container mb-2">
+        <span class="badge bg-primary">Scientific Workflow</span>
+      </div>
+      <h1 class="workflow-title">{{ workflow.name }}</h1>
+    </div>
+
+    <div class="workflow-body">
+      <!-- Description and Details Row -->
+      <div class="row g-4 mb-4">
+        <!-- Description Column -->
+        <div class="col-lg-7 description-col">
+          <h4 class="section-heading">Description</h4>
+          <p class="pre-wrap">{{ workflow.description }}</p>
+        </div>
+
+        <!-- Details Column -->
+        <div class="col-lg-5 details-col">
+          <h4 class="section-heading">Details</h4>
+          <table class="table table-borderless workflow-meta">
+            <tbody>
+              <tr>
+                <th>ID</th>
+                <td class="monospace">{{ workflow.id }}</td>
+              </tr>
+              <tr *ngIf="workflow.contributor">
+                <th>Contributor</th>
+                <td>{{ workflow.contributor }}</td>
+              </tr>
+              <tr>
+                <th>Last Updated</th>
+                <td>{{ workflow.lastUpdated | date:'medium' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OSC Data Section -->
+      <div class="osc-data-section mt-4" *ngIf="workflow.oscData && workflow.oscData.length > 0">
+        <h4 class="section-heading mb-3">
+          <i class="bi bi-database"></i> OSC Data
+        </h4>
+        <div class="artifacts-list">
+          <div class="artifact-item card mb-3" *ngFor="let artifact of workflow.oscData; let i = index">
+            <div class="card-body">
+              <h5 class="artifact-name">
+                <span class="bullet-icon">●</span>
+                {{ artifact.name }}
+              </h5>
+              <div class="artifact-description">
+                <strong>Description:</strong> {{ artifact.description }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GitHub Repositories Section -->
+      <div class="github-section mt-4" *ngIf="workflow.githubRepositories && workflow.githubRepositories.length > 0">
+        <h4 class="section-heading mb-3">
+          <i class="bi bi-github"></i> GitHub Repositories
+        </h4>
+        <div class="repositories-list">
+          <div class="repository-item card mb-4" *ngFor="let repo of workflow.githubRepositories">
+            <div class="card-body">
+              <h5 class="repo-title">
+                <a [href]="repo.title" target="_blank" class="repo-link">
+                  {{ repo.title }}
+                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              </h5>
+              
+              <div class="repo-info mb-3">
+                <strong>Description:</strong> {{ repo.description }}
+              </div>
+
+              <div class="repo-hash mb-3">
+                <strong>Git Hash:</strong> 
+                <code class="hash-code">{{ repo.gitHash }}</code>
+              </div>
+
+              <div class="repo-contents" *ngIf="repo.contents && repo.contents.length > 0">
+                <strong class="d-block mb-2">Contents:</strong>
+                <div class="table-responsive">
+                  <table class="table table-sm contents-table">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Filename</th>
+                        <th>Hash</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let content of repo.contents">
+                        <td class="filename">{{ content.filename }}</td>
+                        <td class="hash">{{ content.hash }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex gap-2 mt-4 justify-content-center action-buttons">
+        <a class="btn btn-outline-primary back-button" routerLink="/list-workflows">
+          <i class="bi bi-arrow-left me-1"></i> Back to Workflows
+        </a>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #loadingTpl>
+  <div class="loading text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading workflow details...</p>
+  </div>
+</ng-template>
+

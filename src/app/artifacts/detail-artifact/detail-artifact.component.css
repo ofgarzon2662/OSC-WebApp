@@ -27,20 +27,38 @@
   white-space: pre-wrap;
 }
 
+.artifact-header {
+  max-width: 100%;
+}
+
 .artifact-title {
   font-size: clamp(1.75rem, 2.2vw + 1rem, 2.5rem);
   font-weight: 700;
   line-height: 1.25;
-  margin-left: -0.25rem;
+  margin: 0;
 }
 
 .artifact-meta th {
   width: 150px;
 }
 
+.badge-container {
+  display: flex;
+  align-items: center;
+}
+
 .badge {
-  font-size: 0.75rem;
-  padding: 0.4em 0.6em;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge.bg-info {
+  background-color: #7DD3D8 !important;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(125, 211, 216, 0.3);
 }
 
 .artifact-wrapper {

@@ -1,0 +1,58 @@
+.workflows-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.main-title {
+  text-align: left;
+  font-size: 54px;
+  font-weight: 700;
+  color: #1D3557;
+  margin-bottom: 0.5rem;
+  padding-left: 0;
+}
+
+.title-divider {
+  width: 50%;
+  height: 1px;
+  background-color: #9BA4B5;
+  margin-bottom: 2rem;
+}
+
+.content-wrapper {
+  margin: 0 auto;
+  max-width: 95%;
+}
+
+.subtitle {
+  text-align: left;
+  padding-left: 3%;
+  font-size: 2rem;
+  color: #1D3557;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.workflows-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.workflow-card-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.loading-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-top: 3rem;
+}
+

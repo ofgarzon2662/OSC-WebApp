@@ -31,6 +31,18 @@ export const routes: Routes = [
     loadComponent: () => import('./artifacts/list-artifact/list-artifact.component').then(m => m.ListArtifactComponent)
   },
 
+  // list workflows
+  {
+    path: 'list-workflows',
+    loadComponent: () => import('./components/list-workflows/list-workflows.component').then(m => m.ListWorkflowsComponent)
+  },
+
+  // Workflow detail
+  {
+    path: 'workflows/:id',
+    loadComponent: () => import('./components/workflow-detail/workflow-detail.component').then(m => m.WorkflowDetailComponent)
+  },
+
   // Ruta protegida para crear artefactos (verifica autenticación y rol)
   {
     path: 'contribute',
