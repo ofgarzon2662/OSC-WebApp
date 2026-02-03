@@ -6,6 +6,7 @@ export interface CreateArtifactDTO {
     // Form fields (user-provided)
     title: string;              // Length: 3-200
     description: string;        // Length: 50-3000
+    submission_comment?: string; // Mandatory via UI; server field
     keywords?: string[];        // Optional array of strings
     links?: string[];           // Optional array of URLs
     dois?: string[];            // Optional array of DOI strings
@@ -27,6 +28,7 @@ export interface UpdateArtifactDTO {
     dois?: string[];
     fundingAgencies?: string[];
     acknowledgements?: string;
+    submission_comment?: string;
     manifest: ManifestItem[];
     footprint: string;
 }

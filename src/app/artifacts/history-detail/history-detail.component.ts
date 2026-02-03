@@ -112,7 +112,7 @@ export class HistoryDetailComponent implements OnInit {
           // current state is the first item by timestamp desc
           this.isCurrent = offset === 0 && items.length > 0 && items[0].txId === it.txId;
           // initial state is the last item overall; detect when we are in final page and last index
-          this.isInitial = (offset + items.length) >= total && (items.at(-1)?.txId === it.txId);
+          this.isInitial = (offset + items.length) >= total && items.length > 0 && items[items.length - 1].txId === it.txId;
           return true;
         }
       }

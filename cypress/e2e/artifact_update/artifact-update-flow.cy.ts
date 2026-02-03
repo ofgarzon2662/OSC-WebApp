@@ -48,6 +48,7 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
 
     cy.get('input[formcontrolname="title"]').type(artifact.title);
     cy.get('textarea[formcontrolname="description"]').type(artifact.description);
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.');
     cy.get('input[formcontrolname="keywords"]').type(artifact.keywords);
 
     // upload sample file
@@ -93,9 +94,8 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
     cy.contains('button', 'Search').click();
 
     // one card expected
-    cy.get('app-artifact-card').should('have.length', 1).within(() => {
-      cy.contains('a.view-button', 'View').click();
-    });
+    cy.get('app-artifact-card').should('have.length', 1);
+    cy.get('app-artifact-card .view-button').click();
   };
 
   const assertDetailPage = (artifact: ArtifactInput) => {
@@ -170,6 +170,9 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
     // Upload a new file with a different name (ensures new footprint via Cypress fast-path)
     const contents = Cypress.Buffer.from('updated content ' + Date.now());
     cy.get('input[type="file"]').first().selectFile({ contents, fileName: 'updated-e2e.txt', mimeType: 'text/plain' }, { force: true });
+
+    // Provide reason for update
+    cy.get('textarea[formcontrolname="submission_comment"]').clear().type('Reason for update via E2E flow.');
 
     // Submit update
     cy.contains('button', 'Update').should('not.be.disabled').click();

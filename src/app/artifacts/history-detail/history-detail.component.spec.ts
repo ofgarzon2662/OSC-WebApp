@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick, flush, flushMicrotasks } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 declare const expect: any;
 import { HistoryDetailComponent } from './history-detail.component';
 import { ActivatedRoute } from '@angular/router';
@@ -61,8 +61,6 @@ describe('HistoryDetailComponent', () => {
     expect([true, false]).toContain(comp.isInitial);
     expect(comp.isLoading).toBeFalse();
   }));
-
-  // removed per request (edge timing can vary between browsers)
 
   it('printManifest builds window content safely', fakeAsync(() => {
     // Ensure item with manifest

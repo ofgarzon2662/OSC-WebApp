@@ -119,6 +119,7 @@ export class UpdateArtifactComponent extends CreateArtifactComponent implements 
       dois,
       fundingAgencies,
       acknowledgements: formValues.acknowledgment ?? '',
+      submission_comment: formValues.submission_comment ?? '',
       manifest,
       footprint
     };

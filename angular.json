@@ -96,7 +96,8 @@
               "buildTarget": "OSC-WebApp:build:production"
             },
             "development": {
-              "buildTarget": "OSC-WebApp:build:development"
+              "buildTarget": "OSC-WebApp:build:development",
+              "proxyConfig": "proxy.conf.json"
             },
             "staging": {
               "buildTarget": "OSC-WebApp:build:staging"

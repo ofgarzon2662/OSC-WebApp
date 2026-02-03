@@ -98,7 +98,6 @@ describe('DetailArtifactComponent', () => {
       expect(mockWin.document.close).toHaveBeenCalled();
       expect(mockWin.focus).toHaveBeenCalled();
     }));
-
     it('printManifest should alert when popup blocked', () => {
       component.artifact = mockArtifact;
       spyOn(window, 'open').and.returnValue(null as any);
