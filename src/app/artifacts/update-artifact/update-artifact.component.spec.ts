@@ -85,8 +85,10 @@ describe('UpdateArtifactComponent', () => {
 
   it('onSubmit sends metadata-only update when keeping manifest', fakeAsync(() => {
     component.keepManifestUnchanged = true;
+    component.artifact = mockArtifact;
     component.artifactForm.patchValue({ keywords: 'changed', submission_comment: 'Valid update reason.' });
     spyOn<any>(component, 'hasMetadataChanges').and.returnValue(true);
+    spyOn(component, 'isFormAndFileValid').and.returnValue(true);
 
     component.onSubmit();
     tick();
@@ -100,11 +102,13 @@ describe('UpdateArtifactComponent', () => {
 
   it('onSubmit rebuilds manifest and hashes canonical list when multiple files', fakeAsync(() => {
     component.keepManifestUnchanged = false;
+    component.artifact = mockArtifact;
     component.artifactForm.patchValue({ submission_comment: 'Valid update reason.' });
     component.selectedFilesData = [
       { name: 'b.txt', hash: '2', size: 10 } as any,
       { name: 'a.txt', hash: '1', size: 10 } as any
     ];
+    spyOn(component, 'isFormAndFileValid').and.returnValue(true);
 
     spyOn(CryptoJS, 'SHA256').and.returnValue({ toString: () => 'hashed' } as any);
 

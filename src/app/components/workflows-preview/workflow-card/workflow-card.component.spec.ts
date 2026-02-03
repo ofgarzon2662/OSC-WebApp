@@ -3,6 +3,7 @@ import { WorkflowCardComponent } from './workflow-card.component';
 import { Workflow } from '../../../models/workflow.model';
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('WorkflowCardComponent', () => {
   let component: WorkflowCardComponent;
@@ -19,7 +20,7 @@ describe('WorkflowCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CommonModule, WorkflowCardComponent]
+      imports: [CommonModule, RouterTestingModule, WorkflowCardComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(WorkflowCardComponent);

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as CryptoJS from 'crypto-js';
@@ -9,7 +8,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Router, NavigationEnd, RouterModule} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FileUploadSectionComponent } from '../../components/file-upload-section/file-upload-section.component';
-import { ArtifactMetadataFormComponent } from '../../components/artifact-metadata-form/artifact-metadata-form.component';
 import { filter } from 'rxjs/operators';
 
 // Size limits
@@ -24,7 +22,7 @@ export const MAX_FILES_IN_FOLDER  = 50;                 // max files in a folder
 @Component({
   selector: 'app-create-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent, ArtifactMetadataFormComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent],
   templateUrl: './create-artifact.component.html',
   styleUrls: ['./create-artifact.component.css']
 })

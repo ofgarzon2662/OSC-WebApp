@@ -17,10 +17,13 @@ describe('WorkflowService', () => {
     it('should return an observable of all workflows', (done) => {
       service.getWorkflows().subscribe(workflows => {
         expect(workflows).toBeTruthy();
-        expect(workflows.length).toBe(3);
+        expect(workflows.length).toBe(6);
         expect(workflows[0].id).toBe('1');
         expect(workflows[1].id).toBe('2');
         expect(workflows[2].id).toBe('3');
+        expect(workflows[3].id).toBe('4');
+        expect(workflows[4].id).toBe('5');
+        expect(workflows[5].id).toBe('6');
         done();
       });
     });
@@ -33,8 +36,8 @@ describe('WorkflowService', () => {
         expect(workflow.description).toBeDefined();
         expect(workflow.recentUpdates).toBeDefined();
         expect(workflow.lastUpdated).toBeDefined();
-        expect(workflow.name).toContain('Name Workflow');
-        expect(workflow.description).toContain('Lorem ipsum');
+        expect(workflow.name).toContain('Kumamoto');
+        expect(workflow.description).toContain('Kumamoto earthquake');
         expect(workflow.recentUpdates).toContain('Excepteur sint');
         done();
       });

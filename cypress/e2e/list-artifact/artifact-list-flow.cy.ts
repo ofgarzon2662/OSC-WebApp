@@ -34,6 +34,7 @@ describe('Artifacts List and Creation Flow', () => {
     // 5. Fill out and submit the artifact form
     cy.get('input[formcontrolname="title"]').type(randomTitle);
     cy.get('textarea[formcontrolname="description"]').type('This is a test description for the artifact. It needs to be at least 50 characters long to be valid.');
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.');
     cy.get('input[formcontrolname="keywords"]').type(randomKeywords);
 
     // Mock file upload

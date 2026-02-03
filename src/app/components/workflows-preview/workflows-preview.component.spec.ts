@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { Component, Input } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
 // Mock del componente WorkflowCardComponent
 @Component({
@@ -51,6 +52,7 @@ describe('WorkflowsPreviewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
+        RouterTestingModule,
         WorkflowsPreviewComponent,
         MockWorkflowCardComponent
       ],
