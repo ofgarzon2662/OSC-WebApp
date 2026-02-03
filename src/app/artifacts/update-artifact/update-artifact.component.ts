@@ -10,11 +10,12 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 import { UpdateArtifactDTO, ManifestItem } from '../models/artifact';
+import { FileUploadSectionComponent } from '../../components/file-upload-section/file-upload-section.component';
 
 @Component({
   selector: 'app-update-artifact',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FileUploadSectionComponent],
   templateUrl: './update-artifact.component.html',
   styleUrls: ['./update-artifact.component.css']
 })

@@ -6,6 +6,7 @@ import { CreateArtifactDTO, UpdateArtifactDTO } from '../models/artifact';
 import { environment } from '../../../environments/environment';
 import { Artifact } from '../../models/artifact.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
+import { ArtifactHistoryResponse } from '../../models/artifact-history.model';
 
 @Injectable({
     providedIn: 'root'
@@ -33,6 +34,38 @@ export class ArtifactService {
     getArtifactById(id: string): Observable<ArtifactDetail> {
         return this.http.get<ArtifactDetail>(`${this.apiUrl}/${id}`)
             .pipe(catchError(this.handleError));
+    }
+
+    /**
+     * Gets blockchain-backed history for an artifact
+     */
+    getArtifactHistory(id: string, options?: {
+        offset?: number;
+        limit?: number;
+        order?: 'asc' | 'desc';
+        includeValue?: boolean;
+    }): Observable<ArtifactHistoryResponse> {
+        const { offset = 0, limit = 50, order = 'desc', includeValue = true } = options ?? {};
+        const url = `${this.apiUrl}/${id}/history?offset=${offset}&limit=${limit}&order=${order}&includeValue=${includeValue}`;
+        return this.http.get<ArtifactHistoryResponse>(url).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
+     * Triggers a backend refresh of artifact history
+     */
+    refreshArtifactHistory(id: string, options?: {
+        offset?: number;
+        limit?: number;
+        order?: 'asc' | 'desc';
+        includeValue?: boolean;
+    }): Observable<any> {
+        const { offset = 0, limit = 500, order = 'desc', includeValue = true } = options ?? {};
+        const url = `${this.apiUrl}/${id}/history/refresh?offset=${offset}&limit=${limit}&order=${order}&includeValue=${includeValue}`;
+        return this.http.post(url, {}).pipe(
+            catchError(this.handleError)
+        );
     }
 
     /**

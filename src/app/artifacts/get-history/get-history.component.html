@@ -1,0 +1,105 @@
+<div class="container py-4">
+  <h2 class="page-headline mb-3">Dive into your Artifact's Full History 📜</h2>
+  <div class="mb-3 content-block">
+    <p class="mb-1"><strong>Title:</strong> {{ artifactTitle }}</p>
+    <p class="mb-1"><strong>Description:</strong> {{ artifactDescription }}</p>
+    <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ artifactId }}</p>
+    <div class="mt-2 d-flex gap-2">
+      <button class="btn btn-outline-primary" (click)="onRefresh()">Refresh History</button>
+      <a class="btn btn-primary" [routerLink]="['/update-artifact', artifactId]">Update this Artifact</a>
+      <a class="btn btn-outline-primary" [routerLink]="['/artifacts', artifactId]">See Artifact's Detail</a>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading">Loading history…</div>
+
+  <div *ngIf="!isLoading && errorMessage" class="text-danger">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && totalItems === 0" class="text-muted">No history found.</div>
+
+  <div class="history-list" *ngIf="!isLoading && totalItems > 0">
+    <div class="history-toolbar d-flex justify-content-between align-items-center mb-2">
+      <div class="pager-info">Showing 10 items per page (of {{ totalItems }} total)</div>
+      <div class="custom-pager" *ngIf="totalUiPages > 1">
+        <button class="page-arrow" (click)="onPrev()" [disabled]="uiPage === 1">&laquo;</button>
+        <ng-container *ngFor="let page of getUiPages()">
+          <span class="page-ellipsis" *ngIf="page === '...'">...</span>
+          <button *ngIf="page !== '...'" class="page-number" [class.active]="uiPage === page" (click)="onGoToPage(+page)">{{ page }}</button>
+        </ng-container>
+        <button class="page-arrow" (click)="onNext()" [disabled]="uiPage === totalUiPages">&raquo;</button>
+      </div>
+    </div>
+    <div class="history-card card shadow-sm mb-3" *ngFor="let item of displayedItems; let i = index">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ item.timestamp | date:'medium' }}</strong>
+        </div>
+        <div>
+          <span class="badge" [ngClass]="{
+                   'tag-current': isFirstPage && i === 0,
+                   'tag-initial': isLastPage && i === (displayedItems.length - 1) && !item.isDelete,
+                   'tag-delete': (!isFirstPage || i !== 0) && item.isDelete,
+                   'tag-update': (!isFirstPage || i !== 0) && !item.isDelete && !(isLastPage && i === (displayedItems.length - 1))
+                 }">
+            {{ isFirstPage && i === 0 ? 'Current State' : (isLastPage && i === (displayedItems.length - 1) && !item.isDelete ? 'Initial State' : (item.isDelete ? 'Deleted' : 'Snapshot')) }}
+          </span>
+          <a class="permalink" [routerLink]="['/artifacts', artifactId, 'history', item.txId]" [state]="{ snapshot: item, isCurrent: (isFirstPage && i === 0), isInitial: (isLastPage && i === (displayedItems.length - 1) && !item.isDelete) }" title="Open snapshot detail">🔗</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div *ngIf="item.value as v; else noValue">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h6 class="section-title">Meta</h6>
+              <p class="mb-1"><strong>Submission State:</strong> {{ v.submissionState }}</p>
+              <p class="mb-1"><strong>Footprint:</strong> <span class="text-break">{{ v.footprint || '—' }}</span></p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="section-title">Ownership</h6>
+              <p class="mb-1"><strong>Submitter:</strong> {{ v.submitterUsername }}</p>
+              <p class="mb-1"><strong>Email:</strong> {{ v.submitterEmail }}</p>
+            </div>
+            <div class="col-12" *ngIf="v.manifest?.length">
+              <h6 class="section-title">Manifest ({{ v.manifest.length }})</h6>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Filename</th>
+                      <th>Hash</th>
+                      <th>Alg.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let m of v.manifest | slice:0:3">
+                      <td class="filename">{{ m.filename }}</td>
+                      <td class="hash text-truncate">{{ m.hash }}</td>
+                      <td class="algorithm">{{ m.algorithm }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noValue>
+          <div class="text-muted">No value included for this event.</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="mt-3 d-flex justify-content-center" *ngIf="totalUiPages > 1">
+      <div class="custom-pager">
+        <button class="page-arrow" (click)="onPrev()" [disabled]="uiPage === 1">&laquo;</button>
+        <ng-container *ngFor="let page of getUiPages()">
+          <span class="page-ellipsis" *ngIf="page === '...'">...</span>
+          <button *ngIf="page !== '...'" class="page-number" [class.active]="uiPage === page" (click)="onGoToPage(+page)">{{ page }}</button>
+        </ng-container>
+        <button class="page-arrow" (click)="onNext()" [disabled]="uiPage === totalUiPages">&raquo;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

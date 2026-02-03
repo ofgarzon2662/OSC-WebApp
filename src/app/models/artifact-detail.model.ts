@@ -15,10 +15,12 @@ export interface ArtifactDetail {
   }>;
   verified: boolean;
   lastTimeVerified: string | null;
+  lastTimeUpdated?: string | null;
   submissionState: string;
   submitterEmail: string;
   submitterUsername: string;
   submittedAt: string;
+  updatedAt?: string | null;
   blockchainTxId: string | null;
   peerId: string | null;
   submissionError: string | null;
