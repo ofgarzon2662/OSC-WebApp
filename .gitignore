@@ -53,3 +53,5 @@ cypress/downloads/downloads.html
 random_files/
 
 bigfile.bin
+
+src/assets/runtime-config.json

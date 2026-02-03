@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
 import { CreateArtifactDTO, UpdateArtifactDTO } from '../models/artifact';
-import { environment } from '../../../environments/environment';
+import { getApiBaseUrl } from '../../config/runtime-config';
 import { Artifact } from '../../models/artifact.model';
 import { ArtifactDetail } from '../../models/artifact-detail.model';
 import { ArtifactHistoryResponse } from '../../models/artifact-history.model';
@@ -12,7 +12,7 @@ import { ArtifactHistoryResponse } from '../../models/artifact-history.model';
     providedIn: 'root'
 })
 export class ArtifactService {
-    private readonly apiUrl = `${environment.apiUrl}/artifacts`;
+    private readonly apiUrl = `${getApiBaseUrl()}/artifacts`;
     private artifactsCache$: Observable<Artifact[]> | undefined;
 
     constructor(private readonly http: HttpClient) { }
