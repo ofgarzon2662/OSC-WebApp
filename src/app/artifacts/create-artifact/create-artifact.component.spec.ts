@@ -199,6 +199,18 @@ describe('CreateArtifactComponent', () => {
       ackControl?.setValue('a'.repeat(3000));
       expect(ackControl?.errors).toBeNull();
     });
+
+    it('should validate submission comment length', () => {
+      const commentControl = component.artifactForm.get('submission_comment');
+      commentControl?.setValue('short comment');
+      expect(commentControl?.errors?.['minlength']).toBeTruthy();
+
+      commentControl?.setValue('a'.repeat(1001));
+      expect(commentControl?.errors?.['maxlength']).toBeTruthy();
+
+      commentControl?.setValue('a'.repeat(20));
+      expect(commentControl?.errors).toBeNull();
+    });
   });
 
   // File Handling Tests
@@ -521,7 +533,8 @@ describe('CreateArtifactComponent', () => {
     it('should show error when form is submitted without a file', () => {
       component.artifactForm.patchValue({
         title: 'Valid Title',
-        description: 'a'.repeat(50)
+        description: 'a'.repeat(50),
+        submission_comment: 'This is a valid submission comment.'
       });
       
       component.onSubmit();
@@ -534,6 +547,7 @@ describe('CreateArtifactComponent', () => {
       component.artifactForm.patchValue({
         title: 'Valid Title',
         description: 'a'.repeat(50),
+        submission_comment: 'This is a valid submission comment.',
         keywords: 'kw1, kw2',
         links: 'http://link1.com',
         doi: '10.1234/doi1',
@@ -575,7 +589,8 @@ describe('CreateArtifactComponent', () => {
       // Set valid form and file state
       component.artifactForm.patchValue({
         title: 'Valid Title',
-        description: 'a'.repeat(50)
+        description: 'a'.repeat(50),
+        submission_comment: 'This is a valid submission comment.'
       });
       component.selectedFilesData = [
         { content: new File(['content'], 'test.txt'), name: 'test.txt', hash: 'hash123', size: 7 }
@@ -656,6 +671,7 @@ describe('CreateArtifactComponent', () => {
     it('should return true if form is valid and file is selected', () => {
       component.artifactForm.get('title')?.setValue('Valid Title');
       component.artifactForm.get('description')?.setValue('a'.repeat(50));
+      component.artifactForm.get('submission_comment')?.setValue('This is a valid submission comment.');
       component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
       expect(component.isFormAndFileValid()).toBeTrue();
     });

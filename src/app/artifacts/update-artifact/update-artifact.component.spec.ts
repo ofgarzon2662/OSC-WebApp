@@ -79,6 +79,7 @@ describe('UpdateArtifactComponent', () => {
     artifactServiceSpy.updateArtifactMetadataOnly.and.returnValue(of(void 0));
     fixture.detectChanges();
 
+    component.artifactForm.patchValue({ submission_comment: 'This is a valid reason for update.' });
     component.selectedFilesData = [
       { content: {} as File, name: 'file.txt', hash: 'hash1', size: 10 }
     ];
@@ -100,6 +101,7 @@ describe('UpdateArtifactComponent', () => {
     artifactServiceSpy.updateArtifactMetadataOnly.and.returnValue(of(void 0));
     fixture.detectChanges();
 
+    component.artifactForm.patchValue({ submission_comment: 'This is a valid reason for update.' });
     component.selectedFilesData = [
       { content: {} as File, name: 'b.txt', hash: 'bbb', size: 1 },
       { content: {} as File, name: 'a.txt', hash: 'aaa', size: 1 }
@@ -119,6 +121,7 @@ describe('UpdateArtifactComponent', () => {
     artifactServiceSpy.updateArtifactMetadataOnly.and.returnValue(of(void 0));
     fixture.detectChanges();
 
+    component.artifactForm.patchValue({ submission_comment: 'This is a valid reason for update.' });
     component.selectedFilesData = [
       { content: {} as File, name: 'file.txt', hash: 'h', size: 5 }
     ];

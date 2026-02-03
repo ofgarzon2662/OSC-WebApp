@@ -108,6 +108,23 @@
             rows="4"
           ></textarea>
         </div>
+
+        <div class="form-group">
+          <label for="submission_comment" class="field-label">Reason for Update</label>
+          <textarea 
+            id="submission_comment"
+            formControlName="submission_comment"
+            class="form-control"
+            rows="3"
+            placeholder="Briefly explain the reason for this update"
+            [ngClass]="{'is-invalid': artifactForm.get('submission_comment')?.invalid && artifactForm.get('submission_comment')?.touched}"
+          ></textarea>
+          <div *ngIf="artifactForm.get('submission_comment')?.invalid && artifactForm.get('submission_comment')?.touched" class="error-message">
+            <small *ngIf="artifactForm.get('submission_comment')?.errors?.['required']">Reason for update is required</small>
+            <small *ngIf="artifactForm.get('submission_comment')?.errors?.['minlength']">Reason for update must be at least 20 characters long</small>
+            <small *ngIf="artifactForm.get('submission_comment')?.errors?.['maxlength']">Reason for update cannot exceed 1000 characters</small>
+          </div>
+        </div>
       </div>
     </div>
   </form>

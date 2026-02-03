@@ -46,6 +46,7 @@ describe('Artifact detail flow – create two artifacts and verify details', () 
 
     cy.get('input[formcontrolname="title"]').type(artifact.title);
     cy.get('textarea[formcontrolname="description"]').type(artifact.description);
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.');
     cy.get('input[formcontrolname="keywords"]').type(artifact.keywords);
 
     // upload sample file

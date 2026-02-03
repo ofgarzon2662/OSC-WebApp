@@ -48,6 +48,9 @@ describe('Artifact Submission Full Flow Test', () => {
       .blur();
     cy.contains('Description must be at least 50 characters').should('not.exist');
     cy.contains('Description cannot exceed 3000 characters').should('not.exist');
+
+    // Submission Comment (required)
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
     
     /* ---------- 2. Upload folder using button click ---------- */
     
@@ -130,6 +133,9 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
     cy.contains('Description must be at least 50 characters').should('not.exist');
     cy.contains('Description cannot exceed 3000 characters').should('not.exist');
+
+    // Submission Comment (required)
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
 
     // Upload oversized file
     cy.fixture('bigfile_21MB.bin', 'base64').then(fileContent => {

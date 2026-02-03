@@ -90,6 +90,9 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.contains('Description must be at least 50 characters').should('not.exist');
     cy.contains('Description cannot exceed 3000 characters').should('not.exist');
 
+    // Submission Comment (required)
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
+
     // Keyword validations
     cy.get('#keywords').type('test-keyword, ').blur();
     cy.contains('Please enter valid keywords separated by commas').should('be.visible');
@@ -158,6 +161,9 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
     cy.contains('Description must be at least 50 characters').should('not.exist');
     cy.contains('Description cannot exceed 3000 characters').should('not.exist');
+
+    // Submission Comment (required)
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
 
     // Upload file
     uploadFile('sample.txt');
