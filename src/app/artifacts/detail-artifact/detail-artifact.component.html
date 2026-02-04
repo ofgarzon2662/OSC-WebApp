@@ -68,6 +68,10 @@
                   {{ artifact.dois && artifact.dois.length > 0 ? artifact.dois.join(', ') : '—' }}
                 </td>
               </tr>
+              <tr>
+                <th>Comment</th>
+                <td class="pre-wrap">{{ artifact.submission_comment ?? '—' }}</td>
+              </tr>
 
               
 
