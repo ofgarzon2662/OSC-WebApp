@@ -52,6 +52,7 @@ describe('HistoryDetailComponent', () => {
   });
 
   it('fetches until found and sets flags', fakeAsync(() => {
+    Object.defineProperty(history, 'state', { value: {}, configurable: true });
     const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
     comp.ngOnInit();
     flush();
