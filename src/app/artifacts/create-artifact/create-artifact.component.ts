@@ -54,7 +54,7 @@ export class CreateArtifactComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       description: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(3000)]],
       submission_comment: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
-      keywords: ['', [Validators.maxLength(1000), this.validateCommaSeparated()]],
+      keywords: ['', [Validators.required, Validators.maxLength(1000), this.validateCommaSeparated()]],
       links: ['', [Validators.maxLength(2000), this.validateLinks()]],
       doi: ['', [this.validateDoi()]],
       nsf: [false],

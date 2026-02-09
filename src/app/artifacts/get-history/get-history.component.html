@@ -3,7 +3,7 @@
   <div class="mb-3 content-block">
     <p class="mb-1"><strong>Title:</strong> {{ artifactTitle }}</p>
     <p class="mb-1"><strong>Description:</strong> {{ artifactDescription }}</p>
-    <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ artifactId }}</p>
+    <p class="mb-1" *ngIf="artifactId"><strong>ID:</strong> {{ 'osc-is-artifact-' + artifactId }}</p>
     <div class="mt-2 d-flex gap-2">
       <button class="btn btn-outline-primary" (click)="onRefresh()">Refresh History</button>
       <a class="btn btn-primary" [routerLink]="['/update-artifact', artifactId]">Update this Artifact</a>

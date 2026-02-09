@@ -46,6 +46,7 @@
         [ngClass]="{'is-invalid': artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched}"
       >
       <div *ngIf="artifactForm.get('keywords')?.invalid && artifactForm.get('keywords')?.touched" class="error-message">
+        <small *ngIf="artifactForm.get('keywords')?.errors?.['required']">At least one keyword is required</small>
         <small *ngIf="artifactForm.get('keywords')?.errors?.['maxlength']">Keywords cannot exceed 1000 characters</small>
         <small *ngIf="artifactForm.get('keywords')?.errors?.['invalidFormat']">Please enter valid keywords separated by commas</small>
       </div>

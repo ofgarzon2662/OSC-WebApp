@@ -1,6 +1,6 @@
 <div class="container py-4" *ngIf="!isLoading; else loadingTpl">
   <div class="mb-3 intro">
-    <p class="mb-1"><strong>Artifact ID:</strong> {{ artifactId }}</p>
+    <p class="mb-1"><strong>Artifact ID:</strong> {{ 'osc-is-artifact-' + artifactId }}</p>
     <p class="mb-1">
       <strong>Tx ID:</strong> <span class="monospace">{{ txId }}</span>
       <span class="ms-2 badge" *ngIf="item" [ngClass]="isCurrent ? 'tag-current' : (isInitial ? 'tag-initial' : 'tag-update')">
@@ -35,7 +35,7 @@
               <tbody>
                 <tr>
                   <th>ID</th>
-                  <td>{{ it.value?.id || artifactId }}</td>
+                  <td>{{ 'osc-is-artifact-' + (it.value?.id || artifactId) }}</td>
                 </tr>
                 <tr>
                   <th>Timestamp</th>
