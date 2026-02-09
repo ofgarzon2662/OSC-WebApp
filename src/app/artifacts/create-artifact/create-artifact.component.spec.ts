@@ -157,7 +157,7 @@ describe('CreateArtifactComponent', () => {
     it('should validate empty values for comma-separated fields', () => {
       const keywordsControl = component.artifactForm.get('keywords');
       keywordsControl?.setValue('');
-      expect(keywordsControl?.errors).toBeNull();
+      expect(keywordsControl?.errors?.['required']).toBeTruthy();
       
       const otherAgencyControl = component.artifactForm.get('otherAgency');
       otherAgencyControl?.setValue('');
@@ -534,7 +534,8 @@ describe('CreateArtifactComponent', () => {
       component.artifactForm.patchValue({
         title: 'Valid Title',
         description: 'a'.repeat(50),
-        submission_comment: 'This is a valid submission comment.'
+        submission_comment: 'This is a valid submission comment.',
+        keywords: 'kw1'
       });
       
       component.onSubmit();
@@ -590,7 +591,8 @@ describe('CreateArtifactComponent', () => {
       component.artifactForm.patchValue({
         title: 'Valid Title',
         description: 'a'.repeat(50),
-        submission_comment: 'This is a valid submission comment.'
+        submission_comment: 'This is a valid submission comment.',
+        keywords: 'kw1'
       });
       component.selectedFilesData = [
         { content: new File(['content'], 'test.txt'), name: 'test.txt', hash: 'hash123', size: 7 }
@@ -672,6 +674,7 @@ describe('CreateArtifactComponent', () => {
       component.artifactForm.get('title')?.setValue('Valid Title');
       component.artifactForm.get('description')?.setValue('a'.repeat(50));
       component.artifactForm.get('submission_comment')?.setValue('This is a valid submission comment.');
+      component.artifactForm.get('keywords')?.setValue('kw1');
       component.selectedFilesData = [{ content: new File([], 'test'), name: 'test', hash: '123', size: 1 }];
       expect(component.isFormAndFileValid()).toBeTrue();
     });

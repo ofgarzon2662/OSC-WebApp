@@ -98,6 +98,34 @@ describe('DetailArtifactComponent', () => {
       expect(mockWin.document.close).toHaveBeenCalled();
       expect(mockWin.focus).toHaveBeenCalled();
     }));
+
+    it('printManifest should use DOM APIs when head/body present', fakeAsync(() => {
+      component.artifact = mockArtifact;
+      const headAppend = jasmine.createSpy('head.appendChild');
+      const bodyAppend = jasmine.createSpy('body.appendChild');
+      const mockWin = {
+        document: {
+          createElement: (tag: string) => ({ tagName: tag, textContent: '' }),
+          head: { appendChild: headAppend },
+          body: { innerHTML: '', appendChild: bodyAppend },
+          open: jasmine.createSpy('open'),
+          write: jasmine.createSpy('write'),
+          close: jasmine.createSpy('close')
+        },
+        focus: jasmine.createSpy('focus'),
+        print: jasmine.createSpy('print')
+      } as unknown as Window;
+
+      spyOn(window, 'open').and.returnValue(mockWin);
+
+      component.printManifest();
+      tick(20);
+
+      expect(window.open).toHaveBeenCalled();
+      expect(headAppend).toHaveBeenCalled();
+      expect(bodyAppend).toHaveBeenCalled();
+      expect(mockWin.document.write).not.toHaveBeenCalled();
+    }));
     it('printManifest should alert when popup blocked', () => {
       component.artifact = mockArtifact;
       spyOn(window, 'open').and.returnValue(null as any);

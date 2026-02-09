@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush, flushMicrotasks } from '@angular/core/testing';
 declare const expect: any;
 import { HistoryDetailComponent } from './history-detail.component';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ArtifactService } from '../services/artifact.service';
 import { HistoryCacheService } from '../services/history-cache.service';
 
@@ -62,6 +62,62 @@ describe('HistoryDetailComponent', () => {
     expect(comp.isLoading).toBeFalse();
   }));
 
+  it('loads from navigation state when snapshot provided', () => {
+    const cache = TestBed.inject(HistoryCacheService);
+    const cacheSpy = spyOn(cache, 'set').and.callThrough();
+    Object.defineProperty(history, 'state', {
+      value: {
+        snapshot: { txId: 'tx-nav', timestamp: new Date().toISOString(), isDelete: false } as any,
+        isCurrent: true,
+        isInitial: false
+      },
+      configurable: true
+    });
+
+    const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
+    comp.ngOnInit();
+
+    expect(comp.item?.txId).toBe('tx-nav');
+    expect(comp.isCurrent).toBeTrue();
+    expect(comp.isInitial).toBeFalse();
+    expect(comp.isLoading).toBeFalse();
+    expect(cacheSpy).toHaveBeenCalledWith('tx-nav', jasmine.any(Object));
+  });
+
+  it('sets not found error when fetch returns no match', fakeAsync(() => {
+    const cache = TestBed.inject(HistoryCacheService);
+    cache.clear();
+    Object.defineProperty(history, 'state', { value: {}, configurable: true });
+    const svc = TestBed.inject(ArtifactService) as any;
+    spyOn(svc, 'getArtifactHistory').and.returnValue(of({ items: [], total: 0 } as any));
+
+    const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
+    comp.ngOnInit();
+    flush();
+    flushMicrotasks();
+    tick();
+
+    expect(comp.errorMessage).toBe('Snapshot not found.');
+    expect(comp.isLoading).toBeFalse();
+  }));
+
+  it('sets error message when fetch fails', fakeAsync(() => {
+    const cache = TestBed.inject(HistoryCacheService);
+    cache.clear();
+    Object.defineProperty(history, 'state', { value: {}, configurable: true });
+    const svc = TestBed.inject(ArtifactService) as any;
+    spyOn(svc, 'getArtifactHistory').and.returnValue(throwError(() => new Error('boom')));
+
+    const comp = TestBed.createComponent(HistoryDetailComponent).componentInstance;
+    comp.ngOnInit();
+    flush();
+    flushMicrotasks();
+    tick();
+
+    expect(comp.errorMessage).toBe('Unable to load snapshot.');
+    expect(comp.isLoading).toBeFalse();
+  }));
+
   it('printManifest builds window content safely', fakeAsync(() => {
     // Ensure item with manifest
     component.item = { value: { manifest: [{ filename: 'a', hash: 'h', algorithm: 'sha256' }] } } as any;
@@ -79,6 +135,21 @@ describe('HistoryDetailComponent', () => {
     tick(20);
     expect(window.open).toHaveBeenCalled();
   }));
+
+  it('printManifest returns early when manifest is empty', () => {
+    component.item = { value: { manifest: [] } } as any;
+    const openSpy = spyOn(window, 'open');
+    component.printManifest();
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('printManifest alerts when popup blocked', () => {
+    component.item = { value: { manifest: [{ filename: 'a', hash: 'h', algorithm: 'sha256' }] } } as any;
+    spyOn(window, 'open').and.returnValue(null as any);
+    const alertSpy = spyOn(window, 'alert');
+    component.printManifest();
+    expect(alertSpy).toHaveBeenCalledWith('Please allow pop-ups to print the manifest.');
+  });
 });
 
 

@@ -119,4 +119,88 @@ describe('UpdateArtifactComponent', () => {
     expect(dto.manifest.length).toBe(2);
     expect(dto.footprint).toBe('hashed');
   }));
+
+  describe('hasMetadataChanges', () => {
+    const setMatchingFormValues = () => {
+      component.artifactForm.patchValue({
+        keywords: 'k1',
+        links: 'https://a',
+        doi: '10.1/x',
+        nsf: true,
+        nih: false,
+        noaa: false,
+        nasa: false,
+        otherAgency: '',
+        acknowledgment: 'a'
+      });
+    };
+
+    it('returns false when metadata matches original', () => {
+      component.artifact = mockArtifact;
+      setMatchingFormValues();
+
+      const result = (component as any).hasMetadataChanges();
+      expect(result).toBeFalse();
+    });
+
+    it('returns true when metadata differs', () => {
+      component.artifact = mockArtifact;
+      setMatchingFormValues();
+      component.artifactForm.patchValue({ keywords: 'k2' });
+
+      const result = (component as any).hasMetadataChanges();
+      expect(result).toBeTrue();
+    });
+  });
+
+  describe('isFormAndFileValid', () => {
+    const setValidForm = () => {
+      component.artifact = mockArtifact;
+      (component as any).prefillForm(mockArtifact);
+      component.artifactForm.patchValue({
+        keywords: 'k1',
+        submission_comment: 'This is a valid update reason.',
+        links: 'https://example.com',
+        doi: '10.1234/abcd'
+      });
+      component.artifactForm.updateValueAndValidity();
+    };
+
+    it('returns false when processing', () => {
+      setValidForm();
+      (component as any).isProcessing = true;
+      component.keepManifestUnchanged = false;
+      component.selectedFilesData = [{ name: 'a.txt', hash: 'h', size: 1 } as any];
+      expect(component.isFormAndFileValid()).toBeFalse();
+      (component as any).isProcessing = false;
+    });
+
+    it('returns false when keeping manifest and no metadata changes', () => {
+      setValidForm();
+      component.keepManifestUnchanged = true;
+      spyOn<any>(component, 'hasMetadataChanges').and.returnValue(false);
+      expect(component.isFormAndFileValid()).toBeFalse();
+    });
+
+    it('returns true when keeping manifest and metadata changes', () => {
+      setValidForm();
+      component.keepManifestUnchanged = true;
+      spyOn<any>(component, 'hasMetadataChanges').and.returnValue(true);
+      expect(component.isFormAndFileValid()).toBeTrue();
+    });
+
+    it('returns true when files selected and form valid', () => {
+      setValidForm();
+      component.keepManifestUnchanged = false;
+      component.selectedFilesData = [{ name: 'a.txt', hash: 'h', size: 1 } as any];
+      expect(component.isFormAndFileValid()).toBeTrue();
+    });
+
+    it('returns false when no files selected', () => {
+      setValidForm();
+      component.keepManifestUnchanged = false;
+      component.selectedFilesData = [];
+      expect(component.isFormAndFileValid()).toBeFalse();
+    });
+  });
 });
