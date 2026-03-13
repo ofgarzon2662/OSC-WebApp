@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideAppInitializer, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -17,12 +17,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimations(),
     provideClientHydration(),
-    {
-      provide: APP_INITIALIZER,
-      multi: true,
-      deps: [RuntimeConfigService],
-      useFactory: (svc: RuntimeConfigService) => () => svc.load()
-    },
+    provideAppInitializer(() => inject(RuntimeConfigService).load()),
     importProvidersFrom(
       ToastrModule.forRoot({
         positionClass: 'toast-bottom-right',
@@ -30,10 +25,6 @@ export const appConfig: ApplicationConfig = {
         timeOut: 3000
       })
     ),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: () => () => loadRuntimeConfig(),
-      multi: true
-    }
+    provideAppInitializer(() => loadRuntimeConfig())
   ]
 };
