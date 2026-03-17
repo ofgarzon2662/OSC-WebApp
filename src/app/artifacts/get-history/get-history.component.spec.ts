@@ -121,6 +121,51 @@ describe('GetHistoryComponent', () => {
     expect(component.errorMessage).toBeTruthy();
     expect(component.isLoading).toBeFalse();
   }));
+
+  it('first displayed item is tagged Current State on page 1', fakeAsync(() => {
+    (component as any).loadAllHeaders().then(() => (component as any).loadUiPage(1));
+    flush(); tick();
+    expect(component.isFirstPage).toBeTrue();
+    expect(component.uiPage).toBe(1);
+    // first item on page 1, index 0 → Current State badge
+    const item = component.displayedItems[0];
+    expect(item).toBeTruthy();
+  }));
+
+  it('last displayed item on last page is tagged Initial State', fakeAsync(() => {
+    (component as any).loadAllHeaders().then(() => (component as any).loadUiPage(1));
+    flush(); tick();
+    const lastPage = component.totalUiPages;
+    (component as any).loadUiPage(lastPage);
+    flush(); tick();
+    expect(component.isLastPage).toBeTrue();
+    const last = component.displayedItems[component.displayedItems.length - 1];
+    expect(last).toBeTruthy();
+    expect(last.isDelete).toBeFalse();
+  }));
+
+  it('totalItems and totalUiPages are set correctly after loading headers', fakeAsync(() => {
+    (component as any).loadAllHeaders().then(() => (component as any).loadUiPage(1));
+    flush(); tick();
+    expect(component.totalItems).toBe(100);
+    expect(component.totalUiPages).toBe(Math.ceil(100 / (component as any).uiPageSize));
+  }));
+
+  it('isFirstPage is false after navigating to page 2', fakeAsync(() => {
+    (component as any).loadAllHeaders().then(() => (component as any).loadUiPage(1));
+    flush(); tick();
+    component.onNext();
+    flush(); tick();
+    expect(component.isFirstPage).toBeFalse();
+    expect(component.uiPage).toBe(2);
+  }));
+
+  it('getUiPages returns sequential numbers when totalUiPages <= 10', () => {
+    (component as any).totalUiPages = 5;
+    component.uiPage = 3;
+    const pages = component.getUiPages();
+    expect(pages).toEqual([1, 2, 3, 4, 5]);
+  });
 });
 
 

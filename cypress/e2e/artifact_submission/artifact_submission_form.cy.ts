@@ -165,6 +165,9 @@ describe('Artifact Submission Full Flow Test', () => {
     // Submission Comment (required)
     cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
 
+    // Keywords (required)
+    cy.get('#keywords').type('e2e-test').blur();
+
     // Upload file
     uploadFile('sample.txt');
 
@@ -181,6 +184,7 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.get('#title').type(uniqueTitle).blur();
     cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
     cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
+    cy.get('#keywords').type('e2e-test').blur();
 
     // Upload file
     uploadFile('sample.txt');
@@ -195,7 +199,8 @@ describe('Artifact Submission Full Flow Test', () => {
     cy.get('#title').type(uniqueTitle).blur();
     cy.get('#description').type('This is a valid description with more than fifty characters to meet the minimum requirement.').blur();
     cy.get('textarea[formcontrolname="submission_comment"]').clear().type('Submitting same title for E2E.').blur();
-    
+    cy.get('#keywords').type('e2e-test').blur();
+
     // Upload file again
     uploadFile('sample.txt');
 

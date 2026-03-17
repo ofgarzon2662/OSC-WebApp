@@ -51,7 +51,10 @@ describe('Artifact Submission Full Flow Test', () => {
 
     // Submission Comment (required)
     cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
-    
+
+    // Keywords (required)
+    cy.get('#keywords').type('e2e-test').blur();
+
     /* ---------- 2. Upload folder using button click ---------- */
     
     const folderName = `random_files_${Date.now()}`;
@@ -136,6 +139,9 @@ describe('Artifact Submission Full Flow Test', () => {
 
     // Submission Comment (required)
     cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E.').blur();
+
+    // Keywords (required)
+    cy.get('#keywords').type('e2e-test').blur();
 
     // Upload oversized file
     cy.fixture('bigfile_21MB.bin', 'base64').then(fileContent => {

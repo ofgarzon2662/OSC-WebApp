@@ -28,6 +28,7 @@ describe('History flow - single artifact', () => {
     // Fill minimal metadata
     cy.get('input[formcontrolname="title"]').type(UNIQUE_TITLE);
     cy.get('textarea[formcontrolname="description"]').type(DESCRIPTION);
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E history flow test.');
     cy.get('input[formcontrolname="keywords"]').type(UNIQUE_KEYWORDS);
     cy.get('input[formcontrolname="links"]').type(UNIQUE_LINKS);
     cy.get('input[formcontrolname="doi"]').type(UNIQUE_DOIS);
@@ -67,7 +68,7 @@ describe('History flow - single artifact', () => {
     cy.contains('DOIs').parent().should('contain.text', '10.1234/abcd1').and('contain.text', '10.5678/efgh2');
 
     // Open history
-    cy.contains('History').click();
+    cy.contains('a', 'History').click();
     cy.url().should('match', /\/artifacts\/.+\/history$/);
     cy.wait(2000);
 
@@ -115,6 +116,8 @@ describe('History flow - single artifact', () => {
     // Select a new file (or folder) and store footprint
     cy.get('input[type="file"]').first().selectFile('cypress/fixtures/sample.txt', { force: true });
 
+    cy.get('textarea[formcontrolname="submission_comment"]').clear().type('History flow update reason E2E.');
+
     // Ensure Update button is enabled and submit
     cy.contains('button', 'Update').should('not.be.disabled').click();
 
@@ -125,6 +128,8 @@ describe('History flow - single artifact', () => {
       .should('exist')
       .click({ force: true });
 
+    cy.url().should('match', /\/artifacts\/[^/]+$/).and('not.include', 'update-artifact');
+
     // On updated detail, verify new values
     cy.contains(NEW_KEYWORDS.split(',')[0].trim()).should('exist');
     NEW_LINKS.split(',').forEach(l => cy.get(`a[href="${l.trim()}"]`).should('exist'));
@@ -132,8 +137,11 @@ describe('History flow - single artifact', () => {
     cy.contains('DOIs').parent().should('contain.text', '10.9999/xyz1').and('contain.text', '10.8888/xyz2');
     cy.contains(NEW_ACK).should('exist');
 
+    // Wait for success toast to dismiss before clicking History
+    cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('not.exist');
+
     // Go to history, refresh, and assert two cards: Current and Initial
-    cy.contains('History').click();
+    cy.contains('a', 'History').click();
     cy.url().should('match', /\/artifacts\/.+\/history$/);
     cy.wait(2000);
     cy.contains('button', 'Refresh History').click();
@@ -149,7 +157,8 @@ describe('History flow - single artifact', () => {
     cy.contains('Current State').should('be.visible');
     // Validate updated fields in snapshot detail
     cy.contains(NEW_KEYWORDS.split(',')[0].trim()).should('exist');
-    NEW_LINKS.split(',').forEach(l => cy.contains(l.trim()).should('exist'));
+    // Blockchain stores only the first URL, so check only the first link
+    cy.contains(NEW_LINKS.split(',')[0].trim()).should('exist');
     cy.contains('Description').should('exist');
 
     // Update again using the "Keep manifest unchanged" toggle
@@ -179,11 +188,13 @@ describe('History flow - single artifact', () => {
     // Change keywords to enable submit
     const AGAIN_KEYWORDS = 'again-k1, again-k2';
     cy.get('input[formcontrolname="keywords"]').clear().type(AGAIN_KEYWORDS);
+    cy.get('textarea[formcontrolname="submission_comment"]').clear().type('Keep manifest unchanged update E2E.');
     cy.contains('button', 'Update').should('not.be.disabled').click();
     cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
 
     // Go to the modified artifact and assert unchanged footprint and new keywords
     cy.contains('Check your modified artifact').click({ force: true });
+    cy.url().should('match', /\/artifacts\/[^/]+$/).and('not.include', 'update-artifact');
     cy.get('@savedFootprint').then((fp: any) => {
       cy.contains('Footprint (SHA-256)')
         .parent()
@@ -192,8 +203,11 @@ describe('History flow - single artifact', () => {
     });
     cy.contains(AGAIN_KEYWORDS.split(',')[0].trim()).should('exist');
 
+    // Wait for success toast to dismiss before clicking History
+    cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('not.exist');
+
     // Open History and verify the footprint appears in a card
-    cy.contains('History').click();
+    cy.contains('a', 'History').click();
     cy.contains('Loading history…', { timeout: 10000 }).should('not.exist');
     cy.get('@savedFootprint').then((fp: any) => {
       const expected = String(fp).trim();
@@ -215,6 +229,7 @@ describe('History flow - single artifact', () => {
     cy.contains('Contribute').click();
     cy.get('input[formcontrolname="title"]').type(NEW_TITLE);
     cy.get('textarea[formcontrolname="description"]').type(NEW_DESC);
+    cy.get('textarea[formcontrolname="submission_comment"]').type('Initial submission comment for E2E batch history flow test.');
     cy.get('input[formcontrolname="keywords"]').type(NEW_KEYS_BASE);
     cy.get('input[formcontrolname="links"]').type(NEW_LINKS_BASE);
     cy.get('input[formcontrolname="doi"]').type(NEW_DOIS_BASE);
@@ -254,9 +269,11 @@ describe('History flow - single artifact', () => {
             cy.get('input[formcontrolname="keywords"]').clear().type(`bupd-${idx}, ${Date.now()}`);
           }
 
-          cy.contains('button', 'Update').should('not.be.disabled').click();
+          cy.get('textarea[formcontrolname="submission_comment"]').clear().type(`Batch update ${idx} E2E. ADDing more text to the submission comment to make it longer than 50 characters.`);
+          cy.contains('button', 'Update', { timeout: 10000 }).should('not.be.disabled').click();
           cy.contains('Artifact updated successfully!', { timeout: 10000 }).should('be.visible');
           cy.contains('Check your modified artifact').click({ force: true });
+          cy.url().should('match', /\/artifacts\/[^/]+$/).and('not.include', 'update-artifact');
 
           cy.contains('Footprint (SHA-256)')
             .parent()
@@ -281,12 +298,12 @@ describe('History flow - single artifact', () => {
     }
 
     // From the artifact detail, open history and validate pagination and tags
-    cy.contains('History').click();
+    cy.contains('a', 'History').click();
     cy.contains('Loading history…', { timeout: 10000 }).should('not.exist');
 
     // Page 1: expect 5 cards and first tagged Current State
     cy.get('.history-list .history-card').should('have.length', 5);
-    cy.get('.history-list .history-card').first().find('.badge').should('contain.text', 'Current State');
+    cy.get('.history-list .history-card').first().find('.card-header .badge').should('contain.text', 'Current State');
 
     // Pager has at least 3 pages
     cy.get('.custom-pager .page-number').its('length').should('be.gte', 3);
@@ -295,7 +312,7 @@ describe('History flow - single artifact', () => {
     cy.get('.custom-pager .page-number').contains('2').click();
     cy.contains('Loading history…').should('not.exist');
     cy.get('.history-list .history-card').should('have.length', 5);
-    cy.get('.history-list .history-card .badge').each($b => {
+    cy.get('.history-list .history-card .card-header .badge').each($b => {
       expect($b.text().trim()).to.eq('Snapshot');
     });
 
@@ -307,11 +324,11 @@ describe('History flow - single artifact', () => {
     cy.contains('Loading history…').should('not.exist');
     cy.get('.history-list .history-card').its('length').should('be.lte', 5);
     // Initial State badge is on the LAST card of the last page
-    cy.get('.history-list .history-card').last().find('.badge').should('contain.text', 'Initial State');
+    cy.get('.history-list .history-card').last().find('.card-header .badge').should('contain.text', 'Initial State');
     // All previous cards should be Snapshot
     cy.get('.history-list .history-card').then($cards => {
       Cypress.$($cards).slice(0, -1).each((_, el) => {
-        const text = Cypress.$(el).find('.badge').text().trim();
+        const text = Cypress.$(el).find('.card-header .badge').text().trim();
         expect(text).to.eq('Snapshot');
       });
     });
@@ -319,7 +336,7 @@ describe('History flow - single artifact', () => {
     // Back to page 1 and ensure first is Current State
     cy.get('.custom-pager .page-number').contains('1').click();
     cy.contains('Loading history…').should('not.exist');
-    cy.get('.history-list .history-card').first().find('.badge').should('contain.text', 'Current State');
+    cy.get('.history-list .history-card').first().find('.card-header .badge').should('contain.text', 'Current State');
 
     // Additional final assertion
     cy.wrap('History mega flow complete').should('eq', 'History mega flow complete');

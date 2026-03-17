@@ -102,6 +102,9 @@ describe('Artifact Contribution Authentication Flows', () => {
     // 4. User logs in as PI
     login(Cypress.env('PI1_USERNAME'), Cypress.env('PI1_PASSWORD'));
 
+    // Wait for redirect away from auth route
+    cy.url().should('not.include', '/auth');
+
     // Go to Contribute page
     cy.contains('a', 'Contribute').click();
     
@@ -130,6 +133,9 @@ describe('Artifact Contribution Authentication Flows', () => {
     
     // 4. User logs in as Collaborator
     login(Cypress.env('COLLABORATOR1_USERNAME'), Cypress.env('COLLABORATOR_PASSWORD'));
+
+    // Wait for redirect away from auth route
+    cy.url().should('not.include', '/auth');
 
     // Go to Contribute page
     cy.contains('a', 'Contribute').click();

@@ -51,7 +51,14 @@
           <div class="row g-3">
             <div class="col-md-6">
               <h6 class="section-title">Meta</h6>
-              <p class="mb-1"><strong>Submission State:</strong> {{ v.submissionState }}</p>
+              <p class="mb-1"><strong>Submission State:</strong>
+                <span class="badge ms-1" [ngClass]="{
+                  'bg-success': v.submissionState === 'SUCCESS' || v.submissionState === 'CONFIRMED' || v.submissionState === 'APPROVED',
+                  'bg-warning': v.submissionState === 'PENDING',
+                  'bg-danger':  v.submissionState === 'FAILED' || v.submissionState === 'REJECTED',
+                  'bg-secondary': v.submissionState !== 'SUCCESS' && v.submissionState !== 'CONFIRMED' && v.submissionState !== 'APPROVED' && v.submissionState !== 'PENDING' && v.submissionState !== 'FAILED' && v.submissionState !== 'REJECTED'
+                }">{{ v.submissionState }}</span>
+              </p>
               <p class="mb-1"><strong>Footprint:</strong> <span class="text-break">{{ v.footprint || '—' }}</span></p>
             </div>
             <div class="col-md-6">
