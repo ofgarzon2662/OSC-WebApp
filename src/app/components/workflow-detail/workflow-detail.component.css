@@ -97,6 +97,31 @@
   word-break: break-all;
 }
 
+/* Keywords */
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.keywords-list .badge {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  font-weight: 500;
+}
+
+/* Artifact links */
+.artifact-link {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.artifact-link:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
 /* OSC Data Section */
 .osc-data-section {
   padding: 2rem 0;
@@ -264,6 +289,35 @@
 .action-buttons .back-button:hover {
   background-color: #1D3557;
   border-color: #1D3557;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.folder-icon {
+  color: #E8A838;
+  margin-right: 6px;
+}
+
+.file-icon {
+  color: #6c757d;
+  margin-right: 6px;
+}
+
+.expand-btn {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.action-buttons .manage-button {
+  background-color: #1D3557;
+  border-color: #1D3557;
+  color: white;
+}
+
+.action-buttons .manage-button:hover {
+  background-color: #457B9D;
+  border-color: #457B9D;
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

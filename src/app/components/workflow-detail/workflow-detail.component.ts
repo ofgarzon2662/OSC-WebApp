@@ -15,6 +15,23 @@ export class WorkflowDetailComponent implements OnInit {
   workflow?: Workflow;
   isLoading = true;
   workflowId = '';
+  expandedRepos: Set<number> = new Set();
+
+  toggleContents(repoIndex: number): void {
+    if (this.expandedRepos.has(repoIndex)) {
+      this.expandedRepos.delete(repoIndex);
+    } else {
+      this.expandedRepos.add(repoIndex);
+    }
+  }
+
+  isExpanded(repoIndex: number): boolean {
+    return this.expandedRepos.has(repoIndex);
+  }
+
+  isFolder(filename: string): boolean {
+    return filename.endsWith('/');
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -23,11 +40,15 @@ export class WorkflowDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.workflowId = this.route.snapshot.paramMap.get('id') ?? '';
-    
-    this.workflowService.getWorkflow(this.workflowId).subscribe(workflow => {
-      this.workflow = workflow;
-      this.isLoading = false;
+
+    this.workflowService.getWorkflow(this.workflowId).subscribe({
+      next: workflow => {
+        this.workflow = workflow;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
     });
   }
 }
-

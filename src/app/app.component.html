@@ -16,12 +16,16 @@
 
     <!-- Navegación dinámica basada en el estado de autenticación -->
     <div class="d-flex nav-links" *ngIf="!isAuthRoute()">
-      <!-- Contribute - comportamiento condicional basado en autenticación -->
-      <a class="nav-link contribute-link"
-         (click)="onContributeClick()"
-         style="cursor: pointer;">
-        Contribute
-      </a>
+      <!-- Contribute dropdown -->
+      <div class="contribute-dropdown">
+        <a class="nav-link contribute-link" style="cursor: pointer;">
+          Contribute <i class="bi bi-chevron-down" style="font-size: 14px;"></i>
+        </a>
+        <div class="contribute-menu">
+          <a class="contribute-menu-item" (click)="onContributeClick('artifact')">Artifact</a>
+          <a class="contribute-menu-item" (click)="onContributeClick('workflow')">Workflow</a>
+        </div>
+      </div>
 
       <!-- Condicional basado en autenticación -->
       <a *ngIf="!isAuthenticated" class="nav-link signin-link" routerLink="/auth/sign-in">Sign In</a>

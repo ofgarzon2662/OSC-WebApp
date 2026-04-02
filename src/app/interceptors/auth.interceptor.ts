@@ -19,20 +19,25 @@ export const authInterceptor: HttpInterceptorFn = (
   const router = inject(Router);
   const toastr = inject(ToastrService);
 
-  const token = authService.getToken();
+  // Only attach token and handle 401 for our own API (relative URLs or same-origin absolute URLs)
+  const isInternalRequest = !request.url.startsWith('http')
+    || request.url.startsWith(window.location.origin)
+    || request.url.startsWith('/api/');
 
-  if (token) {
-    request = request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+  if (isInternalRequest) {
+    const token = authService.getToken();
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
   }
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Don't show session expired message for logout endpoint
-      if (error.status === 401 && !request.url.endsWith('/logout')) {
+      if (error.status === 401 && isInternalRequest && !request.url.endsWith('/logout')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         router.navigate(['/auth/sign-in']);

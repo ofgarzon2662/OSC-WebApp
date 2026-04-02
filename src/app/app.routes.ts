@@ -43,6 +43,20 @@ export const routes: Routes = [
     loadComponent: () => import('./components/workflow-detail/workflow-detail.component').then(m => m.WorkflowDetailComponent)
   },
 
+  // Create workflow
+  {
+    path: 'create-workflow',
+    loadComponent: () => import('./components/create-workflow/create-workflow.component').then(m => m.CreateWorkflowComponent),
+    canActivate: [canCreateArtifactGuard]
+  },
+
+  // Update workflow
+  {
+    path: 'update-workflow/:id',
+    loadComponent: () => import('./components/update-workflow/update-workflow.component').then(m => m.UpdateWorkflowComponent),
+    canActivate: [canCreateArtifactGuard]
+  },
+
   // Ruta protegida para crear artefactos (verifica autenticación y rol)
   {
     path: 'contribute',

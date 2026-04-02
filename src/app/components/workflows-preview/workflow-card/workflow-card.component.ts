@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Workflow } from '../../../models/workflow.model';
+import { WorkflowListItem } from '../../../models/workflow.model';
 
 @Component({
   selector: 'app-workflow-card',
@@ -11,5 +11,5 @@ import { Workflow } from '../../../models/workflow.model';
   imports: [CommonModule, RouterModule]
 })
 export class WorkflowCardComponent {
-  @Input() workflow!: Workflow;
+  @Input() workflow!: WorkflowListItem;
 }

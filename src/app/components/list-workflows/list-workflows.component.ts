@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkflowCardComponent } from '../workflows-preview/workflow-card/workflow-card.component';
-import { Workflow } from '../../models/workflow.model';
+import { WorkflowListItem } from '../../models/workflow.model';
 import { WorkflowService } from '../../services/workflow.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { WorkflowService } from '../../services/workflow.service';
   styleUrls: ['./list-workflows.component.css']
 })
 export class ListWorkflowsComponent implements OnInit {
-  workflows: Workflow[] = [];
+  workflows: WorkflowListItem[] = [];
   isLoading = true;
 
   constructor(private readonly workflowService: WorkflowService) { }

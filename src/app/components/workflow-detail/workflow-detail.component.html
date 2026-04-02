@@ -4,8 +4,13 @@
     <div class="workflow-header">
       <div class="badge-container mb-2">
         <span class="badge bg-primary">Scientific Workflow</span>
+        <span class="badge ms-2" [ngClass]="{
+          'bg-warning': workflow.submissionState === 'PENDING',
+          'bg-success': workflow.submissionState === 'SUCCESS',
+          'bg-danger': workflow.submissionState === 'FAILED'
+        }">{{ workflow.submissionState }}</span>
       </div>
-      <h1 class="workflow-title">{{ workflow.name }}</h1>
+      <h1 class="workflow-title">{{ workflow.title }}</h1>
     </div>
 
     <div class="workflow-body">
@@ -26,33 +31,63 @@
                 <th>ID</th>
                 <td class="monospace">{{ workflow.id }}</td>
               </tr>
-              <tr *ngIf="workflow.contributor">
-                <th>Contributor</th>
-                <td>{{ workflow.contributor }}</td>
-              </tr>
               <tr>
+                <th>Submitter</th>
+                <td>{{ workflow.submitterUsername }} ({{ workflow.submitterEmail }})</td>
+              </tr>
+              <tr *ngIf="workflow.submittedAt">
+                <th>Submitted</th>
+                <td>{{ workflow.submittedAt | date:'medium' }}</td>
+              </tr>
+              <tr *ngIf="workflow.updatedAt">
                 <th>Last Updated</th>
-                <td>{{ workflow.lastUpdated | date:'medium' }}</td>
+                <td>{{ workflow.updatedAt | date:'medium' }}</td>
+              </tr>
+              <tr *ngIf="workflow.blockchainTxId">
+                <th>Blockchain TX</th>
+                <td class="monospace">{{ workflow.blockchainTxId }}</td>
+              </tr>
+              <tr *ngIf="workflow.submissionError">
+                <th>Error</th>
+                <td class="text-danger">{{ workflow.submissionError }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- OSC Data Section -->
-      <div class="osc-data-section mt-4" *ngIf="workflow.oscData && workflow.oscData.length > 0">
+      <!-- Keywords Section -->
+      <div class="keywords-section mt-3 mb-4" *ngIf="workflow.keywords && workflow.keywords.length > 0">
+        <h4 class="section-heading">
+          <i class="bi bi-tags"></i> Keywords
+        </h4>
+        <div class="keywords-list">
+          <span class="badge bg-secondary me-2 mb-2" *ngFor="let kw of workflow.keywords">{{ kw }}</span>
+        </div>
+      </div>
+
+      <!-- Submission Comment -->
+      <div class="comment-section mt-3 mb-4" *ngIf="workflow.submission_comment">
+        <h4 class="section-heading">Submission Comment</h4>
+        <p class="pre-wrap">{{ workflow.submission_comment }}</p>
+      </div>
+
+      <!-- Artifacts Section -->
+      <div class="osc-data-section mt-4" *ngIf="workflow.artifacts && workflow.artifacts.length > 0">
         <h4 class="section-heading mb-3">
-          <i class="bi bi-database"></i> OSC Data
+          <i class="bi bi-database"></i> Linked Artifacts
         </h4>
         <div class="artifacts-list">
-          <div class="artifact-item card mb-3" *ngFor="let artifact of workflow.oscData; let i = index">
+          <div class="artifact-item card mb-3" *ngFor="let artifact of workflow.artifacts">
             <div class="card-body">
               <h5 class="artifact-name">
-                <span class="bullet-icon">●</span>
-                {{ artifact.name }}
+                <span class="bullet-icon">&#9679;</span>
+                <a [routerLink]="['/artifacts', artifact.id]" class="artifact-link">
+                  {{ artifact.title }}
+                </a>
               </h5>
               <div class="artifact-description">
-                <strong>Description:</strong> {{ artifact.description }}
+                <strong>Description:</strong> {{ artifact.description.length > 200 ? (artifact.description | slice:0:200) + '...' : artifact.description }}
               </div>
             </div>
           </div>
@@ -65,26 +100,26 @@
           <i class="bi bi-github"></i> GitHub Repositories
         </h4>
         <div class="repositories-list">
-          <div class="repository-item card mb-4" *ngFor="let repo of workflow.githubRepositories">
+          <div class="repository-item card mb-4" *ngFor="let repo of workflow.githubRepositories; let ri = index">
             <div class="card-body">
               <h5 class="repo-title">
-                <a [href]="repo.title" target="_blank" class="repo-link">
-                  {{ repo.title }}
+                <a [href]="repo.url" target="_blank" class="repo-link">
+                  {{ repo.url }}
                   <i class="bi bi-box-arrow-up-right ms-1"></i>
                 </a>
               </h5>
-              
-              <div class="repo-info mb-3">
+
+              <div class="repo-info mb-3" *ngIf="repo.description">
                 <strong>Description:</strong> {{ repo.description }}
               </div>
 
-              <div class="repo-hash mb-3">
-                <strong>Git Hash:</strong> 
+              <div class="repo-hash mb-3" *ngIf="repo.gitHash">
+                <strong>Git Hash:</strong>
                 <code class="hash-code">{{ repo.gitHash }}</code>
               </div>
 
               <div class="repo-contents" *ngIf="repo.contents && repo.contents.length > 0">
-                <strong class="d-block mb-2">Contents:</strong>
+                <strong class="d-block mb-2">Contents ({{ repo.contents.length }} items):</strong>
                 <div class="table-responsive">
                   <table class="table table-sm contents-table">
                     <thead class="table-light">
@@ -94,12 +129,24 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr *ngFor="let content of repo.contents">
-                        <td class="filename">{{ content.filename }}</td>
-                        <td class="hash">{{ content.hash }}</td>
-                      </tr>
+                      <ng-container *ngFor="let content of repo.contents; let ci = index">
+                        <tr *ngIf="ci < 3 || isExpanded(ri)">
+                          <td class="filename">
+                            <i *ngIf="isFolder(content.filename)" class="bi bi-folder-fill folder-icon"></i>
+                            <i *ngIf="!isFolder(content.filename)" class="bi bi-file-earmark file-icon"></i>
+                            {{ content.filename }}
+                          </td>
+                          <td class="hash">{{ isFolder(content.filename) ? '—' : content.hash }}</td>
+                        </tr>
+                      </ng-container>
                     </tbody>
                   </table>
+                  <button
+                    *ngIf="repo.contents.length > 3"
+                    class="btn btn-sm btn-outline-secondary expand-btn"
+                    (click)="toggleContents(ri)">
+                    {{ isExpanded(ri) ? 'Show less' : 'Show all ' + repo.contents.length + ' items' }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -111,6 +158,9 @@
       <div class="d-flex gap-2 mt-4 justify-content-center action-buttons">
         <a class="btn btn-outline-primary back-button" routerLink="/list-workflows">
           <i class="bi bi-arrow-left me-1"></i> Back to Workflows
+        </a>
+        <a class="btn btn-primary manage-button" [routerLink]="['/update-workflow', workflow.id]">
+          <i class="bi bi-pencil-square me-1"></i> Manage Workflow
         </a>
       </div>
     </div>
@@ -125,4 +175,3 @@
     <p class="mt-3">Loading workflow details...</p>
   </div>
 </ng-template>
-

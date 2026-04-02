@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { WorkflowCardComponent } from './workflow-card/workflow-card.component';
-import { Workflow } from '../../models/workflow.model';
+import { WorkflowListItem } from '../../models/workflow.model';
 import { WorkflowService } from '../../services/workflow.service';
 import { map } from 'rxjs/operators';
 
@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
   imports: [CommonModule, RouterModule, WorkflowCardComponent]
 })
 export class WorkflowsPreviewComponent implements OnInit {
-  workflows: Workflow[] = [];
+  workflows: WorkflowListItem[] = [];
 
   constructor(private readonly workflowService: WorkflowService) { }
 

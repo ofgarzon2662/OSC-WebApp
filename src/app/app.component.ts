@@ -104,12 +104,13 @@ export class AppComponent implements OnInit {
   title = 'OSC-WebApp';
   logoError = false;
 
-  onContributeClick(): void {
+  onContributeClick(type: 'artifact' | 'workflow'): void {
     if (!this.isAuthenticated) {
       this.toastr.info("We'd love to have your contribution, but first Sign in to continue", 'Welcome!');
       this.router.navigate(['/auth/sign-in']);
     } else {
-      this.router.navigate(['/contribute']);
+      const route = type === 'workflow' ? '/create-workflow' : '/contribute';
+      this.router.navigate([route]);
     }
   }
 
