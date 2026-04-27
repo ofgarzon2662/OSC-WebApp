@@ -145,10 +145,11 @@
       <button
         type="submit"
         class="btn btn-primary"
-        [disabled]="workflowForm.invalid || isSubmitting"
+        [disabled]="workflowForm.invalid || isSubmitting || updateSuccess"
       >
         {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
       </button>
+      <a *ngIf="updateSuccess" class="btn btn-success" [routerLink]="['/workflows', workflow?.id]">View updated workflow</a>
     </div>
   </form>
 </div>

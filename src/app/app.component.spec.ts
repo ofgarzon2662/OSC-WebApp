@@ -188,7 +188,7 @@ describe('AppComponent', () => {
       component.isAuthenticated = false;
       spyOn(router, 'navigate');
 
-      component.onContributeClick();
+      component.onContributeClick('artifact');
 
       expect(toastrService.info).toHaveBeenCalledWith(
         "We'd love to have your contribution, but first Sign in to continue",
@@ -197,13 +197,22 @@ describe('AppComponent', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/auth/sign-in']);
     });
 
-    it('should navigate to contribute page when authenticated', () => {
+    it('should navigate to contribute page when authenticated for artifact', () => {
       component.isAuthenticated = true;
       spyOn(router, 'navigate');
 
-      component.onContributeClick();
+      component.onContributeClick('artifact');
 
       expect(router.navigate).toHaveBeenCalledWith(['/contribute']);
+    });
+
+    it('should navigate to create-workflow page when authenticated for workflow', () => {
+      component.isAuthenticated = true;
+      spyOn(router, 'navigate');
+
+      component.onContributeClick('workflow');
+
+      expect(router.navigate).toHaveBeenCalledWith(['/create-workflow']);
     });
   });
 

@@ -21,6 +21,7 @@ import { of } from 'rxjs';
 export class UpdateWorkflowComponent implements OnInit {
   workflowForm: FormGroup;
   isSubmitting = false;
+  updateSuccess = false;
   workflow?: Workflow;
 
   // Artifact picker
@@ -287,6 +288,7 @@ export class UpdateWorkflowComponent implements OnInit {
 
     this.workflowService.updateWorkflow(this.workflow.id, dto).subscribe({
       next: () => {
+        this.updateSuccess = true;
         this.toastr.success(
           'Workflow updated successfully!',
           'Success!',
