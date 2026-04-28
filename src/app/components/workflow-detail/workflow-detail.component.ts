@@ -16,6 +16,7 @@ export class WorkflowDetailComponent implements OnInit {
   isLoading = true;
   workflowId = '';
   expandedRepos: Set<number> = new Set();
+  idCopied = false;
 
   toggleContents(repoIndex: number): void {
     if (this.expandedRepos.has(repoIndex)) {
@@ -31,6 +32,15 @@ export class WorkflowDetailComponent implements OnInit {
 
   isFolder(filename: string): boolean {
     return filename.endsWith('/');
+  }
+
+  copyId(): void {
+    if (!this.workflow) return;
+    const fullId = 'osc-is-workflow-' + this.workflow.id;
+    navigator.clipboard.writeText(fullId).then(() => {
+      this.idCopied = true;
+      setTimeout(() => this.idCopied = false, 2000);
+    });
   }
 
   constructor(

@@ -22,7 +22,14 @@
             <tbody>
               <tr>
                 <th>ID</th>
-                <td>{{ 'osc-is-artifact-' + artifact.id }}</td>
+                <td class="monospace">
+                  {{ 'osc-is-artifact-' + artifact.id }}
+                  <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn"
+                    title="Copy ID to clipboard"
+                    (click)="copyId()">
+                    <i class="bi" [ngClass]="idCopied ? 'bi-check-lg text-success' : 'bi-clipboard'"></i>
+                  </button>
+                </td>
               </tr>
               <tr *ngIf="artifact.organization?.name">
                 <th>Organization</th>

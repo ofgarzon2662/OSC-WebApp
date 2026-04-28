@@ -29,7 +29,14 @@
             <tbody>
               <tr>
                 <th>ID</th>
-                <td class="monospace">{{ workflow.id }}</td>
+                <td class="monospace">
+                  {{ 'osc-is-workflow-' + workflow.id }}
+                  <button class="btn btn-sm btn-outline-secondary ms-2 copy-btn"
+                    title="Copy ID to clipboard"
+                    (click)="copyId()">
+                    <i class="bi" [ngClass]="idCopied ? 'bi-check-lg text-success' : 'bi-clipboard'"></i>
+                  </button>
+                </td>
               </tr>
               <tr>
                 <th>Submitter</th>

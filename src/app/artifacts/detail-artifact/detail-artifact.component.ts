@@ -18,6 +18,7 @@ export class DetailArtifactComponent implements OnInit {
   isLoading = true;
   showBlockchain = false;
   showPeer = false;
+  idCopied = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -37,6 +38,15 @@ export class DetailArtifactComponent implements OnInit {
         this.artifact = detail || undefined;
         this.isLoading = false;
       });
+  }
+
+  copyId(): void {
+    if (!this.artifact) return;
+    const fullId = 'osc-is-artifact-' + this.artifact.id;
+    navigator.clipboard.writeText(fullId).then(() => {
+      this.idCopied = true;
+      setTimeout(() => this.idCopied = false, 2000);
+    });
   }
 
   printManifest(): void {
