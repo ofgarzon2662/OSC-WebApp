@@ -19,10 +19,12 @@ export const authInterceptor: HttpInterceptorFn = (
   const router = inject(Router);
   const toastr = inject(ToastrService);
 
-  // Only attach token and handle 401 for our own API (relative URLs or same-origin absolute URLs)
+  // Only attach token and handle 401 for our own API
+  const apiBaseUrl = window.__RUNTIME_CONFIG__?.['API_BASE_URL'] as string | undefined;
   const isInternalRequest = !request.url.startsWith('http')
     || request.url.startsWith(window.location.origin)
-    || request.url.startsWith('/api/');
+    || request.url.startsWith('/api/')
+    || (!!apiBaseUrl && request.url.startsWith(apiBaseUrl));
 
   if (isInternalRequest) {
     const token = authService.getToken();
