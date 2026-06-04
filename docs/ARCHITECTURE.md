@@ -159,7 +159,7 @@ sequenceDiagram
     U->>APP: credentials
     APP->>GW: POST /users/login
     GW-->>APP: JWT
-    APP->>APP: store token + expiry; decode roles
+    APP->>APP: store token + expiry, decode roles
     Note over APP: route guards + role-aware UI
     U->>APP: navigate /contribute
     APP->>APP: canCreateArtifactGuard (PI/Collaborator?)
