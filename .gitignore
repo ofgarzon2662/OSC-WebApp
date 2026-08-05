@@ -55,3 +55,6 @@ random_files/
 bigfile.bin
 
 src/assets/runtime-config.json
+# Python security tooling
+__pycache__/
+*.py[cod]

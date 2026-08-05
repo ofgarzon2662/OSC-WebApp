@@ -1,12 +1,19 @@
-FROM node:20-alpine AS build
+FROM node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 AS build
 
 WORKDIR /app
-COPY package*.json ./
-RUN HUSKY=0 npm ci
+RUN apk add --no-cache python3
+COPY package.json package-lock.json .npmrc ./
+COPY scripts/security/check_npm_supply_chain.py ./scripts/security/check_npm_supply_chain.py
+COPY security/npm-malware-blocklist.csv security/npm-lifecycle-allowlist.json ./security/
+RUN python3 scripts/security/check_npm_supply_chain.py --repo . --offline-reviewed --skip-installed \
+    && npm ci --ignore-scripts --no-audit --fund=false \
+    && npm audit signatures \
+    && npm rebuild @parcel/watcher@2.5.6 cypress@14.5.4 esbuild@0.25.4 esbuild@0.25.12 lmdb@3.2.6 msgpackr-extract@3.0.3 --ignore-scripts=false \
+    && python3 scripts/security/check_npm_supply_chain.py --repo . --offline-reviewed
 COPY . .
 RUN npm run build:production
 
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 AS runtime
 
 ENV API_UPSTREAM=http://api-gateway:3000
 ENV NGINX_ENVSUBST_FILTER=API_UPSTREAM
