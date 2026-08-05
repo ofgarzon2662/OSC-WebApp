@@ -1,20 +1,56 @@
-<div class="workflows-container">
-  <h1 class="main-title">Workflows</h1>
-  <div class="title-divider"></div>
+<main class="catalog-page" aria-labelledby="workflows-heading">
+  <header class="page-header">
+    <p class="eyebrow">Reproducible processes</p>
+    <h1 id="workflows-heading">Workflows</h1>
+    <p>Explore documented processes and the research artifacts they connect.</p>
+  </header>
 
-  <div class="content-wrapper">
-    <p class="subtitle">Discover & Explore Workflows</p>
+  <section class="results" aria-labelledby="workflow-results-heading">
+    <div class="results-heading">
+      <h2 id="workflow-results-heading">Workflow catalog</h2>
+      <p *ngIf="!isLoading && !errorMessage" role="status" aria-live="polite">
+        {{ workflows.length }}
+        {{ workflows.length === 1 ? 'workflow' : 'workflows' }} available
+      </p>
+    </div>
 
-    <main class="workflows-grid" *ngIf="!isLoading; else loading">
-      <div class="workflow-card-wrapper" *ngFor="let workflow of workflows">
-        <app-workflow-card [workflow]="workflow"></app-workflow-card>
+    <div *ngIf="isLoading" class="state-message" role="status">
+      <span class="loading-spinner" aria-hidden="true"></span>
+      <div>
+        <strong>Loading workflows</strong>
+        <p>Retrieving the latest documented processes.</p>
       </div>
-      <p *ngIf="workflows.length === 0">No workflows available.</p>
-    </main>
-  </div>
+    </div>
 
-  <ng-template #loading>
-    <p class="loading-message">Loading workflows...</p> 
-  </ng-template>
-</div>
+    <div *ngIf="errorMessage" class="state-message state-error" role="alert">
+      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <div>
+        <strong>We could not load the workflow catalog</strong>
+        <p>{{ errorMessage }}</p>
+        <button type="button" (click)="loadWorkflows()">Try again</button>
+      </div>
+    </div>
 
+    <div
+      class="workflows-grid"
+      *ngIf="!isLoading && !errorMessage && workflows.length > 0"
+    >
+      <app-workflow-card
+        *ngFor="let workflow of workflows"
+        [workflow]="workflow"
+      ></app-workflow-card>
+    </div>
+
+    <div
+      *ngIf="!isLoading && !errorMessage && workflows.length === 0"
+      class="state-message"
+      role="status"
+    >
+      <i class="bi bi-diagram-3" aria-hidden="true"></i>
+      <div>
+        <strong>No workflows yet</strong>
+        <p>The first documented workflow will appear here.</p>
+      </div>
+    </div>
+  </section>
+</main>

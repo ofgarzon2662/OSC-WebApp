@@ -1,120 +1,119 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { filter } from 'rxjs/operators';
-import { ArtifactsPreviewComponent } from './components/artifacts-preview/artifacts-preview.component';
-import { WorkflowsPreviewComponent } from './components/workflows-preview/workflows-preview.component';
-import { AuthService } from './auth/auth.service';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { filter } from 'rxjs/operators';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    NgbModule,
-    ArtifactsPreviewComponent,
-    WorkflowsPreviewComponent
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  // Por ahora, esta propiedad es falsa, pero en el futuro
-  // se actualizará basándose en el estado real de autenticación
   isAuthenticated = false;
-
-  // Bandera para mostrar/ocultar el botón de volver atrás
   showBackButton = false;
+  mobileNavigationOpen = false;
+  contributeMenuOpen = false;
+  title = 'Open Science Chain';
+  logoError = false;
 
-  // Lista de rutas donde quieres mostrar el botón de retroceso
-  private readonly routesWithBackButton: string[] = [
-    '/auth/sign-in',
-    // Puedes añadir más rutas aquí según necesites
-    // '/otra-ruta',
-    // '/otra-ruta/sub-ruta',
-  ];
+  private readonly routesWithBackButton = ['/auth/sign-in'];
 
   constructor(
     public router: Router,
     private readonly location: Location,
     private readonly authService: AuthService,
-    private readonly toastr: ToastrService
+    private readonly toastr: ToastrService,
   ) {
     this.authService.isAuthenticated$.subscribe(
-      isAuth => this.isAuthenticated = isAuth
+      (isAuthenticated) => (this.isAuthenticated = isAuthenticated),
     );
   }
 
-  ngOnInit() {
-    // Suscribirse a los eventos de navegación
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.updateBackButtonVisibility();
-    });
+  ngOnInit(): void {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateBackButtonVisibility();
+        this.closeNavigation();
+      });
 
-    // Verificar al inicio
     this.updateBackButtonVisibility();
   }
 
-  // Método para actualizar la visibilidad del botón de volver atrás
-  private updateBackButtonVisibility() {
-    const currentUrl = this.router.url;
-    console.log('Current URL:', currentUrl);
-
-    // Verificar si la URL actual está en la lista de rutas con botón de retroceso
-    this.showBackButton = this.routesWithBackButton.some(route =>
-      currentUrl.startsWith(route)
-    );
-
-    console.log('Show back button:', this.showBackButton);
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeNavigation();
   }
 
-  // Método para verificar si estamos en una ruta de autenticación
+  private updateBackButtonVisibility(): void {
+    const currentUrl = this.router.url;
+    this.showBackButton = this.routesWithBackButton.some((route) =>
+      currentUrl.startsWith(route),
+    );
+  }
+
   isAuthRoute(): boolean {
     return this.router.url.startsWith('/auth');
   }
 
-  // Método para volver atrás
   goBack(): void {
     if (this.router.url.includes('/auth/')) {
-      this.router.navigate(['/']); // Volver a la página principal desde auth
+      this.router.navigate(['/']);
     } else {
-      this.location.back(); // Comportamiento predeterminado del navegador
+      this.location.back();
     }
   }
 
-  // Método para cerrar sesión (implementación futura)
+  toggleMobileNavigation(): void {
+    this.mobileNavigationOpen = !this.mobileNavigationOpen;
+    if (!this.mobileNavigationOpen) {
+      this.contributeMenuOpen = false;
+    }
+  }
+
+  toggleContributeMenu(): void {
+    this.contributeMenuOpen = !this.contributeMenuOpen;
+  }
+
+  closeNavigation(): void {
+    this.mobileNavigationOpen = false;
+    this.contributeMenuOpen = false;
+  }
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
+        this.closeNavigation();
         this.toastr.success('Successfully signed out', 'Goodbye!');
       },
       error: (error) => {
         console.error('Logout error:', error);
-        // Still show success message since we're cleaning up the session anyway
+        this.closeNavigation();
         this.toastr.success('Successfully signed out', 'Goodbye!');
-      }
+      },
     });
   }
 
-  title = 'OSC-WebApp';
-  logoError = false;
-
   onContributeClick(type: 'artifact' | 'workflow'): void {
+    this.closeNavigation();
     if (!this.isAuthenticated) {
-      this.toastr.info("We'd love to have your contribution, but first Sign in to continue", 'Welcome!');
+      this.toastr.info(
+        "We'd love to have your contribution, but first Sign in to continue",
+        'Welcome!',
+      );
       this.router.navigate(['/auth/sign-in']);
-    } else {
-      const route = type === 'workflow' ? '/create-workflow' : '/contribute';
-      this.router.navigate([route]);
+      return;
     }
+
+    const route = type === 'workflow' ? '/create-workflow' : '/contribute';
+    this.router.navigate([route]);
   }
 
-  onLogoError() {
+  onLogoError(): void {
     this.logoError = true;
     console.error('Error loading logo image');
   }

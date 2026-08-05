@@ -11,7 +11,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 @Component({
   selector: 'app-workflow-card',
   template: '<div>{{workflow.title}}</div>',
-  standalone: true
+  standalone: true,
 })
 class MockWorkflowCardComponent {
   @Input() workflow!: WorkflowListItem;
@@ -35,7 +35,7 @@ const mockWorkflows: WorkflowListItem[] = [
     submissionState: 'SUCCESS',
     submittedAt: new Date(),
     updatedAt: null as any,
-  }
+  },
 ];
 
 class MockWorkflowService {
@@ -55,11 +55,9 @@ describe('WorkflowsPreviewComponent', () => {
         CommonModule,
         RouterTestingModule,
         WorkflowsPreviewComponent,
-        MockWorkflowCardComponent
+        MockWorkflowCardComponent,
       ],
-      providers: [
-        { provide: WorkflowService, useClass: MockWorkflowService }
-      ]
+      providers: [{ provide: WorkflowService, useClass: MockWorkflowService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(WorkflowsPreviewComponent);
@@ -78,19 +76,28 @@ describe('WorkflowsPreviewComponent', () => {
   });
 
   it('should display the section title', () => {
-    const titleElement = fixture.debugElement.query(By.css('.section-title'));
+    const titleElement = fixture.debugElement.query(
+      By.css('.preview-heading h3'),
+    );
     expect(titleElement).toBeTruthy();
     expect(titleElement.nativeElement.textContent).toContain('Workflows');
   });
 
-  it('should display a "VIEW ALL" link', () => {
-    const linkElement = fixture.debugElement.query(By.css('.view-all-link'));
+  it('should display a link to the workflow catalog', () => {
+    const linkElement = fixture.debugElement.query(
+      By.css('.preview-heading a'),
+    );
     expect(linkElement).toBeTruthy();
-    expect(linkElement.nativeElement.textContent.trim()).toBe('VIEW ALL');
+    expect(linkElement.nativeElement.textContent).toContain(
+      'View all workflows',
+    );
+    expect(linkElement.attributes['href']).toBe('/list-workflows');
   });
 
   it('should render workflow cards for each workflow', () => {
-    const cardElements = fixture.debugElement.queryAll(By.css('app-workflow-card'));
+    const cardElements = fixture.debugElement.queryAll(
+      By.css('app-workflow-card'),
+    );
     expect(cardElements.length).toBe(2);
   });
 

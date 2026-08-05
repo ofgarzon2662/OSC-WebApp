@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { Component } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
@@ -15,29 +14,14 @@ const mockToastr = {
   success: jasmine.createSpy('success'),
   error: jasmine.createSpy('error'),
   warning: jasmine.createSpy('warning'),
-  info: jasmine.createSpy('info')
+  info: jasmine.createSpy('info'),
 };
 
 const mockAuthService = {
   logout: jasmine.createSpy('logout').and.returnValue(of({})),
   isAuthenticated$: of(false),
-  getToken: jasmine.createSpy('getToken').and.returnValue('mock-token')
+  getToken: jasmine.createSpy('getToken').and.returnValue('mock-token'),
 };
-
-// Crear componentes mock como standalone
-@Component({
-  selector: 'app-artifacts-preview',
-  template: '',
-  standalone: true
-})
-class MockArtifactsPreviewComponent {}
-
-@Component({
-  selector: 'app-workflows-preview',
-  template: '',
-  standalone: true
-})
-class MockWorkflowsPreviewComponent {}
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -58,13 +42,11 @@ describe('AppComponent', () => {
         NgbModule,
         HttpClientTestingModule,
         AppComponent,
-        MockArtifactsPreviewComponent,
-        MockWorkflowsPreviewComponent
       ],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
-        { provide: ToastrService, useValue: mockToastr }
-      ]
+        { provide: ToastrService, useValue: mockToastr },
+      ],
     }).compileComponents();
 
     router = TestBed.inject(Router);
@@ -74,7 +56,7 @@ describe('AppComponent', () => {
 
     // Mock para router.events
     Object.defineProperty(router, 'events', {
-      get: () => routerEventsSubject.asObservable()
+      get: () => routerEventsSubject.asObservable(),
     });
 
     // Configurar la URL actual para las pruebas
@@ -98,32 +80,31 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement;
     const logo = compiled.querySelector('img');
     expect(logo).toBeTruthy();
-    expect(logo.src).toContain('assets/images/OpenScienceChain_logo_horiz_white.png');
+    expect(logo.src).toContain('assets/images/osc-logo-white-transparent.png');
+    expect(logo.alt).toBe('Open Science Chain');
   });
 
-  it('should have Contribute and Sign in links', () => {
+  it('should expose the primary product navigation', () => {
     const compiled = fixture.nativeElement;
-    const links = compiled.querySelectorAll('a');
-
-    // Verificar que existan al menos dos enlaces
-    expect(links.length).toBeGreaterThanOrEqual(2);
-
-    // Usar forEach para construir el array de textos
-    const linkTexts = Array.from<Element, string>(links, (link) =>
-      (link as HTMLAnchorElement).textContent?.trim() ?? '');
-
-    expect(linkTexts).toContain('Contribute');
-    expect(linkTexts).toContain('Sign In');
+    const navigation = compiled.querySelector(
+      'nav[aria-label="Primary navigation"]',
+    );
+    expect(navigation).toBeTruthy();
+    expect(navigation.textContent).toContain('Artifacts');
+    expect(navigation.textContent).toContain('Workflows');
+    expect(navigation.textContent).toContain('Contribute');
+    expect(navigation.textContent).toContain('Sign in');
   });
 
-  it('should include artifacts-preview component', () => {
+  it('should provide a skip link to routed content', () => {
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('app-artifacts-preview')).toBeTruthy();
+    const skipLink = compiled.querySelector('.skip-link');
+    expect(skipLink.getAttribute('href')).toBe('#main-content');
   });
 
-  it('should include workflows-preview component', () => {
+  it('should render routed page content through a router outlet', () => {
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('app-workflows-preview')).toBeTruthy();
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 
   // Pruebas para los métodos no cubiertos
@@ -162,28 +143,42 @@ describe('AppComponent', () => {
       spyOn(router, 'navigate');
       component.logout();
       expect(authService.logout).toHaveBeenCalled();
-      expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
+      expect(toastrService.success).toHaveBeenCalledWith(
+        'Successfully signed out',
+        'Goodbye!',
+      );
     });
 
     it('should handle logout error gracefully', () => {
       const error = new Error('Logout failed');
-      // Guardar la implementación original
-      const originalLogout = authService.logout;
       // Configurar temporalmente para que devuelva un error
-      (authService.logout as jasmine.Spy).and.returnValue(throwError(() => error));
+      (authService.logout as jasmine.Spy).and.returnValue(
+        throwError(() => error),
+      );
       spyOn(console, 'error');
 
       component.logout();
 
       expect(console.error).toHaveBeenCalledWith('Logout error:', error);
-      expect(toastrService.success).toHaveBeenCalledWith('Successfully signed out', 'Goodbye!');
-      
+      expect(toastrService.success).toHaveBeenCalledWith(
+        'Successfully signed out',
+        'Goodbye!',
+      );
+
       // Restaurar la implementación original después de la prueba
       (authService.logout as jasmine.Spy).and.returnValue(of({}));
     });
   });
 
   describe('Contribute Navigation', () => {
+    it('should toggle and close the contribution menu with Escape', () => {
+      component.toggleContributeMenu();
+      expect(component.contributeMenuOpen).toBeTrue();
+
+      component.onEscape();
+      expect(component.contributeMenuOpen).toBeFalse();
+    });
+
     it('should show info message and navigate to sign-in when not authenticated', () => {
       component.isAuthenticated = false;
       spyOn(router, 'navigate');
@@ -192,7 +187,7 @@ describe('AppComponent', () => {
 
       expect(toastrService.info).toHaveBeenCalledWith(
         "We'd love to have your contribution, but first Sign in to continue",
-        'Welcome!'
+        'Welcome!',
       );
       expect(router.navigate).toHaveBeenCalledWith(['/auth/sign-in']);
     });

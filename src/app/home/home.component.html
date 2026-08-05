@@ -1,0 +1,275 @@
+<main>
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-content">
+      <p class="eyebrow">Blockchain-backed scientific provenance</p>
+      <h1 id="hero-heading" aria-label="Open Science Chain">
+        <span>Open Science</span> <span>Chain</span>
+      </h1>
+      <p class="hero-copy">
+        Register datasets, software, and workflows with authorship, file hashes,
+        and revisions anchored in a permissioned blockchain.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-primary" routerLink="/list-artifacts">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          Explore artifacts
+        </a>
+        <a class="button button-secondary" href="#provenance">
+          See how it works
+          <i class="bi bi-arrow-down" aria-hidden="true"></i>
+        </a>
+      </div>
+      <ul class="hero-proof" aria-label="What Open Science Chain preserves">
+        <li>
+          <i class="bi bi-file-earmark-check" aria-hidden="true"></i>
+          <span><strong>Artifact</strong> Research output</span>
+        </li>
+        <li>
+          <i class="bi bi-fingerprint" aria-hidden="true"></i>
+          <span><strong>Fingerprint</strong> SHA-256 file hashes</span>
+        </li>
+        <li>
+          <i class="bi bi-boxes" aria-hidden="true"></i>
+          <span><strong>Ledger</strong> Tamper-evident history</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="audiences" class="audiences" aria-labelledby="audiences-heading">
+    <div class="content-width">
+      <div class="section-heading">
+        <p class="eyebrow">Choose your path</p>
+        <h2 id="audiences-heading">Research records that stay useful</h2>
+        <p>
+          OSC connects research outputs to the people, processes, and changes
+          behind them, whether you are discovering work or contributing your
+          own.
+        </p>
+      </div>
+
+      <div class="audience-grid">
+        <article>
+          <span class="audience-number">01</span>
+          <i class="bi bi-compass" aria-hidden="true"></i>
+          <h3>Discover research</h3>
+          <p>
+            Search artifacts with their contributors, keywords, and verification
+            details still attached.
+          </p>
+          <a routerLink="/list-artifacts">
+            Browse artifacts
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+        <article>
+          <span class="audience-number">02</span>
+          <i class="bi bi-box-arrow-up" aria-hidden="true"></i>
+          <h3>Share your work</h3>
+          <p>
+            Register a dataset, publication, or software package with a durable
+            submission record.
+          </p>
+          <a routerLink="/auth/sign-in">
+            Sign in to contribute
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+        <article>
+          <span class="audience-number">03</span>
+          <i class="bi bi-diagram-3" aria-hidden="true"></i>
+          <h3>Reproduce a process</h3>
+          <p>
+            Follow documented workflows and understand how scientific outputs
+            were produced.
+          </p>
+          <a routerLink="/list-workflows">
+            Explore workflows
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="provenance"
+    class="provenance"
+    aria-labelledby="provenance-heading"
+  >
+    <div class="content-width provenance-layout">
+      <div class="section-heading provenance-intro">
+        <p class="eyebrow">Why provenance matters</p>
+        <h2 id="provenance-heading">Evidence that travels with the work</h2>
+        <p>
+          OSC records provenance events through Hyperledger Fabric, a
+          permissioned blockchain. Metadata, file fingerprints, authorship,
+          organization, and revisions stay connected in an append-only history
+          that collaborators can inspect later.
+        </p>
+        <a class="text-link" routerLink="/list-artifacts">
+          Inspect a research record
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <ol class="provenance-steps">
+        <li>
+          <span aria-hidden="true">01</span>
+          <div>
+            <strong>Describe the output</strong>
+            <p>
+              Hash files locally and capture their manifest, contributors, and
+              research context.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span aria-hidden="true">02</span>
+          <div>
+            <strong>Commit a provenance event</strong>
+            <p>
+              Chaincode validates the record and commits a traceable transaction
+              through the permissioned network.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span aria-hidden="true">03</span>
+          <div>
+            <strong>Verify and reuse later</strong>
+            <p>
+              Compare fingerprints and inspect every accepted revision without
+              relying on one database administrator's audit log.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="blockchain" aria-labelledby="blockchain-heading">
+    <div class="content-width blockchain-layout">
+      <div class="blockchain-copy">
+        <p class="eyebrow">What the blockchain adds</p>
+        <h2 id="blockchain-heading">
+          Trust infrastructure that stays out of the way
+        </h2>
+        <p>
+          Researchers use familiar forms and catalogs. OSC handles the ledger
+          transaction behind the scenes and returns evidence that can be checked
+          by collaborators, organizations, and future maintainers.
+        </p>
+        <ul>
+          <li>
+            <i class="bi bi-check2" aria-hidden="true"></i>
+            <span
+              ><strong>No wallet or cryptocurrency.</strong> Approved
+              organizations manage identities.</span
+            >
+          </li>
+          <li>
+            <i class="bi bi-check2" aria-hidden="true"></i>
+            <span
+              ><strong>Research files stay off-chain.</strong> OSC records their
+              fingerprints and context.</span
+            >
+          </li>
+          <li>
+            <i class="bi bi-check2" aria-hidden="true"></i>
+            <span
+              ><strong>Updates do not erase history.</strong> Each accepted
+              revision becomes a new event.</span
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div
+        class="ledger-example"
+        aria-label="Example OSC blockchain provenance event"
+      >
+        <div class="ledger-example-heading">
+          <span>Example provenance event</span>
+          <strong
+            ><i class="bi bi-shield-check" aria-hidden="true"></i>
+            Confirmed</strong
+          >
+        </div>
+        <ol>
+          <li>
+            <span>01</span>
+            <div>
+              <strong>Record prepared</strong>
+              <p>
+                Metadata and SHA-256 manifest are linked to the contributor and
+                NSG.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <strong>Transaction committed</strong>
+              <p>
+                Fabric chaincode records the event and returns a transaction ID.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <strong>Evidence available</strong>
+              <p>
+                The portal exposes the manifest, organization, timestamp, and
+                revision history.
+              </p>
+            </div>
+          </li>
+        </ol>
+        <dl>
+          <div>
+            <dt>Transaction</dt>
+            <dd>7c6f65d9...ff02822</dd>
+          </div>
+          <div>
+            <dt>Organization</dt>
+            <dd>Neuroscience Gateway</dd>
+          </div>
+          <div>
+            <dt>Network</dt>
+            <dd>Permissioned Hyperledger Fabric</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="community" aria-labelledby="community-heading">
+    <div class="content-width community-layout">
+      <div>
+        <p class="eyebrow">A shared research infrastructure</p>
+        <h2 id="community-heading">Designed for distinct communities</h2>
+      </div>
+      <p>
+        Neuroscience Gateway and Citizen Science can manage their own people and
+        contributions while participating in the same provenance network.
+      </p>
+      <ul aria-label="Participating organizations">
+        <li><strong>NSG</strong><span>Neuroscience Gateway</span></li>
+        <li><strong>CS</strong><span>Citizen Science</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="catalog" aria-labelledby="catalog-heading">
+    <div class="content-width">
+      <div class="section-heading catalog-heading">
+        <p class="eyebrow">From the catalog</p>
+        <h2 id="catalog-heading">See what the community is preserving</h2>
+      </div>
+      <app-artifacts-preview></app-artifacts-preview>
+      <app-workflows-preview></app-workflows-preview>
+    </div>
+  </section>
+</main>

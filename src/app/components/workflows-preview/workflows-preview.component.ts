@@ -11,18 +11,34 @@ import { map } from 'rxjs/operators';
   templateUrl: './workflows-preview.component.html',
   styleUrls: ['./workflows-preview.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule, WorkflowCardComponent]
+  imports: [CommonModule, RouterModule, WorkflowCardComponent],
 })
 export class WorkflowsPreviewComponent implements OnInit {
   workflows: WorkflowListItem[] = [];
+  isLoading = true;
+  hasError = false;
 
-  constructor(private readonly workflowService: WorkflowService) { }
+  constructor(private readonly workflowService: WorkflowService) {}
 
   ngOnInit(): void {
-    this.workflowService.getWorkflows().pipe(
-      map(workflows => workflows.slice(0, 3))
-    ).subscribe(workflows => {
-      this.workflows = workflows;
-    });
+    this.loadWorkflows();
+  }
+
+  loadWorkflows(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.workflowService
+      .getWorkflows()
+      .pipe(map((workflows) => workflows.slice(0, 3)))
+      .subscribe({
+        next: (workflows) => {
+          this.workflows = workflows;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.hasError = true;
+          this.isLoading = false;
+        },
+      });
   }
 }

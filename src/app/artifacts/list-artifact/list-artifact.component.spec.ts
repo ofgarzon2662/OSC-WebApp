@@ -30,7 +30,11 @@ describe('ListArtifactComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListArtifactComponent, HttpClientTestingModule, RouterTestingModule],
+      imports: [
+        ListArtifactComponent,
+        HttpClientTestingModule,
+        RouterTestingModule,
+      ],
       providers: [ArtifactService],
     }).compileComponents();
 
@@ -67,7 +71,7 @@ describe('ListArtifactComponent', () => {
       component.titleSearchTerm = 'Artifact 1';
       component.onSearch();
       expect(component.filteredArtifacts.length).not.toBe(20);
-      
+
       component.titleSearchTerm = '';
       component.onSearch();
       expect(component.filteredArtifacts.length).toBe(20);
@@ -108,7 +112,7 @@ describe('ListArtifactComponent', () => {
       const fiftyArtifacts = createMockArtifacts(50);
       component.allArtifacts = fiftyArtifacts;
       component.filteredArtifacts = fiftyArtifacts;
-      component.itemsPerPage = 5; 
+      component.itemsPerPage = 5;
       fixture.detectChanges();
     });
 
@@ -124,4 +128,4 @@ describe('ListArtifactComponent', () => {
       expect(component.getPages()).toEqual([]);
     });
   });
-}); 
+});

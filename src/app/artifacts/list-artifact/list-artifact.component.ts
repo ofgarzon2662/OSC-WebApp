@@ -10,18 +10,18 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, ArtifactCardComponent, FormsModule],
   templateUrl: './list-artifact.component.html',
-  styleUrls: ['./list-artifact.component.css']
+  styleUrls: ['./list-artifact.component.css'],
 })
 export class ListArtifactComponent implements OnInit {
-  // State
   isLoading = true;
+  errorMessage = '';
   allArtifacts: Artifact[] = [];
   filteredArtifacts: Artifact[] = [];
   paginatedArtifacts: Artifact[] = [];
   titleSearchTerm = '';
   keywordSearchTerm = '';
   searchOperator = 'OR';
-  
+
   // Pagination
   currentPage = 1;
   itemsPerPage = 6;
@@ -29,11 +29,24 @@ export class ListArtifactComponent implements OnInit {
   constructor(private readonly artifactService: ArtifactService) {}
 
   ngOnInit(): void {
-    this.artifactService.getArtifacts().subscribe(artifacts => {
-      this.allArtifacts = artifacts;
-      this.filteredArtifacts = artifacts;
-      this.isLoading = false;
-      this.refreshView();
+    this.loadArtifacts();
+  }
+
+  loadArtifacts(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.artifactService.getArtifacts().subscribe({
+      next: (artifacts) => {
+        this.allArtifacts = artifacts;
+        this.filteredArtifacts = artifacts;
+        this.isLoading = false;
+        this.refreshView();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Artifacts are temporarily unavailable. Check your connection and try again.';
+      },
     });
   }
 
@@ -41,7 +54,7 @@ export class ListArtifactComponent implements OnInit {
     const titleTerm = this.titleSearchTerm.toLowerCase().trim();
     const searchKeywords = this.keywordSearchTerm
       .split(',')
-      .map(k => k.trim().toLowerCase())
+      .map((k) => k.trim().toLowerCase())
       .filter(Boolean);
 
     const keywordTermIsPresent = searchKeywords.length > 0;
@@ -49,13 +62,20 @@ export class ListArtifactComponent implements OnInit {
     if (!titleTerm && !keywordTermIsPresent) {
       this.filteredArtifacts = this.allArtifacts;
     } else {
-      this.filteredArtifacts = this.allArtifacts.filter(artifact => {
-        const titleMatch = titleTerm ? artifact.title.toLowerCase().includes(titleTerm) : false;
-
-        const artifactKeywordsLower = artifact.keywords ? artifact.keywords.map(k => k.toLowerCase()) : [];
-        const keywordMatch = keywordTermIsPresent && artifact.keywords
-          ? searchKeywords.every(searchKeyword => artifactKeywordsLower.includes(searchKeyword))
+      this.filteredArtifacts = this.allArtifacts.filter((artifact) => {
+        const titleMatch = titleTerm
+          ? artifact.title.toLowerCase().includes(titleTerm)
           : false;
+
+        const artifactKeywordsLower = artifact.keywords
+          ? artifact.keywords.map((k) => k.toLowerCase())
+          : [];
+        const keywordMatch =
+          keywordTermIsPresent && artifact.keywords
+            ? searchKeywords.every((searchKeyword) =>
+                artifactKeywordsLower.includes(searchKeyword),
+              )
+            : false;
 
         if (titleTerm && keywordTermIsPresent) {
           if (this.searchOperator === 'AND') {
@@ -83,7 +103,10 @@ export class ListArtifactComponent implements OnInit {
 
   refreshView(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    this.paginatedArtifacts = this.filteredArtifacts.slice(startIndex, startIndex + this.itemsPerPage);
+    this.paginatedArtifacts = this.filteredArtifacts.slice(
+      startIndex,
+      startIndex + this.itemsPerPage,
+    );
   }
 
   get totalPages(): number {
@@ -123,4 +146,4 @@ export class ListArtifactComponent implements OnInit {
     }
     return result;
   }
-} 
+}

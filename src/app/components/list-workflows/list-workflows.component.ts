@@ -9,19 +9,32 @@ import { WorkflowService } from '../../services/workflow.service';
   standalone: true,
   imports: [CommonModule, WorkflowCardComponent],
   templateUrl: './list-workflows.component.html',
-  styleUrls: ['./list-workflows.component.css']
+  styleUrls: ['./list-workflows.component.css'],
 })
 export class ListWorkflowsComponent implements OnInit {
   workflows: WorkflowListItem[] = [];
   isLoading = true;
+  errorMessage = '';
 
-  constructor(private readonly workflowService: WorkflowService) { }
+  constructor(private readonly workflowService: WorkflowService) {}
 
   ngOnInit(): void {
-    this.workflowService.getWorkflows().subscribe(workflows => {
-      this.workflows = workflows;
-      this.isLoading = false;
+    this.loadWorkflows();
+  }
+
+  loadWorkflows(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.workflowService.getWorkflows().subscribe({
+      next: (workflows) => {
+        this.workflows = workflows;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.errorMessage =
+          'Workflows are temporarily unavailable. Check your connection and try again.';
+      },
     });
   }
 }
-

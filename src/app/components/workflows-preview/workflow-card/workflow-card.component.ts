@@ -8,7 +8,7 @@ import { WorkflowListItem } from '../../../models/workflow.model';
   templateUrl: './workflow-card.component.html',
   styleUrls: ['./workflow-card.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule],
 })
 export class WorkflowCardComponent {
   @Input() workflow!: WorkflowListItem;

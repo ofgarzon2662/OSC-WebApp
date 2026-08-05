@@ -11,18 +11,34 @@ import { RouterModule } from '@angular/router';
   templateUrl: './artifacts-preview.component.html',
   styleUrls: ['./artifacts-preview.component.css'],
   standalone: true,
-  imports: [CommonModule, ArtifactCardComponent, RouterModule]
+  imports: [CommonModule, ArtifactCardComponent, RouterModule],
 })
 export class ArtifactsPreviewComponent implements OnInit {
   artifacts: Artifact[] = [];
+  isLoading = true;
+  hasError = false;
 
-  constructor(private readonly artifactService: ArtifactService) { }
+  constructor(private readonly artifactService: ArtifactService) {}
 
   ngOnInit(): void {
-    this.artifactService.getArtifacts().pipe(
-      map(artifacts => artifacts.slice(0, 3))
-    ).subscribe(artifacts => {
-      this.artifacts = artifacts;
-    });
+    this.loadArtifacts();
+  }
+
+  loadArtifacts(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.artifactService
+      .getArtifacts()
+      .pipe(map((artifacts) => artifacts.slice(0, 3)))
+      .subscribe({
+        next: (artifacts) => {
+          this.artifacts = artifacts;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.hasError = true;
+          this.isLoading = false;
+        },
+      });
   }
 }
