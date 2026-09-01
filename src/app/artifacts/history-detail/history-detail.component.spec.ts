@@ -24,6 +24,7 @@ describe('HistoryDetailComponent', () => {
   } as Partial<ArtifactService> as ArtifactService;
 
   beforeEach(async () => {
+    Object.defineProperty(history, 'state', { value: {}, configurable: true });
     await TestBed.configureTestingModule({
       imports: [HistoryDetailComponent],
       providers: [

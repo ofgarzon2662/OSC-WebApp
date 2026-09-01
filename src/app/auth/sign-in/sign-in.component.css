@@ -59,6 +59,29 @@
   line-height: 1.6;
 }
 
+.session-notice {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  margin: -12px 0 24px;
+  padding: 13px 14px;
+  border-left: 4px solid #a97818;
+  background: #fff5d8;
+  color: #5f430d;
+}
+
+.session-notice i {
+  margin-top: 2px;
+}
+.session-notice strong {
+  display: block;
+}
+.session-notice p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -182,7 +205,7 @@ label {
   align-items: flex-end;
   overflow: hidden;
   border-radius: 0 6px 6px 0;
-  background-image: url('/assets/images/provenance-lab-hero-v2.png');
+  background-image: url('/assets/images/research-lab-microscopy-pexels-8940359.jpg');
   background-position: 70% center;
   background-size: cover;
   color: #ffffff;
