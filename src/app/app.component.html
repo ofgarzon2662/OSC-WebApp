@@ -31,6 +31,7 @@
     </div>
 
     <button
+      #navigationToggle
       class="icon-button navigation-toggle"
       type="button"
       aria-controls="primary-navigation-links"
@@ -91,9 +92,10 @@
       <div class="navigation-actions">
         <div class="contribute-dropdown">
           <button
+            #contributeButton
             class="nav-action contribute-button"
             type="button"
-            aria-haspopup="menu"
+            aria-controls="contribute-options"
             [attr.aria-expanded]="contributeMenuOpen"
             (click)="toggleContributeMenu()"
           >
@@ -106,26 +108,17 @@
           </button>
           <div
             *ngIf="contributeMenuOpen"
+            id="contribute-options"
             class="contribute-menu"
-            role="menu"
-            aria-label="Contribution type"
           >
-            <button
-              type="button"
-              role="menuitem"
-              (click)="onContributeClick('artifact')"
-            >
+            <button type="button" (click)="onContributeClick('artifact')">
               <i class="bi bi-box-seam" aria-hidden="true"></i>
               <span>
                 <strong>Artifact</strong>
                 <small>Register data, software, or a publication</small>
               </span>
             </button>
-            <button
-              type="button"
-              role="menuitem"
-              (click)="onContributeClick('workflow')"
-            >
+            <button type="button" (click)="onContributeClick('workflow')">
               <i class="bi bi-diagram-3" aria-hidden="true"></i>
               <span>
                 <strong>Workflow</strong>

@@ -66,7 +66,7 @@ describe('WCAG 2.2 AA regression checks', () => {
     assertNoHorizontalOverflow();
 
     cy.contains('button', 'Contribute').click();
-    cy.get('[role="menu"]').should('be.visible');
+    cy.get('#contribute-options').should('be.visible');
     checkWcag();
   });
 
@@ -79,12 +79,18 @@ describe('WCAG 2.2 AA regression checks', () => {
     cy.get('.navigation-toggle').focus().should('have.focus').click();
     cy.get('#primary-navigation-links').should('be.visible');
     cy.contains('button', 'Contribute').click();
-    cy.get('[role="menu"]').should('be.visible');
+    cy.get('#contribute-options').should('be.visible');
     checkWcag();
     assertNoHorizontalOverflow();
 
-    cy.get('body').type('{esc}');
+    cy.get('#contribute-options button').first().focus().type('{esc}');
+    cy.get('#contribute-options').should('not.exist');
+    cy.contains('button', 'Contribute')
+      .should('have.focus')
+      .and('have.attr', 'aria-expanded', 'false')
+      .type('{esc}');
     cy.get('#primary-navigation-links').should('not.be.visible');
+    cy.get('.navigation-toggle').should('have.focus');
   });
 
   it('checks sign-in validation and expired-session recovery', () => {
@@ -166,6 +172,26 @@ describe('WCAG 2.2 AA regression checks', () => {
     ).should('be.visible');
     checkWcag();
     assertNoHorizontalOverflow();
+  });
+
+  it('keeps a route heading when artifact and workflow APIs fail', () => {
+    cy.intercept('GET', '**/api/v1/artifacts/artifact-nsg-001', {
+      statusCode: 503,
+      body: { message: 'simulated outage' },
+    }).as('artifactDetailFailure');
+    cy.visit('/artifacts/artifact-nsg-001');
+    cy.wait('@artifactDetailFailure');
+    cy.contains('h1', 'Artifact unavailable').should('be.visible');
+    checkWcag();
+
+    cy.intercept('GET', '**/api/v1/workflows/workflow-nsg-001', {
+      statusCode: 503,
+      body: { message: 'simulated outage' },
+    }).as('workflowDetailFailure');
+    cy.visit('/workflows/workflow-nsg-001');
+    cy.wait('@workflowDetailFailure');
+    cy.contains('h1', 'Workflow unavailable').should('be.visible');
+    checkWcag();
   });
 
   it('checks accepted provenance history on desktop and mobile', () => {

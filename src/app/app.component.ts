@@ -1,5 +1,11 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { filter } from 'rxjs/operators';
@@ -13,6 +19,12 @@ import { AuthService } from './auth/auth.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+  @ViewChild('navigationToggle')
+  private navigationToggle?: ElementRef<HTMLButtonElement>;
+
+  @ViewChild('contributeButton')
+  private contributeButton?: ElementRef<HTMLButtonElement>;
+
   isAuthenticated = false;
   showBackButton = false;
   mobileNavigationOpen = false;
@@ -46,7 +58,16 @@ export class AppComponent implements OnInit {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    this.closeNavigation();
+    if (this.contributeMenuOpen) {
+      this.contributeMenuOpen = false;
+      this.contributeButton?.nativeElement.focus();
+      return;
+    }
+
+    if (this.mobileNavigationOpen) {
+      this.mobileNavigationOpen = false;
+      this.navigationToggle?.nativeElement.focus();
+    }
   }
 
   private updateBackButtonVisibility(): void {
