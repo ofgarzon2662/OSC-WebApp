@@ -136,13 +136,11 @@ export class DemoService {
   }
 
   recordEvent(
-    eventName: 'STATUS_VIEWED' | 'SURVEY_SHOWN' | 'HISTORY_VIEWED',
-    resourceType?: 'artifact' | 'workflow',
-    resourceId?: string,
+    eventName: 'STATUS_VIEWED' | 'SURVEY_SHOWN',
   ): Observable<{ accepted: boolean }> {
     return this.http.post<{ accepted: boolean }>(
       this.url('/events'),
-      { eventName, resourceType, resourceId },
+      { eventName },
       this.mutation(),
     );
   }
