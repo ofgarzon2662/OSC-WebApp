@@ -112,6 +112,23 @@ describe('DemoService', () => {
     http.expectOne('/api/v1/demo/workflows').flush([]);
   });
 
+  it('requests workflow history with the cookie capability only', () => {
+    service.createSession('neuroscience-gateway').subscribe();
+    http.expectOne('/api/v1/demo/session').flush(session);
+
+    service
+      .getWorkflowHistory('22222222-2222-4222-8222-222222222222')
+      .subscribe();
+    const request = http.expectOne(
+      '/api/v1/demo/workflows/22222222-2222-4222-8222-222222222222/history',
+    );
+    expect(request.request.method).toBe('GET');
+    expect(request.request.withCredentials).toBeTrue();
+    expect(request.request.headers.has('Authorization')).toBeFalse();
+    expect(request.request.headers.has('X-Correlation-Id')).toBeTrue();
+    request.flush({ assetType: 'workflow', items: [], total: 0 });
+  });
+
   it('drops expired session metadata before a mutation', () => {
     sessionStorage.setItem(
       'osc-usrse26-demo-session',

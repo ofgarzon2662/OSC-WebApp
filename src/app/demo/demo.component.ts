@@ -105,8 +105,9 @@ export class DemoComponent implements OnInit, OnDestroy {
   workflowSubmitting = false;
   workflowError = '';
   workflowHistoryFor = '';
+  workflowHistory: DemoHistoryItem[] = [];
+  workflowHistoryLoading = false;
   private pendingWorkflowRequestId = '';
-  private viewedWorkflowHistory = new Set<string>();
 
   easeRating = 0;
   provenanceRating = 0;
@@ -396,11 +397,22 @@ export class DemoComponent implements OnInit, OnDestroy {
 
   viewWorkflowHistory(workflow: DemoWorkflow): void {
     this.workflowHistoryFor = workflow.id;
-    if (this.viewedWorkflowHistory.has(workflow.id)) return;
-    this.viewedWorkflowHistory.add(workflow.id);
-    this.demo.recordEvent('HISTORY_VIEWED', 'workflow', workflow.id).subscribe({
-      next: () => this.refreshCounters(),
-      error: (error) => this.handleUnauthorized(error),
+    this.workflowHistory = [];
+    this.workflowHistoryLoading = true;
+    this.demo.getWorkflowHistory(workflow.id).subscribe({
+      next: (history) => {
+        this.workflowHistory = history.items || history.history || [];
+        this.workflowHistoryLoading = false;
+        this.refreshCounters();
+      },
+      error: (error) => {
+        this.workflowHistoryLoading = false;
+        this.workflowError = this.errorMessage(
+          error,
+          'Workflow history is temporarily unavailable.',
+        );
+        this.handleUnauthorized(error);
+      },
     });
   }
 

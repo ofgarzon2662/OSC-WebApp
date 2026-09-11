@@ -125,6 +125,16 @@ export class DemoService {
     });
   }
 
+  getWorkflowHistory(id: string): Observable<DemoArtifactHistory> {
+    return this.http.get<DemoArtifactHistory>(
+      this.url(`/workflows/${id}/history`),
+      {
+        headers: new HttpHeaders({ 'X-Correlation-Id': crypto.randomUUID() }),
+        withCredentials: true,
+      },
+    );
+  }
+
   recordEvent(
     eventName: 'STATUS_VIEWED' | 'SURVEY_SHOWN' | 'HISTORY_VIEWED',
     resourceType?: 'artifact' | 'workflow',

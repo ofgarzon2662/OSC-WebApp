@@ -172,6 +172,18 @@ describe("US-RSE'26 interactive demonstration", () => {
     cy.intercept('GET', `**/api/v1/demo/workflows/${workflowId}`, workflow).as(
       'workflowStatus',
     );
+    cy.intercept('GET', `**/api/v1/demo/workflows/${workflowId}/history`, {
+      assetType: 'workflow',
+      artifactId: workflowId,
+      items: [
+        {
+          txId: 'workflow-ledger-transaction',
+          timestamp: opensAt,
+          isDelete: false,
+        },
+      ],
+      total: 1,
+    }).as('workflowHistory');
     cy.intercept('POST', '**/api/v1/demo/feedback', (request) => {
       expect(request.headers['x-demo-csrf']).to.equal('csrf-token');
       expect(request.body).to.deep.equal({
@@ -231,7 +243,8 @@ describe("US-RSE'26 interactive demonstration", () => {
       'workflow-ledger-transaction',
     );
     cy.contains('button', 'Inspect workflow history').click();
-    cy.contains("This workflow's resulting ledger event").should('be.visible');
+    cy.wait('@workflowHistory');
+    cy.contains('code', 'workflow-ledger-transaction').should('be.visible');
 
     cy.get('#ease-rating').select('5');
     cy.get('#provenance-rating').select('4');

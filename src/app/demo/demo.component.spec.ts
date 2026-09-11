@@ -36,6 +36,7 @@ describe('DemoComponent', () => {
       'getArtifactHistory',
       'createWorkflow',
       'getWorkflow',
+      'getWorkflowHistory',
       'recordEvent',
       'submitFeedback',
       'clearSession',

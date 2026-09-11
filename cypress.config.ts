@@ -3,6 +3,7 @@ import { defineConfig } from 'cypress';
 export default defineConfig({
   expose: {
     API_BASE_URL: '',
+    LIVE_DEMO: false,
     USE_STAGING_API: false,
   },
   e2e: {

@@ -455,11 +455,20 @@
         class="history-panel"
         aria-live="polite"
       >
-        <p>This workflow's resulting ledger event:</p>
-        <code>{{ workflow.blockchainTxId || 'Pending confirmation' }}</code>
-        <time [attr.datetime]="workflow.submittedAt">{{
-          workflow.submittedAt | date: 'medium'
-        }}</time>
+        <p *ngIf="workflowHistoryLoading">Loading workflow history…</p>
+        <ol *ngIf="!workflowHistoryLoading && workflowHistory.length">
+          <li *ngFor="let item of workflowHistory">
+            <strong
+              ><code>{{ historyTransaction(item) }}</code></strong
+            >
+            <time *ngIf="item.timestamp" [attr.datetime]="item.timestamp">
+              {{ item.timestamp | date: 'medium' }}
+            </time>
+          </li>
+        </ol>
+        <p *ngIf="!workflowHistoryLoading && !workflowHistory.length">
+          No workflow history is available yet.
+        </p>
       </div>
     </article>
   </section>
