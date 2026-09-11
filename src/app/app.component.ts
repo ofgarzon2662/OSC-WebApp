@@ -10,6 +10,7 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './auth/auth.service';
+import { getRuntimeConfig } from './config/runtime-config';
 
 @Component({
   selector: 'app-root',
@@ -79,6 +80,13 @@ export class AppComponent implements OnInit {
 
   isAuthRoute(): boolean {
     return this.router.url.startsWith('/auth');
+  }
+
+  isDemoExperience(): boolean {
+    return (
+      this.router.url.startsWith('/demo') ||
+      getRuntimeConfig()?.DEMO_MODE === true
+    );
   }
 
   goBack(): void {

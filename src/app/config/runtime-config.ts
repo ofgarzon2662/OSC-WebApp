@@ -2,6 +2,13 @@ import { environment } from '../../environments/environment';
 
 export interface RuntimeConfig {
   API_BASE_URL?: string;
+  DEMO_MODE?: boolean;
+}
+
+declare global {
+  interface Window {
+    __RUNTIME_CONFIG__?: Record<string, unknown>;
+  }
 }
 
 const RUNTIME_CONFIG_KEY = '__runtimeConfig';

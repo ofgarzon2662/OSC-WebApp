@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { canCreateArtifactGuard } from './guards/role.guard';
 import { authGuard } from './guards/auth.guard';
+import { getRuntimeConfig } from './config/runtime-config';
 
 // Componente vacío para la ruta raíz
 export const routes: Routes = [
@@ -9,7 +10,17 @@ export const routes: Routes = [
     path: '',
     pathMatch: 'full',
     loadComponent: () =>
-      import('./home/home.component').then((m) => m.HomeComponent),
+      getRuntimeConfig()?.DEMO_MODE
+        ? import('./demo/demo.component').then((m) => m.DemoComponent)
+        : import('./home/home.component').then((m) => m.HomeComponent),
+  },
+
+  // Stable public conference route. In the dedicated demo bundle the root
+  // route above resolves to this same component without changing product mode.
+  {
+    path: 'demo',
+    loadComponent: () =>
+      import('./demo/demo.component').then((m) => m.DemoComponent),
   },
 
   // Módulo de autenticación

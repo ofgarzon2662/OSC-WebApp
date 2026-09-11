@@ -25,8 +25,9 @@ export const authInterceptor: HttpInterceptorFn = (
     request.url.startsWith(window.location.origin) ||
     request.url.startsWith('/api/') ||
     (!!apiBaseUrl && request.url.startsWith(apiBaseUrl));
+  const isDemoRequest = /\/demo(?:\/|\?|$)/.test(request.url);
 
-  if (isInternalRequest) {
+  if (isInternalRequest && !isDemoRequest) {
     const token = authService.getToken();
     if (token) {
       request = request.clone({
@@ -46,6 +47,7 @@ export const authInterceptor: HttpInterceptorFn = (
       if (
         error.status === 401 &&
         isInternalRequest &&
+        !isDemoRequest &&
         !isAuthenticationRequest &&
         !!authService.getToken()
       ) {
