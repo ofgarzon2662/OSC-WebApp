@@ -1,6 +1,10 @@
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
+  expose: {
+    API_BASE_URL: '',
+    USE_STAGING_API: false,
+  },
   e2e: {
     setupNodeEvents(on, config) {
       on('before:browser:launch', (browser, launchOptions) => {
@@ -13,9 +17,6 @@ export default defineConfig({
     },
     baseUrl: 'http://localhost:4200',
     supportFile: 'cypress/support/e2e.ts',
-    env: {
-      USE_STAGING_API: false,
-    },
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
   },
 });
