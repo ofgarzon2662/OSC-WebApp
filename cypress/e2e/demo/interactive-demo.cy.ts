@@ -215,11 +215,14 @@ describe("US-RSE'26 interactive demonstration", () => {
     cy.contains('guest-1234abcd').should('be.visible');
     cy.get('.organization-card').should('not.exist');
 
-    cy.get('[data-cy="demo-file"]').selectFile({
-      contents: Cypress.Buffer.from('abc'),
-      fileName: 'private-original-name.txt',
-      mimeType: 'text/plain',
-    });
+    cy.get('[data-cy="demo-file"]').selectFile(
+      {
+        contents: Cypress.Buffer.from('abc'),
+        fileName: 'private-original-name.txt',
+        mimeType: 'text/plain',
+      },
+      { force: true },
+    );
     cy.get('[data-cy="fingerprint-summary"] code').should(
       'have.text',
       artifact.fingerprint,

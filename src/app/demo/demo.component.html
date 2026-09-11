@@ -202,10 +202,12 @@
         Choose a non-empty file up to 10 MiB. OSC receives no file bytes and no
         original filename.
       </p>
-      <label class="field-label" for="demo-file">Local file</label>
+      <span class="field-label">Local file</span>
+      <label class="file-picker" for="demo-file">Choose local file</label>
       <input
         id="demo-file"
         data-cy="demo-file"
+        class="file-input-private"
         type="file"
         accept=".csv,.json,.md,.pdf,.png,.tif,.tiff,.txt,.yaml,.yml"
         [disabled]="
@@ -214,6 +216,9 @@
         aria-describedby="file-help"
         (change)="onFileSelected($event)"
       />
+      <span *ngIf="artifactHash" class="file-selected" role="status">
+        Selected locally; filename withheld.
+      </span>
       <p id="file-help" class="field-help">
         Allowed extensions: {{ allowedExtensions }}. The local name is
         deliberately not displayed.
