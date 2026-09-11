@@ -1,144 +1,324 @@
-/* Estilos para el botón de retroceso */
-.back-button {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 35px;
-  padding: 0.25rem;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 2000;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #102f47;
+  font-weight: 700;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-header {
+  position: relative;
+  z-index: 1000;
+  min-height: 72px;
+  background: #163a59;
+  border-bottom: 1px solid #2f5875;
+}
+
+.primary-navigation {
+  width: min(1240px, calc(100% - 40px));
+  min-height: 72px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-left: 10px;
+  justify-content: space-between;
+  gap: 28px;
 }
 
-.back-button:hover {
-  transform: scale(1.1);
+.brand-group,
+.navigation-links,
+.navigation-actions,
+.navigation-panel {
+  display: flex;
+  align-items: center;
 }
 
-.back-button:hover i {
-  transform: translateX(-3px);
+.brand-group {
+  min-width: 228px;
+  gap: 8px;
 }
 
-.btn-back:hover i {
-  transform: translateX(-5px); /* La flecha se mueve ligeramente a la izquierda */
-}
-/* Estilos para la barra de navegación */
-.main-navbar {
-  background-color: #1D3557;
-  padding-top: 1rem !important;    /* Aumentar el padding superior */
-  padding-bottom: 1rem !important; /* Aumentar el padding inferior */
-  height: auto;                    /* Permitir que la altura se ajuste al contenido */
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/* Ajuste para el logo */
-.navbar-brand {
-  margin-left: 0; /* Quitamos el margen izquierdo */
-}
-
-/* Aumentar el tamaño del logo para que el banner se vea más alto */
-.navbar-brand img {
-  width: 70%;
-  height: auto;                    /* Mantén la altura actual o ajústala si es necesario */
-}
-
-/* Estilos para el contenedor del botón de retroceso */
-.back-button-placeholder {
-  width: 10px;
-  visibility: hidden;
-}
-
-/* Estilos para los enlaces de navegación */
-.nav-links {
-  margin-right: 30px;
-}
-
-/* Estilos comunes para los enlaces */
-.nav-link {
-  color: #FFFFFF;
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  color: #ffffff;
+  font-weight: 750;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 24px;
-  font-family: 'Open Sans', sans-serif;
-  padding: 8px 16px;
-  margin: 0 5px;
+}
+
+.brand-link img {
+  display: block;
+  width: 218px;
+  height: auto;
+  max-height: 46px;
+  object-fit: contain;
+}
+
+.navigation-panel {
+  flex: 1;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.navigation-links {
+  gap: 4px;
+}
+
+.nav-link,
+.nav-action,
+.sign-in-button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 4px;
-  transition: all 0.3s ease;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-/* Efecto hover para los enlaces */
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.nav-link {
+  padding: 9px 11px;
+  border-bottom: 3px solid transparent;
 }
 
-/* Estilo específico para el enlace Contribute */
-.contribute-link {
+.nav-link:hover,
+.nav-link.active {
+  background: #254d69;
+  color: #ffffff;
+  border-bottom-color: #79d4c2;
+}
+
+.navigation-actions {
+  gap: 10px;
+}
+
+.nav-action,
+.sign-in-button {
+  padding: 9px 14px;
+  border: 1px solid #83a8bf;
+  background: transparent;
+}
+
+.nav-action:hover,
+.sign-in-button:hover,
+.sign-in-button.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #163a59;
+}
+
+.contribute-button {
+  background: #168071;
+  border-color: #168071;
+}
+
+.contribute-button i {
+  font-size: 12px;
+  transition: transform 160ms ease;
+}
+
+.contribute-button i.rotated {
+  transform: rotate(180deg);
+}
+
+.contribute-dropdown {
   position: relative;
-  overflow: hidden;
-  margin-right: 15px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #FFFFFF;
-  border: 1px solid transparent;
-  font-family: 'Open Sans', sans-serif !important;
 }
 
-.contribute-link:hover::after {
+.contribute-menu {
   position: absolute;
-  right: 10px;
-  animation: slideRight 0.5s ease;
+  top: calc(100% + 9px);
+  right: 0;
+  width: 330px;
+  padding: 7px;
+  border: 1px solid #cbd8df;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(12, 33, 48, 0.2);
 }
 
-@keyframes slideRight {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.contribute-menu button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #19384e;
+  text-align: left;
 }
 
-/* Estilo específico para el enlace Sign in */
-.signin-link {
+.contribute-menu button:hover,
+.contribute-menu button:focus-visible {
+  background: #edf5f4;
+}
+
+.contribute-menu button > i {
+  color: #167568;
   font-size: 20px;
-  font-weight: 600;
-  color: #FFFFFF;
-  font-family: 'Open Sans', sans-serif !important;
+}
+
+.contribute-menu span,
+.contribute-menu strong,
+.contribute-menu small {
+  display: block;
+}
+
+.contribute-menu small {
+  margin-top: 3px;
+  color: #526977;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
 }
 
-.signin-link:hover::after {
-  position: absolute;
-  right: 10px;
-  animation: slideRight 0.5s ease;
+.icon-button:hover {
+  background: #254d69;
 }
 
-.signout-link:hover {
-  background-color: rgba(255, 0, 0, 0.15);
+.navigation-toggle {
+  display: none;
 }
 
-/* Contenedor izquierdo para mantener la flecha y el logo juntos */
-.d-flex.align-items-center {
-  flex-grow: 0; /* Evita que este contenedor crezca y empuje el logo */
+#main-content:focus {
+  outline: none;
 }
 
-/* Botón fijo de volver atrás */
-.fixed-back-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  background-color: rgba(29, 53, 87, 0.8);
-  border-radius: 50%;
-  padding: 10px;
+@media (max-width: 1050px) {
+  .primary-navigation {
+    width: min(100% - 28px, 1240px);
+  }
+
+  .navigation-toggle {
+    display: inline-flex;
+  }
+
+  .navigation-panel {
+    position: absolute;
+    top: 72px;
+    right: 0;
+    left: 0;
+    display: none;
+    align-items: stretch;
+    padding: 14px max(14px, calc((100% - 1240px) / 2));
+    border-top: 1px solid #365c75;
+    border-bottom: 1px solid #cbd8df;
+    background: #163a59;
+    box-shadow: 0 12px 24px rgba(12, 33, 48, 0.18);
+  }
+
+  .navigation-panel-open {
+    display: flex;
+  }
+
+  .navigation-links,
+  .navigation-actions {
+    align-items: stretch;
+  }
+
+  .navigation-links {
+    flex: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header,
+  .primary-navigation {
+    min-height: 64px;
+  }
+
+  .primary-navigation {
+    width: calc(100% - 24px);
+  }
+
+  .brand-group {
+    min-width: 0;
+  }
+
+  .brand-link img {
+    width: 178px;
+    max-height: 39px;
+  }
+
+  .navigation-panel {
+    top: 64px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .navigation-links,
+  .navigation-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-link,
+  .nav-action,
+  .sign-in-button {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 11px 13px;
+  }
+
+  .contribute-dropdown {
+    width: 100%;
+  }
+
+  .contribute-button {
+    justify-content: space-between;
+  }
+
+  .contribute-menu {
+    position: static;
+    width: 100%;
+    margin-top: 6px;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 370px) {
+  .brand-link img {
+    width: 150px;
+  }
+
+  .back-button + .brand-link img {
+    width: 120px;
+  }
 }

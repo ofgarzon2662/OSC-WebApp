@@ -12,7 +12,7 @@ import { Artifact } from '../../models/artifact.model';
 @Component({
   selector: 'app-artifact-card',
   template: '<div></div>',
-  standalone: true
+  standalone: true,
 })
 class MockArtifactCardComponent {
   @Input() artifact!: Artifact;
@@ -20,8 +20,26 @@ class MockArtifactCardComponent {
 
 // Mock Artifact Data
 const mockArtifacts: Artifact[] = [
-  { id: '1', title: 'Test Artifact 1', description: 'Desc 1', keywords: [], submittedAt: new Date().toISOString(), verified: false, lastTimeVerified: null, lastTimeUpdated: null },
-  { id: '2', title: 'Test Artifact 2', description: 'Desc 2', keywords: [], submittedAt: new Date().toISOString(), verified: true, lastTimeVerified: new Date().toISOString(), lastTimeUpdated: null }
+  {
+    id: '1',
+    title: 'Test Artifact 1',
+    description: 'Desc 1',
+    keywords: [],
+    submittedAt: new Date().toISOString(),
+    verified: false,
+    lastTimeVerified: null,
+    lastTimeUpdated: null,
+  },
+  {
+    id: '2',
+    title: 'Test Artifact 2',
+    description: 'Desc 2',
+    keywords: [],
+    submittedAt: new Date().toISOString(),
+    verified: true,
+    lastTimeVerified: new Date().toISOString(),
+    lastTimeUpdated: null,
+  },
 ];
 
 describe('ArtifactsPreviewComponent', () => {
@@ -31,14 +49,18 @@ describe('ArtifactsPreviewComponent', () => {
 
   beforeEach(async () => {
     // Create a spy object for the service
-    mockArtifactService = jasmine.createSpyObj('ArtifactService', ['getArtifacts']);
+    mockArtifactService = jasmine.createSpyObj('ArtifactService', [
+      'getArtifacts',
+    ]);
     mockArtifactService.getArtifacts.and.returnValue(of(mockArtifacts));
 
     await TestBed.configureTestingModule({
-      imports: [ArtifactsPreviewComponent, MockArtifactCardComponent, RouterTestingModule],
-      providers: [
-        { provide: ArtifactService, useValue: mockArtifactService }
-      ]
+      imports: [
+        ArtifactsPreviewComponent,
+        MockArtifactCardComponent,
+        RouterTestingModule,
+      ],
+      providers: [{ provide: ArtifactService, useValue: mockArtifactService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArtifactsPreviewComponent);
@@ -57,15 +79,22 @@ describe('ArtifactsPreviewComponent', () => {
   });
 
   it('should render the correct number of artifact cards', () => {
-    const cardElements = fixture.debugElement.queryAll(By.css('app-artifact-card'));
+    const cardElements = fixture.debugElement.queryAll(
+      By.css('app-artifact-card'),
+    );
     expect(cardElements.length).toEqual(2);
   });
 
-  it('should display the section title and "VIEW ALL" link', () => {
-    const titleEl = fixture.debugElement.query(By.css('.section-title')).nativeElement;
-    const viewAllEl = fixture.debugElement.query(By.css('.view-all-link')).nativeElement;
-    
+  it('should display the section title and catalog link', () => {
+    const titleEl = fixture.debugElement.query(
+      By.css('.preview-heading h3'),
+    ).nativeElement;
+    const viewAllEl = fixture.debugElement.query(
+      By.css('.preview-heading a'),
+    ).nativeElement;
+
     expect(titleEl.textContent).toContain('Artifacts');
-    expect(viewAllEl.textContent).toContain('VIEW ALL');
+    expect(viewAllEl.textContent).toContain('View all artifacts');
+    expect(viewAllEl.getAttribute('href')).toBe('/list-artifacts');
   });
 });

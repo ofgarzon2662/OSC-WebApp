@@ -48,11 +48,13 @@ test-output.txt
 cypress.env.json
 cypress/videos
 cypress/screenshots
-cypress/downloads/downloads.html
+cypress/downloads/
 
 random_files/
 
 bigfile.bin
- 
-# Local runtime config (not committed)
+
 src/assets/runtime-config.json
+# Python security tooling
+__pycache__/
+*.py[cod]

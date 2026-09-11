@@ -7,6 +7,7 @@ export interface ArtifactDetail {
   dois: string[];
   fundingAgencies: string[];
   acknowledgements: string;
+  submission_comment?: string | null;
   footprint: string;
   manifest: Array<{
     hash: string;
@@ -27,4 +28,4 @@ export interface ArtifactDetail {
   organization: {
     name: string;
   };
-} 
+}
